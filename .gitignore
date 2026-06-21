@@ -43,3 +43,10 @@ example
 # generated native folders
 /ios
 /android
+
+# local tooling / editor (non versionné)
+.claude/
+.vscode/
+
+# vérifications de build temporaires
+.expo-export-check/
