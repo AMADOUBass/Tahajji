@@ -27,7 +27,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
-    // L'app mobile n'utilise pas les redirections d'URL pour la session.
+    // On gère les liens (confirmation e-mail) manuellement via deep link.
     detectSessionInUrl: false,
+    // PKCE : recommandé en natif (le lien renvoie un `code` à échanger).
+    flowType: 'pkce',
   },
 });

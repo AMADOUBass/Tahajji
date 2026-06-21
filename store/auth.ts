@@ -6,6 +6,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { create } from 'zustand';
 
+import { authRedirectTo } from '@/lib/authRedirect';
 import { supabase } from '@/lib/supabase';
 
 interface AuthResult {
@@ -53,7 +54,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signUp: async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: authRedirectTo },
+    });
     if (error) return { error: error.message };
     // Si la confirmation par e-mail est activée, aucune session n'est créée.
     return { error: null, needsConfirmation: !data.session };

@@ -1,10 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
+import * as Linking from 'expo-linking';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { createSessionFromUrl } from '@/lib/authRedirect';
 import { appFonts } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { useAuthStore } from '@/store/auth';
@@ -30,6 +32,16 @@ export default function RootLayout() {
 
   // Initialise la session Supabase une seule fois.
   useEffect(() => init(), [init]);
+
+  // Lien de confirmation e-mail (deep link) → ouvre la session.
+  const url = Linking.useURL();
+  useEffect(() => {
+    if (url) {
+      createSessionFromUrl(url).catch(() => {
+        /* lien non lié à l'auth : ignoré */
+      });
+    }
+  }, [url]);
 
   const ready = (fontsLoaded || !!fontError) && !initializing;
 
