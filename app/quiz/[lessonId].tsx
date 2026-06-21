@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
@@ -164,7 +164,7 @@ export default function QuizScreen() {
       {/* Panneau de feedback */}
       {answered ? (
         <Animated.View
-          entering={SlideInDown.springify().damping(18)}
+          entering={FadeInDown.duration(260).easing(Easing.out(Easing.cubic))}
           style={{
             backgroundColor: isCorrect ? 'rgba(46,158,107,0.14)' : 'rgba(217,101,75,0.14)',
             borderTopWidth: 1,
