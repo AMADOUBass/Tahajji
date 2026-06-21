@@ -3,23 +3,24 @@ import { useRouter } from 'expo-router';
 import { Pressable, Switch, View } from 'react-native';
 
 import { AppText, Card, Screen } from '@/components/ui';
+import { useProfile, useProgress, useSetPremium } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import { useAuthStore } from '@/store/auth';
-import { useGameStore } from '@/store/game';
 import { useThemeStore } from '@/store/theme';
 
 export default function ProfileScreen() {
   const { colors, scheme } = useTheme();
   const router = useRouter();
-  const profile = useGameStore((s) => s.profile);
-  const progress = useGameStore((s) => s.progress);
-  const setPremium = useGameStore((s) => s.setPremium);
+  const { data: profile } = useProfile();
+  const { data: progress } = useProgress();
+  const setPremium = useSetPremium();
   const setPreference = useThemeStore((s) => s.setPreference);
   const signOut = useAuthStore((s) => s.signOut);
 
-  const lessonsCompleted = Object.values(progress).filter((p) => p.status === 'completed').length;
-  const initial = profile.displayName.charAt(0).toUpperCase();
+  const lessonsCompleted = (progress ?? []).filter((p) => p.status === 'completed').length;
+  const displayName = profile?.displayName ?? 'Apprenant';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
@@ -35,19 +36,19 @@ export default function ProfileScreen() {
           <AppText variant="h2" color={colors.primary}>{initial}</AppText>
         </View>
         <View style={{ flex: 1 }}>
-          <AppText variant="h3">{profile.displayName}</AppText>
+          <AppText variant="h3">{displayName}</AppText>
           <AppText variant="caption" tone="secondary" style={{ marginTop: 2 }}>Niveau débutant</AppText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.sm, alignSelf: 'flex-start', backgroundColor: 'rgba(201,154,63,0.16)', paddingVertical: 4, paddingHorizontal: spacing.sm, borderRadius: 999 }}>
             <Ionicons name="star" size={12} color={colors.gold} />
-            <AppText variant="caption" color={colors.gold}>Niveau {profile.currentLevel}</AppText>
+            <AppText variant="caption" color={colors.gold}>Niveau {profile?.currentLevel ?? 1}</AppText>
           </View>
         </View>
       </View>
 
       {/* Stats */}
       <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl }}>
-        <StatCard value={profile.xp} label="XP total" />
-        <StatCard value={profile.streakCount} label="Série (jours)" color={colors.flame} />
+        <StatCard value={profile?.xp ?? 0} label="XP total" />
+        <StatCard value={profile?.streakCount ?? 0} label="Série (jours)" color={colors.flame} />
         <StatCard value={lessonsCompleted} label="Leçons" />
       </View>
 
@@ -56,7 +57,7 @@ export default function ProfileScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.primaryContainer, borderRadius: radius.lg, padding: spacing.lg }}>
           <Ionicons name="diamond-outline" size={24} color={colors.gold} />
           <View style={{ flex: 1 }}>
-            <AppText variant="title" color={colors.onPrimaryContainer}>{profile.isPremium ? 'Premium actif' : 'Passer en Premium'}</AppText>
+            <AppText variant="title" color={colors.onPrimaryContainer}>{profile?.isPremium ? 'Premium actif' : 'Passer en Premium'}</AppText>
             <AppText variant="caption" color="rgba(255,253,247,0.7)">Apprentissage avancé & certificats</AppText>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.onPrimaryContainer} />
@@ -76,8 +77,8 @@ export default function ProfileScreen() {
         </SettingRow>
         <SettingRow icon="diamond-outline" label="Premium (démo)">
           <Switch
-            value={profile.isPremium}
-            onValueChange={setPremium}
+            value={profile?.isPremium ?? false}
+            onValueChange={(v) => setPremium.mutate(v)}
             trackColor={{ true: colors.gold, false: colors.locked }}
             thumbColor={colors.onPrimary}
           />

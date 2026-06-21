@@ -10,7 +10,9 @@ import 'react-native-url-polyfill/auto';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+// Accepte les deux conventions de nommage (ANON_KEY ou KEY).
+const supabaseAnonKey =
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? process.env.EXPO_PUBLIC_SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   // Erreur explicite plutôt qu'un échec réseau obscur plus tard.

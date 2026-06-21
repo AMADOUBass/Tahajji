@@ -25,12 +25,19 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
   const theme = useTheme();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const initializing = useAuthStore((s) => s.initializing);
+  const init = useAuthStore((s) => s.init);
+
+  // Initialise la session Supabase une seule fois.
+  useEffect(() => init(), [init]);
+
+  const ready = (fontsLoaded || !!fontError) && !initializing;
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    if (ready) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [ready]);
 
   return (
     <QueryClientProvider client={queryClient}>

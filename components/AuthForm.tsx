@@ -24,6 +24,9 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState<'email' | 'password' | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const signUp = useAuthStore((s) => s.signUp);
   const signIn = useAuthStore((s) => s.signIn);
 
   const isSignUp = mode === 'sign-up';
@@ -40,9 +43,22 @@ export function AuthForm({ mode }: AuthFormProps) {
     justifyContent: 'space-between' as const,
   });
 
-  // UI-first : on marque la session active ; le groupe protégé du layout
-  // monte automatiquement l'app (aucune navigation impérative nécessaire).
-  const submit = () => signIn();
+  // Auth réelle Supabase ; en cas de succès, la garde du layout monte l'app.
+  const submit = async () => {
+    setMessage(null);
+    if (!email.trim() || !password) {
+      setMessage('Renseigne ton e-mail et ton mot de passe.');
+      return;
+    }
+    setLoading(true);
+    const res = isSignUp ? await signUp(email.trim(), password) : await signIn(email.trim(), password);
+    setLoading(false);
+    if (res.error) {
+      setMessage(res.error);
+    } else if (res.needsConfirmation) {
+      setMessage('Compte créé ! Vérifie ta boîte mail pour confirmer, puis connecte-toi.');
+    }
+  };
 
   return (
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
@@ -112,7 +128,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         </View>
       </View>
 
-      <Button label="Continuer" onPress={submit} style={{ marginTop: spacing.xl }} />
+      <Button label="Continuer" onPress={submit} loading={loading} style={{ marginTop: spacing.xl }} />
+      {message ? (
+        <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.md }}>
+          {message}
+        </AppText>
+      ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginVertical: spacing.xl }}>
         <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />

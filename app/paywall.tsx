@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { AppText, Button, Screen } from '@/components/ui';
+import { useSetPremium } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
-import { useGameStore } from '@/store/game';
 
 type Plan = 'monthly' | 'lifetime' | 'yearly';
 
@@ -26,13 +26,12 @@ const PLANS: { id: Plan; label: string; price: string; note: string; badge?: str
 export default function PaywallScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const setPremium = useGameStore((s) => s.setPremium);
+  const setPremium = useSetPremium();
   const [selected, setSelected] = useState<Plan>('lifetime');
 
   // Placeholder MVP : pas de vrai paiement. On simule le déblocage premium.
   const purchase = () => {
-    setPremium(true);
-    router.back();
+    setPremium.mutate(true, { onSuccess: () => router.back() });
   };
 
   return (

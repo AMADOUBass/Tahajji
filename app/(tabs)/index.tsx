@@ -11,10 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { AppText, Screen, StatPill } from '@/components/ui';
-import { useLevelsWithProgress } from '@/lib/queries';
+import { useLevelsWithProgress, useProfile } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
-import { useGameStore } from '@/store/game';
 import type { LessonWithProgress, LevelWithLessons } from '@/types/models';
 
 // Décalage horizontal des nœuds pour le serpentin façon Duolingo.
@@ -22,7 +21,7 @@ const OFFSETS = [0, -52, -72, -44, 12, 40, 12, -44];
 
 export default function ParcoursScreen() {
   const { colors } = useTheme();
-  const profile = useGameStore((s) => s.profile);
+  const { data: profile } = useProfile();
   const { data: levels, isLoading } = useLevelsWithProgress();
 
   return (
@@ -37,8 +36,8 @@ export default function ParcoursScreen() {
           paddingVertical: spacing.md,
         }}
       >
-        <StatPill icon="flame" iconColor={colors.flame} value={profile.streakCount} />
-        <StatPill icon="star" iconColor={colors.gold} value={profile.xp} />
+        <StatPill icon="flame" iconColor={colors.flame} value={profile?.streakCount ?? 0} />
+        <StatPill icon="star" iconColor={colors.gold} value={profile?.xp ?? 0} />
         <StatPill icon="heart" iconColor={colors.coral} value={5} />
       </View>
 
@@ -99,7 +98,7 @@ function LessonNode({
 }) {
   const { colors } = useTheme();
   const router = useRouter();
-  const profile = useGameStore((s) => s.profile);
+  const { data: profile } = useProfile();
 
   const locked = lesson.status === 'locked';
   const inProgress = lesson.status === 'in_progress';
@@ -117,7 +116,7 @@ function LessonNode({
     opacity: 0.45 * (1 - pulse.value),
   }));
 
-  const needsPremium = (lesson.isPremium || premiumLevel) && !profile.isPremium;
+  const needsPremium = (lesson.isPremium || premiumLevel) && !profile?.isPremium;
 
   const onPress = () => {
     if (needsPremium) {

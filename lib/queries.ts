@@ -1,133 +1,279 @@
 /**
- * Hooks de données (React Query) — contenu pédagogique statique.
- * Aujourd'hui ils renvoient le mock ; à l'intégration, on remplace le corps
- * de chaque `queryFn` par un `supabase.from(...).select(...)` sans toucher l'UI.
- *
- * La progression (mutable) vit dans store/game.ts ; useLevelsWithProgress
- * combine le contenu statique avec la progression locale.
+ * Hooks de données (React Query) branchés sur Supabase.
+ * Les lignes (snake_case) sont mappées vers les types domaine (camelCase).
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import {
-  mockLessonItems,
-  mockLessons,
-  mockLevels,
-  mockQuizQuestions,
-  mockSurahs,
-  mockVerses,
-} from '@/lib/mock';
-import { useGameStore } from '@/store/game';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/auth';
+import type { Database } from '@/types/database';
 import type {
   Lesson,
   LessonItem,
+  Level,
   LevelWithLessons,
+  Profile,
+  ProgressStatus,
   QuizQuestion,
   Surah,
+  UserProgress,
   Verse,
 } from '@/types/models';
 
-// Simule une latence réseau pour des états de chargement réalistes.
-function delay<T>(value: T, ms = 200): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
-}
+type Row<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+
+/* ---------- Mappers snake_case → camelCase ---------- */
+
+const toLevel = (r: Row<'levels'>): Level => ({
+  id: r.id, position: r.position, title: r.title, description: r.description, isPremium: r.is_premium,
+});
+const toLesson = (r: Row<'lessons'>): Lesson => ({
+  id: r.id, levelId: r.level_id, position: r.position, title: r.title,
+  lessonType: r.lesson_type as Lesson['lessonType'], isPremium: r.is_premium,
+});
+const toItem = (r: Row<'lesson_items'>): LessonItem => ({
+  id: r.id, lessonId: r.lesson_id, position: r.position, itemType: r.item_type as LessonItem['itemType'],
+  arabicText: r.arabic_text, transliteration: r.transliteration, translationFr: r.translation_fr, audioUrl: r.audio_url,
+});
+const toQuiz = (r: Row<'quiz_questions'>): QuizQuestion => ({
+  id: r.id, lessonId: r.lesson_id, position: r.position, questionType: r.question_type as QuizQuestion['questionType'],
+  prompt: r.prompt, arabicText: r.arabic_text, audioUrl: r.audio_url, correctAnswer: r.correct_answer, options: r.options,
+});
+const toSurah = (r: Row<'surahs'>): Surah => ({
+  id: r.id, number: r.number, nameAr: r.name_ar, nameFr: r.name_fr,
+  revelationType: r.revelation_type as Surah['revelationType'], verseCount: r.verse_count,
+});
+const toVerse = (r: Row<'verses'>): Verse => ({
+  id: r.id, surahId: r.surah_id, number: r.number, arabicText: r.arabic_text,
+  translationFr: r.translation_fr, translationEn: r.translation_en, audioUrl: r.audio_url,
+});
+const toProfile = (r: Row<'profiles'>): Profile => ({
+  id: r.id, displayName: r.display_name ?? 'Apprenant', locale: r.locale, currentLevel: r.current_level,
+  xp: r.xp, streakCount: r.streak_count, lastActiveDate: r.last_active_date, isPremium: r.is_premium,
+});
 
 export const queryKeys = {
   levels: ['levels'] as const,
-  lessons: (levelId: number) => ['lessons', levelId] as const,
-  lesson: (lessonId: number) => ['lesson', lessonId] as const,
+  lessons: ['lessons'] as const,
   lessonItems: (lessonId: number) => ['lessonItems', lessonId] as const,
   quiz: (lessonId: number) => ['quiz', lessonId] as const,
   surahs: ['surahs'] as const,
   verses: (surahId: number) => ['verses', surahId] as const,
+  profile: (userId: string | null) => ['profile', userId] as const,
+  progress: (userId: string | null) => ['progress', userId] as const,
 };
 
-export function useLevels() {
-  return useQuery({
-    queryKey: queryKeys.levels,
-    queryFn: () => delay(mockLevels),
-  });
-}
-
-export function useLesson(lessonId: number) {
-  return useQuery<Lesson | undefined>({
-    queryKey: queryKeys.lesson(lessonId),
-    queryFn: () => delay(mockLessons.find((l) => l.id === lessonId)),
-  });
-}
+/* ---------- Contenu (lecture publique) ---------- */
 
 export function useLessonItems(lessonId: number) {
-  return useQuery<LessonItem[]>({
+  return useQuery({
     queryKey: queryKeys.lessonItems(lessonId),
-    queryFn: () =>
-      delay(
-        mockLessonItems
-          .filter((i) => i.lessonId === lessonId)
-          .sort((a, b) => a.position - b.position),
-      ),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('lesson_items').select('*').eq('lesson_id', lessonId).order('position');
+      if (error) throw error;
+      return data.map(toItem);
+    },
   });
 }
 
 export function useQuizQuestions(lessonId: number) {
-  return useQuery<QuizQuestion[]>({
+  return useQuery({
     queryKey: queryKeys.quiz(lessonId),
-    queryFn: () =>
-      delay(
-        mockQuizQuestions
-          .filter((q) => q.lessonId === lessonId)
-          .sort((a, b) => a.position - b.position),
-      ),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quiz_questions').select('*').eq('lesson_id', lessonId).order('position');
+      if (error) throw error;
+      return data.map(toQuiz);
+    },
   });
 }
 
 export function useSurahs() {
-  return useQuery<Surah[]>({
+  return useQuery({
     queryKey: queryKeys.surahs,
-    queryFn: () => delay(mockSurahs),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('surahs').select('*').order('number');
+      if (error) throw error;
+      return data.map(toSurah);
+    },
   });
 }
 
 export function useVerses(surahId: number) {
-  return useQuery<Verse[]>({
+  return useQuery({
     queryKey: queryKeys.verses(surahId),
-    queryFn: () =>
-      delay(
-        mockVerses
-          .filter((v) => v.surahId === surahId)
-          .sort((a, b) => a.number - b.number),
-      ),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('verses').select('*').eq('surah_id', surahId).order('number');
+      if (error) throw error;
+      return data.map(toVerse);
+    },
+  });
+}
+
+export function useLessons() {
+  return useQuery({
+    queryKey: queryKeys.lessons,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lessons').select('*').order('position');
+      if (error) throw error;
+      return data.map(toLesson);
+    },
+  });
+}
+
+/* ---------- Profil & progression (privés) ---------- */
+
+export function useProfile() {
+  const userId = useAuthStore((s) => s.userId);
+  return useQuery({
+    queryKey: queryKeys.profile(userId),
+    enabled: !!userId,
+    queryFn: async (): Promise<Profile | null> => {
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId!).maybeSingle();
+      if (error) throw error;
+      return data ? toProfile(data) : null;
+    },
+  });
+}
+
+export function useProgress() {
+  const userId = useAuthStore((s) => s.userId);
+  return useQuery({
+    queryKey: queryKeys.progress(userId),
+    enabled: !!userId,
+    queryFn: async (): Promise<UserProgress[]> => {
+      const { data, error } = await supabase
+        .from('user_progress').select('*').eq('user_id', userId!);
+      if (error) throw error;
+      return data.map((r) => ({
+        lessonId: r.lesson_id,
+        status: r.status as ProgressStatus,
+        stars: r.stars,
+        completedAt: r.completed_at,
+      }));
+    },
   });
 }
 
 /**
- * Niveaux + leçons enrichis de la progression locale (store/game).
- * C'est ce que consomme l'écran Parcours.
+ * Niveaux + leçons + statut dérivé de la progression.
+ * Règle de déblocage : la 1ʳᵉ leçon est ouverte ; une leçon s'ouvre quand la
+ * précédente (ordre global niveau→position) est terminée.
  */
-export function useLevelsWithProgress(): {
-  data: LevelWithLessons[];
-  isLoading: boolean;
-} {
-  const { data: levels, isLoading } = useLevels();
-  const progress = useGameStore((s) => s.progress);
+export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: boolean } {
+  const levelsQ = useQuery({
+    queryKey: queryKeys.levels,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('levels').select('*').order('position');
+      if (error) throw error;
+      return data.map(toLevel);
+    },
+  });
+  const lessonsQ = useQuery({
+    queryKey: queryKeys.lessons,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lessons').select('*').order('position');
+      if (error) throw error;
+      return data.map(toLesson);
+    },
+  });
+  const progressQ = useProgress();
 
-  if (!levels) return { data: [], isLoading };
+  const isLoading = levelsQ.isLoading || lessonsQ.isLoading;
+  if (!levelsQ.data || !lessonsQ.data) return { data: [], isLoading };
 
-  const data: LevelWithLessons[] = levels
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map((level) => ({
-      ...level,
-      lessons: mockLessons
-        .filter((l) => l.levelId === level.id)
-        .sort((a, b) => a.position - b.position)
-        .map((lesson) => {
-          const p = progress[lesson.id];
-          return {
-            ...lesson,
-            status: p?.status ?? 'locked',
-            stars: p?.stars ?? 0,
-          };
-        }),
-    }));
+  const completions = new Map((progressQ.data ?? []).map((p) => [p.lessonId, p]));
+  const levels = [...levelsQ.data].sort((a, b) => a.position - b.position);
+  const lessons = [...lessonsQ.data].sort(
+    (a, b) =>
+      (levels.find((l) => l.id === a.levelId)?.position ?? 0) -
+        (levels.find((l) => l.id === b.levelId)?.position ?? 0) || a.position - b.position,
+  );
+
+  // Statut dérivé en parcourant les leçons dans l'ordre global.
+  const statusById = new Map<number, { status: ProgressStatus; stars: number }>();
+  let prevCompleted = true;
+  for (const lesson of lessons) {
+    const done = completions.get(lesson.id);
+    if (done && done.status === 'completed') {
+      statusById.set(lesson.id, { status: 'completed', stars: done.stars });
+      prevCompleted = true;
+    } else if (prevCompleted) {
+      statusById.set(lesson.id, { status: 'in_progress', stars: 0 });
+      prevCompleted = false;
+    } else {
+      statusById.set(lesson.id, { status: 'locked', stars: 0 });
+    }
+  }
+
+  const data: LevelWithLessons[] = levels.map((level) => ({
+    ...level,
+    lessons: lessonsQ.data!
+      .filter((l) => l.levelId === level.id)
+      .sort((a, b) => a.position - b.position)
+      .map((lesson) => ({
+        ...lesson,
+        status: statusById.get(lesson.id)?.status ?? 'locked',
+        stars: statusById.get(lesson.id)?.stars ?? 0,
+      })),
+  }));
 
   return { data, isLoading };
+}
+
+/** Termine une leçon : enregistre la complétion + ajoute l'XP (1ʳᵉ fois). */
+export function useCompleteLesson() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lessonId, stars, xpGained }: { lessonId: number; stars: number; xpGained: number }) => {
+      const userId = useAuthStore.getState().userId;
+      if (!userId) throw new Error('Non authentifié');
+
+      // Déjà terminée ? (pour ne pas recréditer l'XP)
+      const { data: existing } = await supabase
+        .from('user_progress').select('status, stars').eq('user_id', userId).eq('lesson_id', lessonId).maybeSingle();
+      const firstTime = !existing || existing.status !== 'completed';
+
+      const { error: upErr } = await supabase.from('user_progress').upsert(
+        {
+          user_id: userId,
+          lesson_id: lessonId,
+          status: 'completed',
+          stars: Math.max(stars, existing?.stars ?? 0),
+          completed_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,lesson_id' },
+      );
+      if (upErr) throw upErr;
+
+      if (firstTime) {
+        const { data: prof } = await supabase.from('profiles').select('xp').eq('id', userId).single();
+        await supabase.from('profiles').update({ xp: (prof?.xp ?? 0) + xpGained }).eq('id', userId);
+      }
+    },
+    onSuccess: () => {
+      const userId = useAuthStore.getState().userId;
+      queryClient.invalidateQueries({ queryKey: queryKeys.progress(userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
+    },
+  });
+}
+
+/** Bascule premium (placeholder paywall / réglage démo). */
+export function useSetPremium() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (isPremium: boolean) => {
+      const userId = useAuthStore.getState().userId;
+      if (!userId) throw new Error('Non authentifié');
+      const { error } = await supabase.from('profiles').update({ is_premium: isPremium }).eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      const userId = useAuthStore.getState().userId;
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
+    },
+  });
 }

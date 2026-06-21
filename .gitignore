@@ -47,6 +47,7 @@ example
 # local tooling / editor (non versionné)
 .claude/
 .vscode/
+.agents/
 
 # vérifications de build temporaires
 .expo-export-check/

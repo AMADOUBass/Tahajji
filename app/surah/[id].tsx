@@ -4,8 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
-import { mockSurahs } from '@/lib/mock';
-import { useVerses } from '@/lib/queries';
+import { useSurahs, useVerses } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import type { Verse } from '@/types/models';
@@ -16,7 +15,8 @@ export default function SurahScreen() {
   const router = useRouter();
   const { colors } = useTheme();
 
-  const surah = mockSurahs.find((s) => s.id === surahId);
+  const { data: surahs } = useSurahs();
+  const surah = surahs?.find((s) => s.id === surahId);
   const { data: verses, isLoading } = useVerses(surahId);
 
   return (

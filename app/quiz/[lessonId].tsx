@@ -6,10 +6,9 @@ import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
-import { useQuizQuestions } from '@/lib/queries';
+import { useCompleteLesson, useQuizQuestions } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
-import { useGameStore } from '@/store/game';
 
 const XP_PER_LESSON = 50;
 
@@ -20,7 +19,7 @@ export default function QuizScreen() {
   const { colors } = useTheme();
 
   const { data: questions, isLoading } = useQuizQuestions(lessonId);
-  const completeLesson = useGameStore((s) => s.completeLesson);
+  const completeLesson = useCompleteLesson();
 
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -71,7 +70,7 @@ export default function QuizScreen() {
   }
 
   function finish(stars: number) {
-    completeLesson(lessonId, stars, XP_PER_LESSON);
+    completeLesson.mutate({ lessonId, stars, xpGained: XP_PER_LESSON });
     const accuracy = questions!.length ? Math.round((correctCount / questions!.length) * 100) : 100;
     router.replace({
       pathname: '/level-complete/[id]',

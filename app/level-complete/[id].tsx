@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 
 import { AppText, Button, Confetti, Screen } from '@/components/ui';
-import { mockLessons } from '@/lib/mock';
+import { useLessons } from '@/lib/queries';
 import { spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -18,9 +18,10 @@ export default function LevelCompleteScreen() {
   const xp = Number(params.xp ?? 50);
   const accuracy = Number(params.accuracy ?? 100);
 
-  const lesson = mockLessons.find((l) => l.id === lessonId);
+  const { data: lessons } = useLessons();
+  const lesson = lessons?.find((l) => l.id === lessonId);
   const isLastOfLevel =
-    lesson && !mockLessons.some((l) => l.levelId === lesson.levelId && l.position === lesson.position + 1);
+    !!lesson && !lessons?.some((l) => l.levelId === lesson.levelId && l.position === lesson.position + 1);
 
   const onPrimary = colors.onPrimaryContainer;
 
