@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#4A3526">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#4A3526"/>
+    <rect x="510" y="250" width="180" height="180" rx="34" fill="none" stroke="#C99A3F" stroke-width="14"/>
+    <rect x="510" y="250" width="180" height="180" rx="34" fill="none" stroke="#C99A3F" stroke-width="14" transform="rotate(45 600 340)"/>
+    <circle cx="600" cy="340" r="22" fill="#F8F2E8"/>
+    <text x="600" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="92" font-weight="700" fill="#F8F2E8">Tahajji</text>
+    <text x="600" y="610" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#C99A3F">تهجّي</text>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri+Quran&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .app-root{
+    --desk:#E7E1D6; --desk-ink:#7A6A58;
+    --bg:#F8F2E8; --surface:#FFFDF7;
+    --primary:#4A3526; --primary-d:#2E2118; --on-primary:#FFFDF7;
+    --tan:#EDE3D6; --gold:#C99A3F;
+    --ink:#2E2118; --ink2:#7A6A58;
+    --success:#2E9E6B; --coral:#D9654B; --amber:#E0A33E; --flame:#E8843C;
+    --border:rgba(74,53,38,.12); --line:rgba(74,53,38,.08);
+    --locked:#DDD3C3; --locked-ink:#B4A691;
+  }
+  .app-root[data-theme="dark"]{
+    --desk:#0E0A06; --desk-ink:#8A7B66;
+    --bg:#1A140E; --surface:#241C14;
+    --primary:#C9A36E; --primary-d:#C9A36E; --on-primary:#241C14;
+    --tan:#33271B; --gold:#E0B85C;
+    --ink:#ECE3D5; --ink2:#A89880;
+    --success:#3DB57E; --coral:#E07B62; --amber:#E0A33E; --flame:#E8843C;
+    --border:rgba(236,227,213,.13); --line:rgba(236,227,213,.07);
+    --locked:#2A2117; --locked-ink:#6B5C49;
+  }
+  @keyframes nodepulse{0%,100%{box-shadow:0 0 0 0 rgba(201,154,63,.5)}50%{box-shadow:0 0 0 12px rgba(201,154,63,0)}}
+</style>
+</helmet>
+
+<div class="app-root" data-theme="{{ theme }}" style="min-height:100vh; background:var(--desk); padding:40px 48px 90px;">
+
+  <div style="max-width:1560px; margin:0 auto 8px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:18px;">
+      <div style="width:54px; height:54px; position:relative; display:flex; align-items:center; justify-content:center; flex:none;">
+        <div style="position:absolute; width:38px; height:38px; border:2.5px solid var(--gold); border-radius:8px;"></div>
+        <div style="position:absolute; width:38px; height:38px; border:2.5px solid var(--gold); border-radius:8px; transform:rotate(45deg);"></div>
+        <div style="width:9px; height:9px; background:var(--primary); border-radius:50%;"></div>
+      </div>
+      <div>
+        <div style="display:flex; align-items:baseline; gap:12px;">
+          <div style="font:800 30px/1 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Tahajji</div>
+          <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--gold);">تهجّي</span>
+        </div>
+        <div style="font:500 14px 'Plus Jakarta Sans'; color:var(--desk-ink); margin-top:7px;">Apprendre à lire le Coran · façon Duolingo · 10 écrans MVP · maquettes haute-fidélité</div>
+      </div>
+    </div>
+    <button onClick="{{ toggleTheme }}" style="display:flex; align-items:center; gap:10px; background:var(--surface); color:var(--ink); border:1px solid var(--border); border-radius:999px; padding:12px 20px; font:600 14px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.07);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 13.2A9 9 0 1 1 10.8 3 7 7 0 0 0 21 13.2z"/></svg>
+      {{ toggleLabel }}
+    </button>
+  </div>
+
+  <!--SECTION:Onboarding-->
+  <div style="max-width:1560px; margin:48px auto 22px; display:flex; align-items:center; gap:16px;">
+    <span style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.2em; text-transform:uppercase; color:var(--desk-ink);">Onboarding</span>
+    <span style="flex:1; height:1px; background:var(--border);"></span>
+  </div>
+  <div style="max-width:1560px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 46px;">
+
+    <!-- 01 ACCUEIL -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">01 · Accueil / Bienvenue</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:0 30px 36px; overflow:hidden;">
+            <div aria-hidden="true" style="position:absolute; right:-90px; top:60px; width:300px; height:300px; opacity:.06; pointer-events:none;">
+              <div style="position:absolute; inset:0; border:14px solid var(--primary); border-radius:40px;"></div>
+              <div style="position:absolute; inset:0; border:14px solid var(--primary); border-radius:40px; transform:rotate(45deg);"></div>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:28px;">
+              <div style="width:96px; height:96px; position:relative; display:flex; align-items:center; justify-content:center;">
+                <div style="position:absolute; width:70px; height:70px; border:3px solid var(--gold); border-radius:13px;"></div>
+                <div style="position:absolute; width:70px; height:70px; border:3px solid var(--gold); border-radius:13px; transform:rotate(45deg);"></div>
+                <div style="width:16px; height:16px; background:var(--primary); border-radius:50%;"></div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:-6px;">
+                <div style="font:800 30px 'Plus Jakarta Sans'; color:var(--primary); letter-spacing:-.01em;">Tahajji</div>
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:26px; color:var(--gold); line-height:1;">تهجّي</div>
+              </div>
+              <div>
+                <div style="font:800 29px/1.2 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Apprends à lire<br>le Coran, depuis zéro.</div>
+                <div style="font:500 15.5px/1.6 'Plus Jakarta Sans'; color:var(--ink2); margin-top:16px; max-width:288px;">À ton rythme, pas à pas. Aucune connaissance préalable — on commence par la toute première lettre.</div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button style="background:var(--primary); color:var(--on-primary); border:none; border-radius:14px; padding:18px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 10px 22px -10px var(--primary);">Commencer</button>
+              <button style="background:none; border:none; color:var(--ink2); padding:14px; font:600 15px 'Plus Jakarta Sans'; cursor:pointer;">J'ai déjà un compte</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 INSCRIPTION -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">02 · Inscription / Connexion</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:8px 30px 32px; overflow:hidden;">
+            <button style="width:40px; height:40px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <div style="margin-top:26px;">
+              <div style="font:800 27px/1.15 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Crée ton compte</div>
+              <div style="font:500 15px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:9px;">Sauvegarde ta progression, ta série et tes leçons.</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:16px; margin-top:30px;">
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <span style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2);">Adresse e-mail</span>
+                <div style="border:1.5px solid var(--border); background:var(--surface); border-radius:12px; padding:16px; font:500 15px 'Plus Jakarta Sans'; color:var(--ink2);">toi@exemple.com</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <span style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2);">Mot de passe</span>
+                <div style="border:1.5px solid var(--primary); background:var(--surface); border-radius:12px; padding:16px; display:flex; align-items:center; justify-content:space-between;">
+                  <span style="letter-spacing:3px; color:var(--ink); font-size:16px;">••••••••</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.7"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.6"/></svg>
+                </div>
+              </div>
+            </div>
+            <button style="margin-top:24px; background:var(--primary); color:var(--on-primary); border:none; border-radius:14px; padding:18px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 10px 22px -10px var(--primary);">Continuer</button>
+            <div style="display:flex; align-items:center; gap:14px; margin:22px 0;">
+              <span style="flex:1; height:1px; background:var(--border);"></span>
+              <span style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">ou</span>
+              <span style="flex:1; height:1px; background:var(--border);"></span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <button style="background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:15px; font:600 15px 'Plus Jakarta Sans'; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 10.2v3.9h5.5a4.7 4.7 0 0 1-2 3.1l3.2 2.5c1.9-1.7 3-4.3 3-7.4 0-.7-.1-1.4-.2-2.1z"/><path fill="#34A853" d="M12 22c2.7 0 4.9-.9 6.5-2.4l-3.2-2.5c-.9.6-2 .9-3.3.9-2.6 0-4.7-1.7-5.5-4.1l-3.3 2.5C4.9 19.8 8.2 22 12 22z"/><path fill="#FBBC05" d="M6.5 13.9a6 6 0 0 1 0-3.8L3.2 7.6a10 10 0 0 0 0 8.8z"/><path fill="#4285F4" d="M12 6.4c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3.5 14.7 2.6 12 2.6 8.2 2.6 4.9 4.8 3.2 7.6l3.3 2.5C7.3 8.1 9.4 6.4 12 6.4z"/></svg>
+                Continuer avec Google
+              </button>
+              <button style="background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:15px; font:600 15px 'Plus Jakarta Sans'; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="var(--ink)"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7 2-1.1 2.8-2.2c.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.8zM14.2 5.8c.6-.8 1-1.9.9-3-.9 0-2 .6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.8-1.2z"/></svg>
+                Continuer avec Apple
+              </button>
+            </div>
+            <div style="font:500 12px/1.5 'Plus Jakarta Sans'; color:var(--ink2); text-align:center; margin-top:auto; padding-top:18px;">En continuant, tu acceptes nos <span style="color:var(--primary); font-weight:600;">conditions</span> et notre <span style="color:var(--primary); font-weight:600;">politique de confidentialité</span>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="max-width:1560px; margin:56px auto 22px; display:flex; align-items:center; gap:16px;">
+    <span style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.2em; text-transform:uppercase; color:var(--desk-ink);">Apprentissage</span>
+    <span style="flex:1; height:1px; background:var(--border);"></span>
+  </div>
+  <div style="max-width:1560px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 46px;">
+
+    <!-- 03 PARCOURS -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">03 · Parcours (écran principal)</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column;">
+            <div style="padding:8px 22px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:7px; background:var(--tan); padding:8px 12px; border-radius:999px;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="var(--flame)"><path d="M12 2.5c.4 3-1.6 4.4-2.9 6.1C7.6 10.6 7 12.3 7 14a5 5 0 0 0 10 0c0-2.2-1.1-3.7-2-5-.3 1-.9 1.6-1.7 1.9.5-2.6-.6-5.6-1.4-8.4z"/></svg>
+                <span style="font:700 15px 'Plus Jakarta Sans'; color:var(--ink);">5</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px; background:var(--tan); padding:8px 12px; border-radius:999px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+                <span style="font:700 15px 'Plus Jakarta Sans'; color:var(--ink);">340</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px; background:var(--tan); padding:8px 12px; border-radius:999px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--coral)"><path d="M12 21s-7-4.5-9.3-9.1C1.1 8.6 2.6 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.4 0 4.9 3.6 3.3 6.9C19 16.5 12 21 12 21z"/></svg>
+                <span style="font:700 15px 'Plus Jakarta Sans'; color:var(--ink);">5</span>
+              </div>
+            </div>
+
+            <div style="flex:1; overflow:hidden; padding:4px 26px 0; display:flex; flex-direction:column; align-items:center;">
+              <div style="width:100%; background:var(--primary); border-radius:18px; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 10px 24px -12px var(--primary);">
+                <div>
+                  <div style="font:700 12px 'Plus Jakarta Sans'; letter-spacing:.14em; color:var(--gold); text-transform:uppercase;">Unité 1</div>
+                  <div style="font:700 18px 'Plus Jakarta Sans'; color:var(--on-primary); margin-top:4px;">Les lettres de l'alphabet</div>
+                </div>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6a1.5 1.5 0 0 1 1.5-1.5H18a1 1 0 0 1 1 1V18"/><path d="M6 17h13v2.5H6A1.5 1.5 0 0 1 6 16.5"/></svg>
+              </div>
+
+              <div style="display:flex; flex-direction:column; align-items:center; gap:24px; margin-top:30px;">
+                <div style="transform:translateX(0);">
+                  <div style="width:70px; height:70px; border-radius:50%; background:var(--primary); box-shadow:0 6px 0 var(--primary-d); display:flex; align-items:center; justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+                  </div>
+                </div>
+                <div style="transform:translateX(-58px);">
+                  <div style="width:70px; height:70px; border-radius:50%; background:var(--primary); box-shadow:0 6px 0 var(--primary-d); display:flex; align-items:center; justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+                  </div>
+                </div>
+                <div style="transform:translateX(-78px); position:relative;">
+                  <div style="position:absolute; bottom:96px; left:50%; transform:translateX(-50%); background:var(--surface); border:1.5px solid var(--gold); color:var(--primary); font:700 12px 'Plus Jakarta Sans'; letter-spacing:.08em; padding:8px 14px; border-radius:10px; white-space:nowrap; box-shadow:0 6px 16px -6px rgba(0,0,0,.25);">COMMENCER<span style="position:absolute; bottom:-7px; left:50%; transform:translateX(-50%) rotate(45deg); width:12px; height:12px; background:var(--surface); border-right:1.5px solid var(--gold); border-bottom:1.5px solid var(--gold);"></span></div>
+                  <div style="width:86px; height:86px; border-radius:50%; background:var(--gold); box-shadow:0 6px 0 #a87f2e; animation:nodepulse 2.2s infinite; display:flex; align-items:center; justify-content:center;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+                  </div>
+                </div>
+                <div style="transform:translateX(-50px);">
+                  <div style="width:64px; height:64px; border-radius:50%; background:var(--locked); box-shadow:0 5px 0 rgba(0,0,0,.08); display:flex; align-items:center; justify-content:center;">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--locked-ink)" stroke-width="1.9"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                  </div>
+                </div>
+                <div style="transform:translateX(8px);">
+                  <div style="width:60px; height:60px; border-radius:16px; background:var(--locked); box-shadow:0 5px 0 rgba(0,0,0,.08); display:flex; align-items:center; justify-content:center;">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--locked-ink)" stroke-width="1.8"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M4 13h16M12 9v11M9 9V7.5a2.5 2.5 0 1 1 3 0V9"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:80px; border-top:1px solid var(--line); background:var(--surface); display:flex; align-items:flex-start; padding:13px 6px 0; justify-content:space-around;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--primary);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.2 9.3V20h13.6V9.3"/></svg>
+                <span style="font:700 11px 'Plus Jakarta Sans';">Parcours</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.5-1.1-3.6-1.6-6.5-1.4-.8 0-1.3.5-1.3 1.2V18c0 .7.6 1.1 1.3 1 2.7-.1 4.7.3 6.5 1.4"/><path d="M12 6c1.5-1.1 3.6-1.6 6.5-1.4.8 0 1.3.5 1.3 1.2V18c0 .7-.6 1.1-1.3 1-2.7-.1-4.7.3-6.5 1.4"/><path d="M12 6v14.4"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Coran</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.2"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Pratique</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Profil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 LECON -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">04 · Écran de leçon</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:6px 24px 26px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <div style="flex:1; height:11px; border-radius:999px; background:var(--tan); overflow:hidden;"><div style="width:38%; height:100%; background:var(--gold); border-radius:999px;"></div></div>
+              <span style="font:700 13px 'Plus Jakarta Sans'; color:var(--ink2);">3/8</span>
+            </div>
+
+            <div style="text-align:center; margin-top:26px;">
+              <span style="font:600 12px 'Plus Jakarta Sans'; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);">Nouvelle lettre</span>
+            </div>
+
+            <div style="margin-top:18px; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:26px 20px 22px; text-align:center; box-shadow:0 12px 30px -18px rgba(0,0,0,.3);">
+              <div dir="rtl" style="font-family:'Amiri Quran'; font-size:118px; line-height:1; color:var(--primary);">بـ</div>
+              <div style="font:700 22px 'Plus Jakarta Sans'; color:var(--ink); margin-top:8px;">Bā — <span style="color:var(--ink2); font-weight:600;">la 2ᵉ lettre</span></div>
+              <div style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:4px;">se prononce « b »</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px;">
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 6px; text-align:center;">
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:40px; color:var(--ink); line-height:1.1;">بَ</div>
+                <div style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:6px;">ba</div>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 6px; text-align:center;">
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:40px; color:var(--ink); line-height:1.1;">بِ</div>
+                <div style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:6px;">bi</div>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 6px; text-align:center;">
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:40px; color:var(--ink); line-height:1.1;">بُ</div>
+                <div style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:6px;">bou</div>
+              </div>
+            </div>
+
+            <button style="margin-top:18px; background:var(--primary); color:var(--on-primary); border:none; border-radius:14px; padding:17px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 10px 22px -10px var(--primary);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="var(--on-primary)"/><path d="M16.5 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/></svg>
+              Écouter
+            </button>
+            <button style="margin-top:10px; background:none; color:var(--primary); border:1.5px solid var(--border); border-radius:14px; padding:15px; font:600 15px 'Plus Jakarta Sans'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              Répéter à voix haute
+            </button>
+
+            <div style="display:flex; gap:12px; margin-top:auto; padding-top:18px;">
+              <button style="flex:1; background:none; color:var(--ink2); border:1.5px solid var(--border); border-radius:13px; padding:14px; font:600 15px 'Plus Jakarta Sans'; cursor:pointer;">Précédent</button>
+              <button style="flex:1.4; background:var(--gold); color:#2E2118; border:none; border-radius:13px; padding:14px; font:700 15px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 8px 18px -8px var(--gold);">Suivant</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 QUIZ -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">05 · Quiz / micro-test</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:6px 24px 0;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <div style="flex:1; height:11px; border-radius:999px; background:var(--tan); overflow:hidden;"><div style="width:70%; height:100%; background:var(--success); border-radius:999px;"></div></div>
+              <div style="display:flex; align-items:center; gap:5px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--coral)"><path d="M12 21s-7-4.5-9.3-9.1C1.1 8.6 2.6 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.4 0 4.9 3.6 3.3 6.9C19 16.5 12 21 12 21z"/></svg>
+                <span style="font:700 14px 'Plus Jakarta Sans'; color:var(--ink);">4</span>
+              </div>
+            </div>
+
+            <div style="margin-top:26px;">
+              <div style="font:800 21px/1.3 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.01em;">Quelle lettre se prononce « Bā » ?</div>
+            </div>
+
+            <button style="margin-top:18px; align-self:flex-start; background:var(--tan); border:none; border-radius:14px; padding:14px 18px; display:flex; align-items:center; gap:11px; cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="var(--primary)"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>
+              <span style="font:600 14px 'Plus Jakarta Sans'; color:var(--primary);">Réécouter le son</span>
+            </button>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px;">
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 0; text-align:center;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:44px; color:var(--ink);">تـ</span></div>
+              <div style="background:var(--surface); border:2.5px solid var(--success); border-radius:16px; padding:22px 0; text-align:center; position:relative; box-shadow:0 8px 22px -10px rgba(46,158,107,.5);">
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:44px; color:var(--ink);">بـ</span>
+                <div style="position:absolute; top:9px; right:9px; width:24px; height:24px; border-radius:50%; background:var(--success); display:flex; align-items:center; justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 0; text-align:center;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:44px; color:var(--ink);">نـ</span></div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:22px 0; text-align:center;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:44px; color:var(--ink);">ثـ</span></div>
+            </div>
+
+            <div style="margin-top:auto; margin-left:-24px; margin-right:-24px; background:rgba(46,158,107,.14); border-top:1px solid rgba(46,158,107,.25); padding:20px 24px 26px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:var(--success); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+                <div>
+                  <div style="font:800 17px 'Plus Jakarta Sans'; color:var(--success);">Bravo, c'est ça !</div>
+                  <div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">بـ se prononce « b ».</div>
+                </div>
+              </div>
+              <button style="margin-top:14px; width:100%; background:var(--success); color:#fff; border:none; border-radius:13px; padding:16px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 8px 18px -8px var(--success);">Continuer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 NIVEAU COMPLETE -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">06 · Niveau complété</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--primary);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--on-primary);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--on-primary)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--on-primary)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--on-primary); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--on-primary); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--on-primary); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; overflow:hidden;">
+            <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none;">
+              <div style="position:absolute; left:42px; top:60px; width:9px; height:9px; border-radius:2px; background:var(--gold); transform:rotate(20deg);"></div>
+              <div style="position:absolute; left:300px; top:50px; width:7px; height:7px; border-radius:50%; background:#fff;"></div>
+              <div style="position:absolute; left:70px; top:150px; width:8px; height:8px; border-radius:2px; background:#fff; transform:rotate(40deg);"></div>
+              <div style="position:absolute; left:280px; top:170px; width:10px; height:10px; border-radius:2px; background:var(--gold); transform:rotate(-15deg);"></div>
+              <div style="position:absolute; left:48px; top:280px; width:7px; height:7px; border-radius:50%; background:var(--gold);"></div>
+              <div style="position:absolute; left:320px; top:300px; width:8px; height:8px; border-radius:2px; background:#fff; transform:rotate(30deg);"></div>
+              <div style="position:absolute; left:150px; top:40px; width:6px; height:6px; border-radius:50%; background:var(--gold);"></div>
+              <div style="position:absolute; left:210px; top:120px; width:8px; height:8px; border-radius:2px; background:var(--gold); transform:rotate(45deg);"></div>
+            </div>
+            <div style="position:relative; height:100%; display:flex; flex-direction:column; align-items:center; padding:40px 30px 30px; text-align:center;">
+              <div style="margin-top:24px; width:128px; height:128px; border-radius:50%; background:rgba(201,154,63,.18); display:flex; align-items:center; justify-content:center;">
+                <div style="width:96px; height:96px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; box-shadow:0 12px 30px -8px rgba(0,0,0,.4);">
+                  <svg width="52" height="52" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+                </div>
+              </div>
+              <div style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-top:28px;">Niveau 1 terminé</div>
+              <div style="font:800 28px/1.2 'Plus Jakarta Sans'; color:var(--on-primary); margin-top:10px; letter-spacing:-.02em;">Tes 4 premières<br>lettres, c'est fait !</div>
+
+              <div style="display:flex; gap:10px; margin-top:24px;">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="var(--gold)" style="margin-top:-8px;"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:30px; width:100%;">
+                <div style="flex:1; background:rgba(255,255,255,.1); border-radius:14px; padding:16px 8px;">
+                  <div style="font:800 22px 'Plus Jakarta Sans'; color:var(--gold);">+50</div>
+                  <div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.7); margin-top:3px;">XP gagné</div>
+                </div>
+                <div style="flex:1; background:rgba(255,255,255,.1); border-radius:14px; padding:16px 8px;">
+                  <div style="font:800 22px 'Plus Jakarta Sans'; color:var(--on-primary);">95%</div>
+                  <div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.7); margin-top:3px;">Précision</div>
+                </div>
+                <div style="flex:1; background:rgba(255,255,255,.1); border-radius:14px; padding:16px 8px;">
+                  <div style="font:800 22px 'Plus Jakarta Sans'; color:var(--on-primary);">4:12</div>
+                  <div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.7); margin-top:3px;">Temps</div>
+                </div>
+              </div>
+
+              <button style="margin-top:auto; width:100%; background:var(--gold); color:#2E2118; border:none; border-radius:14px; padding:18px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 12px 26px -10px rgba(0,0,0,.5);">Continuer</button>
+              <button style="margin-top:8px; background:none; border:none; color:rgba(255,253,247,.8); padding:10px; font:600 14px 'Plus Jakarta Sans'; cursor:pointer;">Partager ma réussite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="max-width:1560px; margin:56px auto 22px; display:flex; align-items:center; gap:16px;">
+    <span style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.2em; text-transform:uppercase; color:var(--desk-ink);">Le Coran (toujours gratuit)</span>
+    <span style="flex:1; height:1px; background:var(--border);"></span>
+  </div>
+  <div style="max-width:1560px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 46px;">
+
+    <!-- 07 BIBLIOTHEQUE -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">07 · Bibliothèque Coran</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column;">
+            <div style="padding:8px 24px 14px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="font:800 26px 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Le Coran</div>
+                <div style="display:flex; align-items:center; gap:5px; background:rgba(46,158,107,.14); padding:6px 11px; border-radius:999px;"><span style="width:6px; height:6px; border-radius:50%; background:var(--success);"></span><span style="font:600 12px 'Plus Jakarta Sans'; color:var(--success);">Gratuit</span></div>
+              </div>
+              <div style="margin-top:14px; display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px;">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                <span style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink2);">Rechercher une sourate</span>
+              </div>
+            </div>
+            <div style="flex:1; overflow:hidden; padding:0 24px;">
+              <div style="background:var(--primary); border-radius:16px; padding:16px; display:flex; align-items:center; gap:14px; box-shadow:0 10px 24px -12px var(--primary);">
+                <div style="width:46px; height:46px; border-radius:12px; background:rgba(201,154,63,.25); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v12l4-2.5 4 2.5V6z"/></svg></div>
+                <div style="flex:1;">
+                  <div style="font:600 11px 'Plus Jakarta Sans'; letter-spacing:.1em; text-transform:uppercase; color:var(--gold);">Reprendre</div>
+                  <div style="font:700 16px 'Plus Jakarta Sans'; color:var(--on-primary); margin-top:2px;">Al-Fatiha · verset 5</div>
+                  <div style="margin-top:8px; height:5px; border-radius:999px; background:rgba(255,255,255,.18);"><div style="width:62%; height:100%; border-radius:999px; background:var(--gold);"></div></div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; display:flex; flex-direction:column;">
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 2px; border-bottom:1px solid var(--line);">
+                  <div style="width:42px; height:42px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; background:var(--tan); transform:rotate(45deg); border-radius:9px;"></div><span style="position:relative; font:700 14px 'Plus Jakarta Sans'; color:var(--primary);">1</span></div>
+                  <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">Al-Fatiha</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">L'Ouverture · 7 versets</div></div>
+                  <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--primary);">الفاتحة</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 2px; border-bottom:1px solid var(--line);">
+                  <div style="width:42px; height:42px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; background:var(--tan); transform:rotate(45deg); border-radius:9px;"></div><span style="position:relative; font:700 14px 'Plus Jakarta Sans'; color:var(--primary);">2</span></div>
+                  <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">Al-Baqara</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">La Vache · 286 versets</div></div>
+                  <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--primary);">البقرة</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 2px; border-bottom:1px solid var(--line);">
+                  <div style="width:42px; height:42px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; background:var(--tan); transform:rotate(45deg); border-radius:9px;"></div><span style="position:relative; font:700 14px 'Plus Jakarta Sans'; color:var(--primary);">3</span></div>
+                  <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">Aal-Imran</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">La Famille d'Imran · 200 versets</div></div>
+                  <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--primary);">آل عمران</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 2px; border-bottom:1px solid var(--line);">
+                  <div style="width:42px; height:42px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; background:var(--tan); transform:rotate(45deg); border-radius:9px;"></div><span style="position:relative; font:700 13px 'Plus Jakarta Sans'; color:var(--primary);">112</span></div>
+                  <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">Al-Ikhlas</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">Le Monothéisme pur · 4 versets</div></div>
+                  <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--primary);">الإخلاص</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:13px 2px;">
+                  <div style="width:42px; height:42px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; background:var(--tan); transform:rotate(45deg); border-radius:9px;"></div><span style="position:relative; font:700 13px 'Plus Jakarta Sans'; color:var(--primary);">114</span></div>
+                  <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">An-Nas</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">Les Hommes · 6 versets</div></div>
+                  <span dir="rtl" style="font-family:'Amiri Quran'; font-size:24px; color:var(--primary);">الناس</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:80px; border-top:1px solid var(--line); background:var(--surface); display:flex; align-items:flex-start; padding:13px 6px 0; justify-content:space-around;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.2 9.3V20h13.6V9.3"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Parcours</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--primary);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.5-1.1-3.6-1.6-6.5-1.4-.8 0-1.3.5-1.3 1.2V18c0 .7.6 1.1 1.3 1 2.7-.1 4.7.3 6.5 1.4"/><path d="M12 6c1.5-1.1 3.6-1.6 6.5-1.4.8 0 1.3.5 1.3 1.2V18c0 .7-.6 1.1-1.3 1-2.7-.1-4.7.3-6.5 1.4"/><path d="M12 6v14.4"/></svg>
+                <span style="font:700 11px 'Plus Jakarta Sans';">Coran</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.2"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Pratique</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Profil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 LECTEUR DE SOURATE -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">08 · Lecteur de sourate</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column;">
+            <div style="padding:6px 22px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+              <div style="flex:1; text-align:center;">
+                <div style="font:800 17px 'Plus Jakarta Sans'; color:var(--ink);">Al-Fatiha</div>
+                <div style="font:500 12px 'Plus Jakarta Sans'; color:var(--ink2);">L'Ouverture · 7 versets</div>
+              </div>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </div>
+
+            <div style="flex:1; overflow:hidden; padding:6px 24px 0;">
+              <div style="text-align:center; padding:16px 0 12px;">
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; color:var(--gold); line-height:1;">۞</span>
+              </div>
+              <div style="padding:16px 0; border-bottom:1px solid var(--line);">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <div style="width:30px; height:30px; border-radius:50%; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:none;"><span style="font:700 12px 'Plus Jakarta Sans'; color:var(--gold);">1</span></div>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="var(--ink2)"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>
+                </div>
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; line-height:2.1; color:var(--ink); text-align:right;">بِسْمِ <span style="color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:2px;">ٱللَّهِ</span> ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+                <div style="font:500 13.5px/1.5 'Plus Jakarta Sans'; color:var(--ink2); margin-top:10px;">Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux.</div>
+              </div>
+              <div style="padding:16px 0; border-bottom:1px solid var(--line);">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <div style="width:30px; height:30px; border-radius:50%; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:none;"><span style="font:700 12px 'Plus Jakarta Sans'; color:var(--gold);">2</span></div>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="var(--ink2)"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg>
+                </div>
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; line-height:2.1; color:var(--ink); text-align:right;">ٱلْحَمْدُ <span style="color:var(--gold); border-bottom:2px solid var(--gold); padding-bottom:2px;">لِلَّهِ</span> رَبِّ ٱلْعَٰلَمِينَ</div>
+                <div style="font:500 13.5px/1.5 'Plus Jakarta Sans'; color:var(--ink2); margin-top:10px;">Louange à Allah, Seigneur de l'univers.</div>
+              </div>
+              <div style="padding:16px 0;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <div style="width:30px; height:30px; border-radius:50%; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; flex:none;"><span style="font:700 12px 'Plus Jakarta Sans'; color:var(--gold);">3</span></div>
+                </div>
+                <div dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; line-height:2.1; color:var(--ink); text-align:right;">ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+                <div style="font:500 13.5px/1.5 'Plus Jakarta Sans'; color:var(--ink2); margin-top:10px;">Le Tout Miséricordieux, le Très Miséricordieux.</div>
+              </div>
+            </div>
+
+            <div style="margin:0 16px 14px; background:var(--primary); border-radius:18px; padding:13px 16px; display:flex; align-items:center; gap:13px; box-shadow:0 12px 26px -12px var(--primary);">
+              <div style="width:44px; height:44px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2E2118"><path d="M7 5v14l11-7z"/></svg></div>
+              <div style="flex:1;">
+                <div style="font:700 13px 'Plus Jakarta Sans'; color:var(--on-primary);">Récitation · verset 1</div>
+                <div style="margin-top:7px; height:4px; border-radius:999px; background:rgba(255,255,255,.2);"><div style="width:25%; height:100%; border-radius:999px; background:var(--gold);"></div></div>
+              </div>
+              <span style="font:600 11px 'Plus Jakarta Sans'; color:rgba(255,253,247,.7);">0:14</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="max-width:1560px; margin:56px auto 22px; display:flex; align-items:center; gap:16px;">
+    <span style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.2em; text-transform:uppercase; color:var(--desk-ink);">Compte &amp; Premium</span>
+    <span style="flex:1; height:1px; background:var(--border);"></span>
+  </div>
+  <div style="max-width:1560px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 46px;">
+
+    <!-- 09 PROFIL -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">09 · Profil</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column;">
+            <div style="flex:1; overflow:hidden; padding:8px 24px 0;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="font:800 24px 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Profil</div>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 12a7.4 7.4 0 0 0-.1-1.3l1.8-1.4-1.7-3-2.1.8a7.3 7.3 0 0 0-2.3-1.3l-.3-2.2H10l-.3 2.2a7.3 7.3 0 0 0-2.3 1.3L5.3 5.3l-1.7 3 1.8 1.4a7.4 7.4 0 0 0 0 2.6l-1.8 1.4 1.7 3 2.1-.8a7.3 7.3 0 0 0 2.3 1.3l.3 2.2h4l.3-2.2a7.3 7.3 0 0 0 2.3-1.3l2.1.8 1.7-3-1.8-1.4c.1-.4.1-.8.1-1.3z"/></svg>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:16px; margin-top:18px;">
+                <div style="width:72px; height:72px; flex:none; position:relative; display:flex; align-items:center; justify-content:center;">
+                  <div style="position:absolute; inset:0; background:var(--tan); border-radius:20px;"></div>
+                  <div style="position:absolute; inset:0; border:2px solid var(--gold); border-radius:20px; transform:rotate(45deg); opacity:.5;"></div>
+                  <span style="position:relative; font:800 30px 'Plus Jakarta Sans'; color:var(--primary);">Y</span>
+                </div>
+                <div>
+                  <div style="font:800 21px 'Plus Jakarta Sans'; color:var(--ink);">Yacine</div>
+                  <div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:3px;">Niveau débutant · membre depuis avril</div>
+                  <div style="display:inline-flex; align-items:center; gap:5px; margin-top:7px; background:rgba(201,154,63,.16); padding:4px 9px; border-radius:999px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span style="font:700 11px 'Plus Jakarta Sans'; color:var(--gold);">Niveau 3</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:20px;">
+                <div style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 8px; text-align:center;"><div style="font:800 20px 'Plus Jakarta Sans'; color:var(--ink);">340</div><div style="font:600 11px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:2px;">XP total</div></div>
+                <div style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 8px; text-align:center;"><div style="font:800 20px 'Plus Jakarta Sans'; color:var(--flame);">5</div><div style="font:600 11px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:2px;">Série (jours)</div></div>
+                <div style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 8px; text-align:center;"><div style="font:800 20px 'Plus Jakarta Sans'; color:var(--ink);">12</div><div style="font:600 11px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:2px;">Leçons</div></div>
+              </div>
+
+              <div style="font:700 13px 'Plus Jakarta Sans'; color:var(--ink); margin-top:22px;">Badges obtenus</div>
+              <div style="display:flex; gap:14px; margin-top:12px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:52px; height:52px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg></div><span style="font:600 10px 'Plus Jakarta Sans'; color:var(--ink2);">1ʳᵉ lettre</span></div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:52px; height:52px; border-radius:50%; background:var(--flame); display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5c.4 3-1.6 4.4-2.9 6.1C7.6 10.6 7 12.3 7 14a5 5 0 0 0 10 0c0-2.2-1.1-3.7-2-5-.3 1-.9 1.6-1.7 1.9.5-2.6-.6-5.6-1.4-8.4z"/></svg></div><span style="font:600 10px 'Plus Jakarta Sans'; color:var(--ink2);">Série 5j</span></div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:52px; height:52px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><span style="font:600 10px 'Plus Jakarta Sans'; color:var(--ink2);">Niveau 1</span></div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;"><div style="width:52px; height:52px; border-radius:50%; background:var(--locked); display:flex; align-items:center; justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--locked-ink)" stroke-width="1.9"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><span style="font:600 10px 'Plus Jakarta Sans'; color:var(--ink2);">Verrouillé</span></div>
+              </div>
+
+              <div style="margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:4px 16px;">
+                <div onClick="{{ toggleTheme }}" style="display:flex; align-items:center; justify-content:space-between; padding:13px 0; cursor:pointer;">
+                  <div style="display:flex; align-items:center; gap:12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--ink2)"><path d="M21 13.2A9 9 0 1 1 10.8 3 7 7 0 0 0 21 13.2z"/></svg><span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">Mode sombre</span></div>
+                  <div style="width:46px; height:27px; border-radius:999px; background:var(--primary); padding:3px; display:flex; justify-content:flex-end;"><div style="width:21px; height:21px; border-radius:50%; background:var(--on-primary);"></div></div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-top:1px solid var(--line);">
+                  <div style="display:flex; align-items:center; gap:12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="1.8"><path d="M12 8v8M8 12h8" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg><span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">Taille du texte</span></div>
+                  <span style="font:600 13px 'Plus Jakarta Sans'; color:var(--ink2);">Grand ›</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:80px; border-top:1px solid var(--line); background:var(--surface); display:flex; align-items:flex-start; padding:13px 6px 0; justify-content:space-around;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.2 9.3V20h13.6V9.3"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Parcours</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.5-1.1-3.6-1.6-6.5-1.4-.8 0-1.3.5-1.3 1.2V18c0 .7.6 1.1 1.3 1 2.7-.1 4.7.3 6.5 1.4"/><path d="M12 6c1.5-1.1 3.6-1.6 6.5-1.4.8 0 1.3.5 1.3 1.2V18c0 .7-.6 1.1-1.3 1-2.7-.1-4.7.3-6.5 1.4"/><path d="M12 6v14.4"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Coran</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.2"/></svg>
+                <span style="font:600 11px 'Plus Jakarta Sans';">Pratique</span>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--primary);">
+                <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
+                <span style="font:700 11px 'Plus Jakarta Sans';">Profil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 PAYWALL -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">10 · Paywall premium</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:8px 24px 24px;">
+            <div style="display:flex; justify-content:flex-end;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </div>
+            <div style="text-align:center; margin-top:6px;">
+              <div style="width:64px; height:64px; margin:0 auto; border-radius:18px; background:rgba(201,154,63,.16); display:flex; align-items:center; justify-content:center;"><svg width="32" height="32" viewBox="0 0 24 24" fill="var(--gold)"><path d="M3 7l4.5 3L12 4l4.5 6L21 7l-1.6 11H4.6z"/></svg></div>
+              <div style="font:800 25px/1.2 'Plus Jakarta Sans'; color:var(--ink); margin-top:16px; letter-spacing:-.02em;">Va plus loin avec<br>Premium</div>
+              <div style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink2); margin-top:8px;">Débloque l'apprentissage avancé et tes certificats.</div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:11px; margin-top:20px;">
+              <div style="display:flex; align-items:center; gap:11px;"><div style="width:22px; height:22px; border-radius:50%; background:rgba(201,154,63,.18); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><span style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink);">Toutes les leçons &amp; règles de tajwid</span></div>
+              <div style="display:flex; align-items:center; gap:11px;"><div style="width:22px; height:22px; border-radius:50%; background:rgba(201,154,63,.18); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><span style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink);">Certificats de fin de niveau</span></div>
+              <div style="display:flex; align-items:center; gap:11px;"><div style="width:22px; height:22px; border-radius:50%; background:rgba(201,154,63,.18); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><span style="font:500 14px 'Plus Jakarta Sans'; color:var(--ink);">Hors-ligne &amp; sans publicité</span></div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+              <div style="flex:1; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:14px 10px; text-align:center;"><div style="font:600 12px 'Plus Jakarta Sans'; color:var(--ink2);">Mensuel</div><div style="font:800 17px 'Plus Jakarta Sans'; color:var(--ink); margin-top:4px;">4,99€</div><div style="font:500 11px 'Plus Jakarta Sans'; color:var(--ink2);">/mois</div></div>
+              <div style="flex:1.15; background:var(--surface); border:2.5px solid var(--gold); border-radius:14px; padding:14px 10px; text-align:center; position:relative;"><div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--gold); color:#2E2118; font:700 9px 'Plus Jakarta Sans'; letter-spacing:.06em; padding:3px 9px; border-radius:999px; white-space:nowrap;">MEILLEURE OFFRE</div><div style="font:600 12px 'Plus Jakarta Sans'; color:var(--ink2);">À vie</div><div style="font:800 17px 'Plus Jakarta Sans'; color:var(--ink); margin-top:4px;">79,99€</div><div style="font:500 11px 'Plus Jakarta Sans'; color:var(--gold);">paiement unique</div></div>
+              <div style="flex:1; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:14px 10px; text-align:center;"><div style="font:600 12px 'Plus Jakarta Sans'; color:var(--ink2);">Annuel</div><div style="font:800 17px 'Plus Jakarta Sans'; color:var(--ink); margin-top:4px;">39,99€</div><div style="font:500 11px 'Plus Jakarta Sans'; color:var(--ink2);">/an</div></div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px; margin-top:16px; background:rgba(46,158,107,.12); border-radius:12px; padding:12px 14px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+              <span style="font:600 12.5px/1.4 'Plus Jakarta Sans'; color:var(--ink);">La lecture du Coran reste <span style="color:var(--success);">100% gratuite</span>, pour toujours.</span>
+            </div>
+
+            <button style="margin-top:auto; background:var(--gold); color:#2E2118; border:none; border-radius:14px; padding:18px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; box-shadow:0 12px 26px -10px var(--gold);">Choisir « À vie » — 79,99€</button>
+            <div style="text-align:center; margin-top:12px; display:flex; justify-content:center; gap:18px;"><span style="font:600 12px 'Plus Jakarta Sans'; color:var(--ink2);">Restaurer mes achats</span><span style="font:600 12px 'Plus Jakarta Sans'; color:var(--ink2);">Conditions</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="max-width:1560px; margin:56px auto 6px; display:flex; align-items:center; gap:16px;">
+    <span style="font:700 13px 'Plus Jakarta Sans'; letter-spacing:.2em; text-transform:uppercase; color:var(--desk-ink);">Variantes à explorer</span>
+    <span style="flex:1; height:1px; background:var(--border);"></span>
+  </div>
+  <div style="max-width:1560px; margin:0 auto 18px; font:500 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">Deux directions alternatives, en plus du basculement clair / sombre déjà disponible sur tous les écrans.</div>
+  <div style="max-width:1560px; margin:0 auto; display:flex; flex-wrap:wrap; gap:52px 46px;">
+
+    <!-- VAR A — LECON IMMERSIVE -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">Variante A · Leçon « immersive » (arabe pleine page)</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--primary);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--on-primary);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--on-primary)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--on-primary)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--on-primary); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--on-primary); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--on-primary); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column; padding:6px 26px 28px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              <div style="flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.18); overflow:hidden;"><div style="width:38%; height:100%; background:var(--gold); border-radius:999px;"></div></div>
+              <span style="font:700 13px 'Plus Jakarta Sans'; color:rgba(255,253,247,.75);">3/8</span>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+              <span style="font:600 12px 'Plus Jakarta Sans'; letter-spacing:.16em; text-transform:uppercase; color:var(--gold);">Nouvelle lettre · 2ᵉ</span>
+              <div dir="rtl" style="font-family:'Amiri Quran'; font-size:180px; line-height:1; color:var(--on-primary); margin:18px 0 6px;">بـ</div>
+              <div style="font:800 30px 'Plus Jakarta Sans'; color:var(--gold);">Bā</div>
+              <div style="font:500 15px 'Plus Jakarta Sans'; color:rgba(255,253,247,.7); margin-top:4px;">se prononce « b »</div>
+              <div style="display:flex; gap:10px; margin-top:26px;">
+                <div style="background:rgba(255,255,255,.1); border-radius:12px; padding:10px 16px;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; color:var(--on-primary);">بَ</span><div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.65);">ba</div></div>
+                <div style="background:rgba(255,255,255,.1); border-radius:12px; padding:10px 16px;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; color:var(--on-primary);">بِ</span><div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.65);">bi</div></div>
+                <div style="background:rgba(255,255,255,.1); border-radius:12px; padding:10px 16px;"><span dir="rtl" style="font-family:'Amiri Quran'; font-size:30px; color:var(--on-primary);">بُ</span><div style="font:600 12px 'Plus Jakarta Sans'; color:rgba(255,253,247,.65);">bou</div></div>
+              </div>
+            </div>
+            <button style="background:var(--gold); color:#2E2118; border:none; border-radius:14px; padding:18px; font:700 16px 'Plus Jakarta Sans'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 12px 26px -10px rgba(0,0,0,.5);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E2118" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z" fill="#2E2118"/><path d="M16.5 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/></svg>
+              Écouter la prononciation
+            </button>
+            <button style="margin-top:10px; background:rgba(255,255,255,.1); color:var(--on-primary); border:none; border-radius:14px; padding:15px; font:600 15px 'Plus Jakarta Sans'; cursor:pointer;">Suivant</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAR B — PARCOURS CHAPITRES -->
+    <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+      <div style="font:600 14px 'Plus Jakarta Sans'; color:var(--desk-ink);">Variante B · Parcours en « chapitres » (liste de cartes)</div>
+      <div style="width:392px; padding:13px; border-radius:56px; background:#0C0A08; box-shadow:0 34px 64px -22px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.05);">
+        <div style="position:relative; width:366px; height:792px; border-radius:44px; overflow:hidden; background:var(--bg);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:116px; height:33px; border-radius:20px; background:#0C0A08; z-index:30;"></div>
+          <div style="position:absolute; inset:0 0 auto 0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 9px; z-index:20;">
+            <span style="font:600 15px 'Plus Jakarta Sans'; color:var(--ink);">9:41</span>
+            <div style="display:flex; align-items:center; gap:7px;">
+              <svg width="18" height="12" viewBox="0 0 18 12"><g fill="var(--ink)"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1.5" width="3" height="10.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></g></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="var(--ink)" stroke-width="1.5"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.6 6.3a7 7 0 0 1 9.8 0"/><path d="M6.1 8.9a3.2 3.2 0 0 1 4.8 0"/></svg>
+              <div style="display:flex; align-items:center; gap:2px;"><div style="width:23px; height:12px; border:1.4px solid var(--ink); border-radius:3px; padding:1.6px;"><div style="width:78%; height:100%; background:var(--ink); border-radius:1px;"></div></div><div style="width:1.5px; height:4px; background:var(--ink); border-radius:1px; opacity:.5;"></div></div>
+            </div>
+          </div>
+          <div style="position:absolute; inset:54px 0 0 0; display:flex; flex-direction:column;">
+            <div style="padding:8px 24px 12px; display:flex; align-items:center; justify-content:space-between;">
+              <div><div style="font:800 22px 'Plus Jakarta Sans'; color:var(--ink); letter-spacing:-.02em;">Ton parcours</div><div style="font:500 13px 'Plus Jakarta Sans'; color:var(--ink2);">Unité 1 · Les lettres</div></div>
+              <div style="display:flex; gap:8px;">
+                <div style="display:flex; align-items:center; gap:5px; background:var(--tan); padding:7px 10px; border-radius:999px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--flame)"><path d="M12 2.5c.4 3-1.6 4.4-2.9 6.1C7.6 10.6 7 12.3 7 14a5 5 0 0 0 10 0c0-2.2-1.1-3.7-2-5-.3 1-.9 1.6-1.7 1.9.5-2.6-.6-5.6-1.4-8.4z"/></svg><span style="font:700 13px 'Plus Jakarta Sans'; color:var(--ink);">5</span></div>
+              </div>
+            </div>
+            <div style="flex:1; overflow:hidden; padding:6px 24px 0; display:flex; flex-direction:column; gap:12px;">
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:15px; display:flex; align-items:center; gap:13px; opacity:.78;">
+                <div style="width:46px; height:46px; border-radius:13px; background:var(--primary); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--on-primary)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+                <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">1 · Alif &amp; Bā</div><div style="font:500 12px 'Plus Jakarta Sans'; color:var(--success);">Terminé · ★★★</div></div>
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:26px; color:var(--ink2);">ا ب</span>
+              </div>
+              <div style="background:var(--surface); border:2px solid var(--gold); border-radius:16px; padding:15px; display:flex; align-items:center; gap:13px; box-shadow:0 12px 28px -14px rgba(201,154,63,.6);">
+                <div style="width:46px; height:46px; border-radius:13px; background:var(--gold); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg></div>
+                <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink);">2 · Tā &amp; Thā</div><div style="margin-top:7px; height:6px; border-radius:999px; background:var(--tan);"><div style="width:40%; height:100%; border-radius:999px; background:var(--gold);"></div></div></div>
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:26px; color:var(--primary);">ت ث</span>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:15px; display:flex; align-items:center; gap:13px;">
+                <div style="width:46px; height:46px; border-radius:13px; background:var(--locked); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--locked-ink)" stroke-width="1.9"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+                <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink2);">3 · Jīm &amp; Ḥā</div><div style="font:500 12px 'Plus Jakarta Sans'; color:var(--ink2);">Verrouillé</div></div>
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:26px; color:var(--locked-ink);">ج ح</span>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:15px; display:flex; align-items:center; gap:13px;">
+                <div style="width:46px; height:46px; border-radius:13px; background:var(--locked); display:flex; align-items:center; justify-content:center; flex:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--locked-ink)" stroke-width="1.9"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+                <div style="flex:1;"><div style="font:700 16px 'Plus Jakarta Sans'; color:var(--ink2);">4 · Dāl &amp; Rā</div><div style="font:500 12px 'Plus Jakarta Sans'; color:var(--ink2);">Verrouillé</div></div>
+                <span dir="rtl" style="font-family:'Amiri Quran'; font-size:26px; color:var(--locked-ink);">د ر</span>
+              </div>
+            </div>
+            <div style="height:80px; border-top:1px solid var(--line); background:var(--surface); display:flex; align-items:flex-start; padding:13px 6px 0; justify-content:space-around;">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--primary);"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.2 9.3V20h13.6V9.3"/></svg><span style="font:700 11px 'Plus Jakarta Sans';">Parcours</span></div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.5-1.1-3.6-1.6-6.5-1.4-.8 0-1.3.5-1.3 1.2V18c0 .7.6 1.1 1.3 1 2.7-.1 4.7.3 6.5 1.4"/><path d="M12 6c1.5-1.1 3.6-1.6 6.5-1.4.8 0 1.3.5 1.3 1.2V18c0 .7-.6 1.1-1.3 1-2.7-.1-4.7.3-6.5 1.4"/><path d="M12 6v14.4"/></svg><span style="font:600 11px 'Plus Jakarta Sans';">Coran</span></div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.2"/></svg><span style="font:600 11px 'Plus Jakarta Sans';">Pratique</span></div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink2);"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg><span style="font:600 11px 'Plus Jakarta Sans';">Profil</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!--SECTIONS-->
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startInDark&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { dark: null };
+  renderVals() {
+    const dark = this.state.dark === null ? !!this.props.startInDark : this.state.dark;
+    return {
+      theme: dark ? 'dark' : 'light',
+      toggleLabel: dark ? 'Mode clair' : 'Mode sombre',
+      toggleTheme: () => this.setState(s => ({ dark: !(s.dark === null ? !!this.props.startInDark : s.dark) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,5 +1,47 @@
 {
-  "enabledPlugins": {
-    "expo@claude-plugins-official": true
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell(npx --version)",
+      "PowerShell(npx --yes create-expo-app@latest . --template default 2>&1)",
+      "PowerShell(npx --yes create-expo-app@latest _scaffold --template default 2>&1)",
+      "PowerShell($src = \"c:\\\\Dev\\\\Tahajji\\\\_scaffold\"; $dst = \"c:\\\\Dev\\\\Tahajji\"; Get-ChildItem -Force -Path $src | ForEach-Object { Move-Item -LiteralPath $_.FullName -Destination $dst -Force }; Remove-Item -LiteralPath $src -Recurse -Force; Get-ChildItem -Force $dst | Select-Object Name)",
+      "PowerShell(npm view @expo-google-fonts/amiri-quran version 2>$null)",
+      "PowerShell(npm view @expo-google-fonts/amiri version 2>$null)",
+      "PowerShell(if \\($?\\) { \"amiri-quran: dispo\" } else { \"amiri-quran: absent\" })",
+      "PowerShell(if \\($?\\) { \"amiri: dispo\" } else { \"amiri: absent\" })",
+      "PowerShell(npx --yes expo install @expo-google-fonts/amiri-quran 2>&1)",
+      "PowerShell(npx --yes expo-doctor 2>&1)",
+      "PowerShell(npx --yes expo install expo-asset 2>&1)",
+      "PowerShell(npx --yes tsc --noEmit 2>&1)",
+      "PowerShell($env:CI=\"1\"; npx --yes expo export --platform web --output-dir .expo-export-check 2>&1 | Select-Object -Last 30)",
+      "PowerShell(\"nettoy�\")",
+      "PowerShell(npx --yes tsc --noEmit 2>&1 | Select-Object -First 30; Write-Output \"=== exit: $LASTEXITCODE ===\")",
+      "Read(//c/Users/cegep garneau/.claude/projects/c--Dev-Tahajji/memory/**)",
+      "PowerShell(npm install expo@^54.0.0 2>&1)",
+      "PowerShell(node -e \"console.log\\('expo', require\\('./node_modules/expo/package.json'\\).version\\)\")",
+      "PowerShell(npx --yes expo install --fix 2>&1)",
+      "Bash(node -e \"console.log\\('vector-icons', require\\('@expo/vector-icons/package.json'\\).version\\)\")",
+      "Bash(ls node_modules/@expo/vector-icons/build/Ionicons.js)",
+      "PowerShell(npx --yes expo install @expo/vector-icons 2>&1)",
+      "PowerShell(npx --yes tsc --noEmit 2>&1 | Select-Object -First 50; Write-Output \"=== exit: $LASTEXITCODE ===\")",
+      "Bash(ls node_modules/@expo/vector-icons/package.json)",
+      "Bash(node -e \"console.log\\(require\\('@expo/vector-icons/package.json'\\).version\\)\")",
+      "PowerShell(npx --yes tsc --noEmit 2>&1 | Select-Object -First 20; Write-Output \"=== tsc exit: $LASTEXITCODE ===\")",
+      "PowerShell(npx --yes tsc --noEmit 2>&1 | Select-Object -First 15; Write-Output \"=== tsc exit: $LASTEXITCODE ===\")",
+      "Bash(node -e \"const r=require\\('expo-router'\\); console.log\\('Stack:', typeof r.Stack, '| Protected on Stack:', r.Stack && typeof r.Stack.Protected\\); console.log\\('keys sample:', Object.keys\\(r\\).filter\\(k=>/Protect|Redirect|Stack|Slot/.test\\(k\\)\\)\\)\")",
+      "Bash(cat babel.config.js)",
+      "Bash(grep -rn \"worklets\\\\|reanimated\" babel.config.js metro.config.js)",
+      "Bash(node -e \"console.log\\('reanimated', require\\('react-native-reanimated/package.json'\\).version\\); console.log\\('worklets', require\\('react-native-worklets/package.json'\\).version\\)\")",
+      "PowerShell(npx --yes tsc --noEmit 2>&1 | Select-Object -First 25; Write-Output \"=== tsc exit: $LASTEXITCODE ===\")",
+      "Bash(node -e \"console.log\\(require\\('babel-preset-expo/package.json'\\).version\\)\")",
+      "PowerShell(cd \"c:\\\\Dev\\\\Tahajji\"; Write-Output \"=== branch ===\"; git branch; Write-Output \"=== remote ===\"; git remote -v; Write-Output \"=== log ===\"; git log --oneline -5 2>&1; Write-Output \"=== status \\(court\\) ===\"; git status --short | Select-Object -First 30; Write-Output \"=== count fichiers modifiés ===\"; \\(git status --short | Measure-Object -Line\\).Lines)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\cegep garneau\\.claude\\projects\\c--Dev-Tahajji\\memory",
+      "c:\\Users\\cegep garneau\\.claude\\projects\\c--Dev-Tahajji",
+      "c:\\Dev\\Tahajji\\node_modules"
+    ]
   }
 }
