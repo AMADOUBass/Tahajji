@@ -75,15 +75,15 @@ export default function VerifyOtpScreen() {
 
       <TextInput
         value={code}
-        onChangeText={(t) => setCode(t.replace(/[^0-9]/g, '').slice(0, 6))}
-        placeholder="••••••"
+        onChangeText={(t) => setCode(t.replace(/[^0-9]/g, '').slice(0, 10))}
+        placeholder="––––––"
         placeholderTextColor={colors.textSecondary}
         keyboardType="number-pad"
         style={{
           borderWidth: 1.5, borderColor: colors.primary, backgroundColor: colors.surface,
           borderRadius: radius.md, height: 64, marginTop: spacing.xl,
-          fontFamily: fonts.bold, fontSize: 28, color: colors.text,
-          textAlign: 'center', letterSpacing: 8,
+          fontFamily: fonts.bold, fontSize: 26, color: colors.text,
+          textAlign: 'center', letterSpacing: 6,
         }}
       />
 
