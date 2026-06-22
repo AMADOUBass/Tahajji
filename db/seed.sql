@@ -10,7 +10,8 @@
 --      Contenu généré — À FAIRE VALIDER par une autorité avant publication.
 -- ============================================================
 
-truncate table verses, surahs, quiz_questions, lesson_items, lessons, levels restart identity cascade;
+-- (Le Coran — surahs/verses — est géré séparément par db/import_quran.sql.)
+truncate table quiz_questions, lesson_items, lessons, levels restart identity cascade;
 
 -- ========== NIVEAUX ==========
 insert into levels (id, position, title, description, is_premium) values
@@ -115,33 +116,10 @@ insert into quiz_questions (id, lesson_id, position, question_type, prompt, arab
   (31, 15, 3, 'recognize_letter', 'Quelle lettre se nomme « Ṣād » ?', null, null, 'ص', '["ض","س","ص","ط"]'),
   (32, 15, 4, 'recognize_letter', 'Quelle lettre se nomme « Qāf » ?', null, null, 'ق', '["ف","ك","ق","ع"]');
 
--- ========== SOURATES (échantillon du Juz ''Amma + ouverture) ==========
-insert into surahs (id, number, name_ar, name_fr, revelation_type, verse_count) values
-  (1, 1, 'الفاتحة', 'L''Ouverture', 'meccan', 7),
-  (2, 2, 'البقرة', 'La Vache', 'medinan', 286),
-  (3, 3, 'آل عمران', 'La Famille d''Imran', 'medinan', 200),
-  (112, 112, 'الإخلاص', 'Le Monothéisme pur', 'meccan', 4),
-  (113, 113, 'الفلق', 'L''Aube naissante', 'meccan', 5),
-  (114, 114, 'الناس', 'Les Hommes', 'meccan', 6);
-
--- ========== VERSETS ==========
-insert into verses (id, surah_id, number, arabic_text, translation_fr, translation_en, audio_url) values
-  (1, 1, 1, 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'Au nom d''Allah, le Tout Miséricordieux, le Très Miséricordieux.', null, null),
-  (2, 1, 2, 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ', 'Louange à Allah, Seigneur de l''univers.', null, null),
-  (3, 1, 3, 'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'Le Tout Miséricordieux, le Très Miséricordieux.', null, null),
-  (4, 1, 4, 'مَٰلِكِ يَوْمِ ٱلدِّينِ', 'Maître du Jour de la rétribution.', null, null),
-  (5, 1, 5, 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', 'C''est Toi que nous adorons, et c''est Toi dont nous implorons secours.', null, null),
-  (6, 1, 6, 'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ', 'Guide-nous dans le droit chemin.', null, null),
-  (7, 1, 7, 'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ', 'Le chemin de ceux que Tu as comblés de faveurs, non pas de ceux qui ont encouru Ta colère, ni des égarés.', null, null),
-  (8, 112, 1, 'قُلْ هُوَ ٱللَّهُ أَحَدٌ', 'Dis : « Il est Allah, Unique.', null, null),
-  (9, 112, 2, 'ٱللَّهُ ٱلصَّمَدُ', 'Allah, Le Seul à être imploré pour ce que nous désirons.', null, null),
-  (10, 112, 3, 'لَمْ يَلِدْ وَلَمْ يُولَدْ', 'Il n''a jamais engendré, n''a pas été engendré non plus.', null, null),
-  (11, 112, 4, 'وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ', 'Et nul n''est égal à Lui. »', null, null);
-
 -- ========== RÉINITIALISER LES SÉQUENCES ==========
 select setval(pg_get_serial_sequence('levels', 'id'),         (select max(id) from levels));
 select setval(pg_get_serial_sequence('lessons', 'id'),        (select max(id) from lessons));
 select setval(pg_get_serial_sequence('lesson_items', 'id'),   (select max(id) from lesson_items));
 select setval(pg_get_serial_sequence('quiz_questions', 'id'), (select max(id) from quiz_questions));
-select setval(pg_get_serial_sequence('surahs', 'id'),         (select max(id) from surahs));
-select setval(pg_get_serial_sequence('verses', 'id'),         (select max(id) from verses));
+
+-- ➜ Ensuite, exécute db/import_quran.sql pour le Coran complet.
