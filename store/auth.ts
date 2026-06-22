@@ -1,18 +1,19 @@
 /**
- * Authentification réelle via Supabase Auth.
- * `init()` est appelé une fois au démarrage (layout racine) : il lit la session
- * persistée et s'abonne aux changements (connexion/déconnexion/refresh token).
+ * Authentification via Supabase Auth — confirmation par CODE e-mail (OTP),
+ * sans deep link. L'e-mail (envoyé par Supabase, via Resend en prod) contient
+ * un code à 6 chiffres que l'utilisateur saisit dans l'app.
  */
 import type { Session } from '@supabase/supabase-js';
 import { create } from 'zustand';
 
-import { authRedirectTo } from '@/lib/authRedirect';
 import { supabase } from '@/lib/supabase';
 
 interface AuthResult {
   error: string | null;
   needsConfirmation?: boolean;
 }
+
+type OtpType = 'signup' | 'recovery';
 
 interface AuthState {
   session: Session | null;
@@ -23,6 +24,11 @@ interface AuthState {
   signUp: (email: string, password: string) => Promise<AuthResult>;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
+  /** Vérifie le code à 6 chiffres reçu par e-mail. */
+  verifyOtp: (email: string, token: string, type: OtpType) => Promise<AuthResult>;
+  resendSignup: (email: string) => Promise<AuthResult>;
+  requestPasswordReset: (email: string) => Promise<AuthResult>;
+  updatePassword: (password: string) => Promise<AuthResult>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -54,13 +60,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signUp: async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: authRedirectTo },
-    });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
-    // Si la confirmation par e-mail est activée, aucune session n'est créée.
+    // Pas de session immédiate ⇒ un code de confirmation a été envoyé par e-mail.
     return { error: null, needsConfirmation: !data.session };
   },
 
@@ -71,5 +73,26 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signOut: async () => {
     await supabase.auth.signOut();
+  },
+
+  verifyOtp: async (email, token, type) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type });
+    return { error: error?.message ?? null };
+  },
+
+  resendSignup: async (email) => {
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    return { error: error?.message ?? null };
+  },
+
+  requestPasswordReset: async (email) => {
+    // Envoie un e-mail de réinitialisation (code OTP de type « recovery »).
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    return { error: error?.message ?? null };
+  },
+
+  updatePassword: async (password) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error?.message ?? null };
   },
 }));

@@ -30,6 +30,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const signIn = useAuthStore((s) => s.signIn);
 
   const isSignUp = mode === 'sign-up';
+  const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
   const fieldStyle = (name: 'email' | 'password') => ({
     borderWidth: 1.5,
@@ -46,8 +47,12 @@ export function AuthForm({ mode }: AuthFormProps) {
   // Auth réelle Supabase ; en cas de succès, la garde du layout monte l'app.
   const submit = async () => {
     setMessage(null);
-    if (!email.trim() || !password) {
-      setMessage('Renseigne ton e-mail et ton mot de passe.');
+    if (!isValidEmail(email.trim())) {
+      setMessage('Entre une adresse e-mail valide.');
+      return;
+    }
+    if (password.length < 6) {
+      setMessage('Le mot de passe doit faire au moins 6 caractères.');
       return;
     }
     setLoading(true);
@@ -56,7 +61,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     if (res.error) {
       setMessage(res.error);
     } else if (res.needsConfirmation) {
-      setMessage('Compte créé ! Vérifie ta boîte mail pour confirmer, puis connecte-toi.');
+      // Confirmation par code : on va à l'écran de saisie du code (pas de deep link).
+      router.push({ pathname: '/(auth)/verify-otp', params: { email: email.trim(), type: 'signup' } });
     }
   };
 
@@ -133,6 +139,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.md }}>
           {message}
         </AppText>
+      ) : null}
+
+      {!isSignUp ? (
+        <Pressable onPress={() => router.push('/(auth)/forgot-password')} style={{ marginTop: spacing.md }}>
+          <AppText variant="bodyStrong" tone="secondary" align="center">Mot de passe oublié ?</AppText>
+        </Pressable>
       ) : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginVertical: spacing.xl }}>
