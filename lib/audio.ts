@@ -19,7 +19,9 @@ export function playAudioUrl(url: string | null | undefined): boolean {
 
 /** Variantes vocalisées (fatha/kasra/damma) d'une lettre, pour les leçons. */
 export function vowelVariants(arabicLetter: string): { ar: string; translit: string }[] {
-  const base = arabicLetter.replace(/ـ/g, ''); // retire le tatweel de liaison
+  // Retire tatweel + harakât existantes pour repartir de la lettre nue
+  // (évite de doubler les diacritiques si l'entrée est déjà vocalisée).
+  const base = arabicLetter.replace(/[ـً-ْٰ]/g, '');
   return [
     { ar: base + 'َ', translit: 'a' }, // fatha
     { ar: base + 'ِ', translit: 'i' }, // kasra
