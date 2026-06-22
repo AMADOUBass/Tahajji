@@ -175,10 +175,56 @@ lessonId += 1;
   });
 }
 
-// ---------- Niveaux 4-5 : placeholders ----------
+// ---------- Niveau 4 : le tanwîn ----------
+levels.push([4, 4, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false]);
+
+const TANWIN = {
+  f: { suffix: 'ane', short: 'َ', title: 'Tanwîn fatha (-an)' },
+  k: { suffix: 'ine', short: 'ِ', title: 'Tanwîn kasra (-in)' },
+  d: { suffix: 'oune', short: 'ُ', title: 'Tanwîn dhômma (-oun)' },
+};
+// Forme tanwîn (le fatha-tanwîn s'écrit avec un alif neutre).
+const tform = (bare, k) => (k === 'f' ? bare + 'ً' + 'ا' : k === 'k' ? bare + 'ٍ' : bare + 'ٌ');
+
+for (const kind of ['f', 'k', 'd']) {
+  const cfg = TANWIN[kind];
+  const otherKind = kind === 'f' ? 'k' : kind === 'k' ? 'd' : 'f';
+  lessonId += 1;
+  const lid = lessonId;
+  lessons.push([lid, 4, lessons.filter((l) => l[1] === 4).length + 1, cfg.title, 'learn', false]);
+  MADD_SET.forEach(([bare, cons], idx) => {
+    itemId += 1;
+    items.push([itemId, lid, idx + 1, 'word', tform(bare, kind), cons + cfg.suffix, `Tanwîn : « ${cons}${cfg.suffix} »`]);
+  });
+  MADD_SET.slice(0, 4).forEach(([bare, cons], idx) => {
+    const correct = tform(bare, kind);
+    const short = bare + cfg.short;
+    const otherLetter = tform(MADD_SET[(idx + 1) % MADD_SET.length][0], kind);
+    const otherTanwin = tform(bare, otherKind);
+    const opts = [correct, short, otherLetter, otherTanwin];
+    const rot = idx % 4;
+    addQuiz(lid, idx + 1, `Quelle case se lit « ${cons}${cfg.suffix} » ?`, correct, opts.slice(rot).concat(opts.slice(0, rot)));
+  });
+}
+
+// Révision tanwîn.
+const TAN_REV = [['بًا', 'bane'], ['بٍ', 'bine'], ['بٌ', 'boune'], ['نًا', 'nane'], ['نٍ', 'nine'], ['نٌ', 'noune']];
+lessonId += 1;
+{
+  const lid = lessonId;
+  lessons.push([lid, 4, lessons.filter((l) => l[1] === 4).length + 1, 'Révision du tanwîn', 'exam', false]);
+  TAN_REV.forEach(([ar, tr], idx) => {
+    itemId += 1;
+    items.push([itemId, lid, idx + 1, 'word', ar, tr, `Se lit « ${tr} »`]);
+  });
+  TAN_REV.slice(0, 4).forEach(([ar, tr], idx) => {
+    const opts = [ar, TAN_REV[(idx + 1) % TAN_REV.length][0], TAN_REV[(idx + 3) % TAN_REV.length][0], TAN_REV[(idx + 5) % TAN_REV.length][0]];
+    addQuiz(lid, idx + 1, `Quelle case se lit « ${tr} » ?`, ar, opts);
+  });
+}
+
+// ---------- Niveau 5 : placeholder ----------
 const more = [
-  [4, 4, 'Le tanwîn', 'Les doubles voyelles : -an, -in, -oun.', false,
-    ['Tanwîn fatha (-an)', 'Tanwîn kasra (-in)', 'Tanwîn dhômma (-oun)']],
   [5, 5, 'Règles de lecture', 'Chadda, hamzatoul wasl, lettres solaires et lunaires.', true,
     ['La chadda', 'Hamzatoul wasl', 'Lettres solaires et lunaires', 'Lecture de versets']],
 ];
@@ -194,7 +240,7 @@ const sql = `-- ============================================================
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
 -- Méthode : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako),
 -- utilisée avec l'autorisation de l'auteur, fusionnée avec la Qaïda Nourania.
--- Niveaux 1-3 détaillés ; niveaux 4-5 : placeholders.
+-- Niveaux 1-4 détaillés ; niveau 5 : placeholder.
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.

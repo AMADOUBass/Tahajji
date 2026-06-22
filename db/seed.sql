@@ -2,7 +2,7 @@
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
 -- Méthode : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako),
 -- utilisée avec l'autorisation de l'auteur, fusionnée avec la Qaïda Nourania.
--- Niveaux 1-3 détaillés ; niveaux 4-5 : placeholders.
+-- Niveaux 1-4 détaillés ; niveau 5 : placeholder.
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.
@@ -14,7 +14,7 @@ insert into levels (id, position, title, description, is_premium) values
   (1, 1, 'L’alphabet — la voyelle « a »', 'Les 28 lettres lues avec la fatha (a), dans l’ordre de la méthode.', false),
   (2, 2, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false),
   (3, 3, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false),
-  (4, 4, 'Le tanwîn', 'Les doubles voyelles : -an, -in, -oun.', false),
+  (4, 4, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false),
   (5, 5, 'Règles de lecture', 'Chadda, hamzatoul wasl, lettres solaires et lunaires.', true);
 
 insert into lessons (id, level_id, position, title, lesson_type, is_premium) values
@@ -42,10 +42,11 @@ insert into lessons (id, level_id, position, title, lesson_type, is_premium) val
   (22, 4, 1, 'Tanwîn fatha (-an)', 'learn', false),
   (23, 4, 2, 'Tanwîn kasra (-in)', 'learn', false),
   (24, 4, 3, 'Tanwîn dhômma (-oun)', 'learn', false),
-  (25, 5, 1, 'La chadda', 'learn', true),
-  (26, 5, 2, 'Hamzatoul wasl', 'learn', true),
-  (27, 5, 3, 'Lettres solaires et lunaires', 'learn', true),
-  (28, 5, 4, 'Lecture de versets', 'learn', true);
+  (25, 4, 4, 'Révision du tanwîn', 'exam', false),
+  (26, 5, 1, 'La chadda', 'learn', true),
+  (27, 5, 2, 'Hamzatoul wasl', 'learn', true),
+  (28, 5, 3, 'Lettres solaires et lunaires', 'learn', true),
+  (29, 5, 4, 'Lecture de versets', 'learn', true);
 
 insert into lesson_items (id, lesson_id, position, item_type, arabic_text, transliteration, translation_fr, audio_url) values
   (1, 1, 1, 'letter', 'أَ', 'a', 'Lettre Alif / Hamza — son « a »', null),
@@ -179,7 +180,43 @@ insert into lesson_items (id, lesson_id, position, item_type, arabic_text, trans
   (129, 21, 3, 'word', 'بُو', 'boû', 'Se lit « boû »', null),
   (130, 21, 4, 'word', 'نَا', 'nâ', 'Se lit « nâ »', null),
   (131, 21, 5, 'word', 'نِي', 'nî', 'Se lit « nî »', null),
-  (132, 21, 6, 'word', 'نُو', 'noû', 'Se lit « noû »', null);
+  (132, 21, 6, 'word', 'نُو', 'noû', 'Se lit « noû »', null),
+  (133, 22, 1, 'word', 'بًا', 'bane', 'Tanwîn : « bane »', null),
+  (134, 22, 2, 'word', 'تًا', 'tane', 'Tanwîn : « tane »', null),
+  (135, 22, 3, 'word', 'جًا', 'jane', 'Tanwîn : « jane »', null),
+  (136, 22, 4, 'word', 'دًا', 'dane', 'Tanwîn : « dane »', null),
+  (137, 22, 5, 'word', 'رًا', 'rane', 'Tanwîn : « rane »', null),
+  (138, 22, 6, 'word', 'سًا', 'sane', 'Tanwîn : « sane »', null),
+  (139, 22, 7, 'word', 'لًا', 'lane', 'Tanwîn : « lane »', null),
+  (140, 22, 8, 'word', 'مًا', 'mane', 'Tanwîn : « mane »', null),
+  (141, 22, 9, 'word', 'نًا', 'nane', 'Tanwîn : « nane »', null),
+  (142, 22, 10, 'word', 'كًا', 'kane', 'Tanwîn : « kane »', null),
+  (143, 23, 1, 'word', 'بٍ', 'bine', 'Tanwîn : « bine »', null),
+  (144, 23, 2, 'word', 'تٍ', 'tine', 'Tanwîn : « tine »', null),
+  (145, 23, 3, 'word', 'جٍ', 'jine', 'Tanwîn : « jine »', null),
+  (146, 23, 4, 'word', 'دٍ', 'dine', 'Tanwîn : « dine »', null),
+  (147, 23, 5, 'word', 'رٍ', 'rine', 'Tanwîn : « rine »', null),
+  (148, 23, 6, 'word', 'سٍ', 'sine', 'Tanwîn : « sine »', null),
+  (149, 23, 7, 'word', 'لٍ', 'line', 'Tanwîn : « line »', null),
+  (150, 23, 8, 'word', 'مٍ', 'mine', 'Tanwîn : « mine »', null),
+  (151, 23, 9, 'word', 'نٍ', 'nine', 'Tanwîn : « nine »', null),
+  (152, 23, 10, 'word', 'كٍ', 'kine', 'Tanwîn : « kine »', null),
+  (153, 24, 1, 'word', 'بٌ', 'boune', 'Tanwîn : « boune »', null),
+  (154, 24, 2, 'word', 'تٌ', 'toune', 'Tanwîn : « toune »', null),
+  (155, 24, 3, 'word', 'جٌ', 'joune', 'Tanwîn : « joune »', null),
+  (156, 24, 4, 'word', 'دٌ', 'doune', 'Tanwîn : « doune »', null),
+  (157, 24, 5, 'word', 'رٌ', 'roune', 'Tanwîn : « roune »', null),
+  (158, 24, 6, 'word', 'سٌ', 'soune', 'Tanwîn : « soune »', null),
+  (159, 24, 7, 'word', 'لٌ', 'loune', 'Tanwîn : « loune »', null),
+  (160, 24, 8, 'word', 'مٌ', 'moune', 'Tanwîn : « moune »', null),
+  (161, 24, 9, 'word', 'نٌ', 'noune', 'Tanwîn : « noune »', null),
+  (162, 24, 10, 'word', 'كٌ', 'koune', 'Tanwîn : « koune »', null),
+  (163, 25, 1, 'word', 'بًا', 'bane', 'Se lit « bane »', null),
+  (164, 25, 2, 'word', 'بٍ', 'bine', 'Se lit « bine »', null),
+  (165, 25, 3, 'word', 'بٌ', 'boune', 'Se lit « boune »', null),
+  (166, 25, 4, 'word', 'نًا', 'nane', 'Se lit « nane »', null),
+  (167, 25, 5, 'word', 'نٍ', 'nine', 'Se lit « nine »', null),
+  (168, 25, 6, 'word', 'نٌ', 'noune', 'Se lit « noune »', null);
 
 insert into quiz_questions (id, lesson_id, position, question_type, prompt, arabic_text, audio_url, correct_answer, options) values
   (1, 1, 1, 'recognize_letter', 'Quelle case se lit « a » ?', 'أَ', null, 'أَ', '["أَ","إِ","أُ","حَ"]'),
@@ -265,7 +302,23 @@ insert into quiz_questions (id, lesson_id, position, question_type, prompt, arab
   (81, 21, 1, 'recognize_letter', 'Quelle case se lit « bâ » ?', 'بَا', null, 'بَا', '["بَا","بِي","نَا","نُو"]'),
   (82, 21, 2, 'recognize_letter', 'Quelle case se lit « bî » ?', 'بِي', null, 'بِي', '["بِي","بُو","نِي","بَا"]'),
   (83, 21, 3, 'recognize_letter', 'Quelle case se lit « boû » ?', 'بُو', null, 'بُو', '["بُو","نَا","نُو","بِي"]'),
-  (84, 21, 4, 'recognize_letter', 'Quelle case se lit « nâ » ?', 'نَا', null, 'نَا', '["نَا","نِي","بَا","بُو"]');
+  (84, 21, 4, 'recognize_letter', 'Quelle case se lit « nâ » ?', 'نَا', null, 'نَا', '["نَا","نِي","بَا","بُو"]'),
+  (85, 22, 1, 'recognize_letter', 'Quelle case se lit « bane » ?', 'بًا', null, 'بًا', '["بًا","بَ","تًا","بٍ"]'),
+  (86, 22, 2, 'recognize_letter', 'Quelle case se lit « tane » ?', 'تًا', null, 'تًا', '["تَ","جًا","تٍ","تًا"]'),
+  (87, 22, 3, 'recognize_letter', 'Quelle case se lit « jane » ?', 'جًا', null, 'جًا', '["دًا","جٍ","جًا","جَ"]'),
+  (88, 22, 4, 'recognize_letter', 'Quelle case se lit « dane » ?', 'دًا', null, 'دًا', '["دٍ","دًا","دَ","رًا"]'),
+  (89, 23, 1, 'recognize_letter', 'Quelle case se lit « bine » ?', 'بٍ', null, 'بٍ', '["بٍ","بِ","تٍ","بٌ"]'),
+  (90, 23, 2, 'recognize_letter', 'Quelle case se lit « tine » ?', 'تٍ', null, 'تٍ', '["تِ","جٍ","تٌ","تٍ"]'),
+  (91, 23, 3, 'recognize_letter', 'Quelle case se lit « jine » ?', 'جٍ', null, 'جٍ', '["دٍ","جٌ","جٍ","جِ"]'),
+  (92, 23, 4, 'recognize_letter', 'Quelle case se lit « dine » ?', 'دٍ', null, 'دٍ', '["دٌ","دٍ","دِ","رٍ"]'),
+  (93, 24, 1, 'recognize_letter', 'Quelle case se lit « boune » ?', 'بٌ', null, 'بٌ', '["بٌ","بُ","تٌ","بًا"]'),
+  (94, 24, 2, 'recognize_letter', 'Quelle case se lit « toune » ?', 'تٌ', null, 'تٌ', '["تُ","جٌ","تًا","تٌ"]'),
+  (95, 24, 3, 'recognize_letter', 'Quelle case se lit « joune » ?', 'جٌ', null, 'جٌ', '["دٌ","جًا","جٌ","جُ"]'),
+  (96, 24, 4, 'recognize_letter', 'Quelle case se lit « doune » ?', 'دٌ', null, 'دٌ', '["دًا","دٌ","دُ","رٌ"]'),
+  (97, 25, 1, 'recognize_letter', 'Quelle case se lit « bane » ?', 'بًا', null, 'بًا', '["بًا","بٍ","نًا","نٌ"]'),
+  (98, 25, 2, 'recognize_letter', 'Quelle case se lit « bine » ?', 'بٍ', null, 'بٍ', '["بٍ","بٌ","نٍ","بًا"]'),
+  (99, 25, 3, 'recognize_letter', 'Quelle case se lit « boune » ?', 'بٌ', null, 'بٌ', '["بٌ","نًا","نٌ","بٍ"]'),
+  (100, 25, 4, 'recognize_letter', 'Quelle case se lit « nane » ?', 'نًا', null, 'نًا', '["نًا","نٍ","بًا","بٌ"]');
 
 select setval(pg_get_serial_sequence('levels', 'id'),         (select max(id) from levels));
 select setval(pg_get_serial_sequence('lessons', 'id'),        (select max(id) from lessons));
