@@ -10,9 +10,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { AppText, InfoModal, Screen, StatPill, type InfoRow } from '@/components/ui';
+import { AppText, InfoModal, ProgressBar, Screen, StatPill, type InfoRow } from '@/components/ui';
 import { useLevelsWithProgress, useProfile } from '@/lib/queries';
-import { radius, spacing } from '@/lib/theme';
+import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import type { LessonWithProgress, LevelWithLessons } from '@/types/models';
 
@@ -62,6 +62,8 @@ export default function ParcoursScreen() {
 
 function LevelSection({ level }: { level: LevelWithLessons }) {
   const { colors } = useTheme();
+  const total = level.lessons.length;
+  const done = level.lessons.filter((l) => l.status === 'completed').length;
 
   return (
     <View style={{ marginTop: spacing.xl }}>
@@ -71,18 +73,28 @@ function LevelSection({ level }: { level: LevelWithLessons }) {
           backgroundColor: colors.primaryContainer,
           borderRadius: radius.lg,
           padding: spacing.lg,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: spacing.md,
         }}
       >
-        <View style={{ flex: 1 }}>
-          <AppText variant="overline" tone="gold">Unité {level.position}</AppText>
-          <AppText variant="title" color={colors.onPrimaryContainer} style={{ marginTop: spacing.xs }}>
-            {level.title}
-          </AppText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flex: 1 }}>
+            <AppText variant="overline" tone="gold">Unité {level.position}</AppText>
+            <AppText variant="title" color={colors.onPrimaryContainer} style={{ marginTop: spacing.xs }}>
+              {level.title}
+            </AppText>
+            {level.description ? (
+              <AppText variant="caption" color="rgba(255,253,247,0.7)" style={{ marginTop: 2 }}>
+                {level.description}
+              </AppText>
+            ) : null}
+          </View>
+          <Ionicons name={level.isPremium ? 'lock-closed' : 'book-outline'} size={22} color={colors.onPrimaryContainer} />
         </View>
-        <Ionicons name={level.isPremium ? 'lock-closed' : 'book-outline'} size={22} color={colors.onPrimaryContainer} />
+        {/* Avancement de l'unité */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+          <ProgressBar value={total ? done / total : 0} height={6} trackColor="rgba(255,255,255,0.18)" style={{ flex: 1 }} />
+          <AppText variant="caption" color="rgba(255,253,247,0.85)">{done}/{total}</AppText>
+        </View>
       </View>
 
       {/* Serpentin de nœuds */}
@@ -206,6 +218,23 @@ function LessonNode({
           {Array.from({ length: 3 }).map((_, s) => (
             <Ionicons key={s} name="star" size={12} color={s < lesson.stars ? colors.gold : colors.locked} />
           ))}
+        </View>
+      ) : null}
+
+      {/* Titre de la leçon (le nom dit ce qu'on apprend) */}
+      <AppText
+        variant="caption"
+        align="center"
+        numberOfLines={2}
+        color={locked && !inProgress ? colors.lockedInk : colors.text}
+        style={{ marginTop: spacing.xs, width: 116, fontFamily: fonts.semibold }}
+      >
+        {lesson.title}
+      </AppText>
+      {needsPremium ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
+          <Ionicons name="diamond" size={10} color={colors.gold} />
+          <AppText variant="caption" color={colors.gold} style={{ fontSize: 10 }}>Premium</AppText>
         </View>
       ) : null}
     </View>
