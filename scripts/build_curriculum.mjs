@@ -223,24 +223,82 @@ lessonId += 1;
   });
 }
 
-// ---------- Niveau 5 : placeholder ----------
-const more = [
-  [5, 5, 'Règles de lecture', 'Chadda, hamzatoul wasl, lettres solaires et lunaires.', true,
-    ['La chadda', 'Hamzatoul wasl', 'Lettres solaires et lunaires', 'Lecture de versets']],
-];
-for (const [id, pos, title, desc, premium, titles] of more) {
-  levels.push([id, pos, title, desc, premium]);
-  titles.forEach((t, idx) => {
-    lessonId += 1;
-    lessons.push([lessonId, id, idx + 1, t, 'learn', premium]);
+// ---------- Niveau 5 : règles de lecture (premium) ----------
+levels.push([5, 5, 'Règles de lecture', 'Chadda, alif maqsoura, hamzatoul wasl, lettres solaires/lunaires, chiffres et versets.', true]);
+
+// Crée une leçon « contenu » : items + (jusqu'à 4) quiz « Quel … se lit … ? ».
+function contentLesson(title, lessonType, itemType, entries, promptFn) {
+  lessonId += 1;
+  const lid = lessonId;
+  lessons.push([lid, 5, lessons.filter((l) => l[1] === 5).length + 1, title, lessonType, true]);
+  entries.forEach(([ar, tr, desc], idx) => {
+    itemId += 1;
+    items.push([itemId, lid, idx + 1, itemType, ar, tr, desc ?? `Se lit « ${tr} »`]);
+  });
+  entries.slice(0, 4).forEach((entry, idx) => {
+    const ar = entry[0];
+    const opts = [ar, entries[(idx + 1) % entries.length][0], entries[(idx + 2) % entries.length][0], entries[(idx + 3) % entries.length][0]];
+    addQuiz(lid, idx + 1, promptFn(entry), ar, opts);
   });
 }
+
+// 1. La chadda
+contentLesson('La chadda', 'learn', 'word', [
+  ['إِنَّ', 'inna', 'chadda sur le « n » — prolongé'],
+  ['ثُمَّ', 'thumma', 'chadda sur le « m » — prolongé'],
+  ['حَقَّ', 'ḥaqqa', 'chadda sur le « q »'],
+  ['خَرَّ', 'kharra', 'chadda sur le « r »'],
+  ['مَدَّ', 'madda', 'chadda sur le « d »'],
+  ['ضَلَّ', 'ḍalla', 'chadda sur le « l »'],
+], (e) => `Quel mot se lit « ${e[1]} » ?`);
+
+// 2. Alif maqsoura (ى se lit â)
+contentLesson('Alif maqsoura (ى)', 'learn', 'word', [
+  ['عَلَى', 'ʿalâ', 'le ى final se lit « â »'],
+  ['إِلَى', 'ilâ', 'le ى final se lit « â »'],
+  ['مُوسَى', 'mûsâ', 'le ى final se lit « â »'],
+  ['رَمَى', 'ramâ', 'le ى final se lit « â »'],
+], (e) => `Quel mot se lit « ${e[1]} » ?`);
+
+// 3. Hamzatoul wasl (ٱ)
+contentLesson('Hamzatoul wasl (ٱ)', 'learn', 'word', [
+  ['ٱلْحَمْدُ', 'al-ḥamdu', 'lue « a » devant un lâm'],
+  ['ٱهْدِنَا', 'ihdinâ', 'lue « i » (3ᵉ lettre kasra/fatha)'],
+  ['ٱنْظُرْ', 'ounẓur', 'lue « ou » (3ᵉ lettre dhômma)'],
+  ['ٱمْشُوا', 'imchoû', 'exception : lue « i » malgré la dhômma'],
+], (e) => `Quel mot se lit « ${e[1]} » ?`);
+
+// 4. Lettres solaires et lunaires
+contentLesson('Lettres solaires et lunaires', 'learn', 'word', [
+  ['ٱلْقَمَر', 'al-qamar', 'lunaire : on entend le « l »'],
+  ['ٱلْأَمْر', 'al-amr', 'lunaire : on entend le « l »'],
+  ['ٱلشَّمْس', 'ach-chams', 'solaire : le « l » disparaît, lettre redoublée'],
+  ['ٱلرَّحْمَٰن', 'ar-raḥmân', 'solaire : le « l » disparaît'],
+  ['ٱلصِّرَاط', 'aṣ-ṣirâṭ', 'solaire'],
+  ['ٱلطَّيْر', 'aṭ-ṭayr', 'solaire'],
+], (e) => `Quel mot se lit « ${e[1]} » ?`);
+
+// 5. Les chiffres arabes
+contentLesson('Les chiffres (٠-٩)', 'learn', 'word', [
+  ['٠', 'sifr', '0 — صِفْر'], ['١', 'wâḥid', '1 — وَاحِد'], ['٢', 'ithnân', '2 — اثْنَان'],
+  ['٣', 'thalâtha', '3 — ثَلَاثَة'], ['٤', 'arbaʿa', '4 — أَرْبَعَة'], ['٥', 'khamsa', '5 — خَمْسَة'],
+  ['٦', 'sitta', '6 — سِتَّة'], ['٧', 'sabʿa', '7 — سَبْعَة'], ['٨', 'thamâniya', '8 — ثَمَانِيَة'],
+  ['٩', 'tisʿa', '9 — تِسْعَة'],
+], (e) => `Quel chiffre est « ${e[1]} » ?`);
+
+// 6. Lecture de versets (sourate Al-Ikhlas)
+contentLesson('Lecture de versets', 'exam', 'verse', [
+  ['قُلْ هُوَ ٱللَّهُ أَحَدٌ', 'Al-Ikhlas 1', 'Dis : « Il est Allah, Unique.'],
+  ['ٱللَّهُ ٱلصَّمَدُ', 'Al-Ikhlas 2', 'Allah, Le Seul imploré.'],
+  ['لَمْ يَلِدْ وَلَمْ يُولَدْ', 'Al-Ikhlas 3', 'Il n’a pas engendré et n’a pas été engendré.'],
+  ['وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ', 'Al-Ikhlas 4', 'Et nul n’est égal à Lui. »'],
+], (e) => `Quel verset signifie « ${e[2]} » ?`);
 
 const sql = `-- ============================================================
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
 -- Méthode : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako),
 -- utilisée avec l'autorisation de l'auteur, fusionnée avec la Qaïda Nourania.
--- Niveaux 1-4 détaillés ; niveau 5 : placeholder.
+-- Niveaux 1-5 détaillés (curriculum complet).
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.
