@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -54,11 +54,15 @@ export default function ParcoursScreen() {
         <StatPill icon="heart" iconColor={colors.coral} value={5} onPress={() => setInfoVisible(true)} />
       </View>
 
-      <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl }} edges={[]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl }}
+        showsVerticalScrollIndicator={false}
+      >
         {isLoading
           ? <AppText tone="secondary" align="center" style={{ marginTop: spacing.xxl }}>Chargement…</AppText>
           : levels.map((level) => <LevelSection key={level.id} level={level} />)}
-      </Screen>
+      </ScrollView>
     </Screen>
   );
 }
@@ -177,20 +181,37 @@ function LessonNode({
     const len = Math.hypot(dx, ROW_H);
     const angle = (Math.atan2(ROW_H, dx) * 180) / Math.PI;
     connector = (
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          top: NODE_CY + ROW_H / 2 - 2,
-          left: '50%',
-          marginLeft: (offset + nextOffset) / 2 - len / 2,
-          width: len,
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: colors.primaryLight,
-          transform: [{ rotate: `${angle}deg` }],
-        }}
-      />
+      <>
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: NODE_CY + ROW_H / 2 - 2,
+            left: '50%',
+            marginLeft: (offset + nextOffset) / 2 - len / 2,
+            width: len,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: colors.primaryLight,
+            transform: [{ rotate: `${angle}deg` }],
+          }}
+        />
+        {/* Petit losange doré au milieu du segment */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: NODE_CY + ROW_H / 2 - 5,
+            left: '50%',
+            marginLeft: (offset + nextOffset) / 2 - 5,
+            width: 10,
+            height: 10,
+            borderRadius: 2,
+            backgroundColor: colors.gold,
+            transform: [{ rotate: '45deg' }],
+          }}
+        />
+      </>
     );
   }
 
