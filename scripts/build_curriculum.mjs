@@ -126,10 +126,57 @@ lessonId += 1;
   });
 }
 
-// ---------- Niveaux 3-5 : placeholders ----------
+// ---------- Niveau 3 : voyelles longues (madd) ----------
+levels.push([3, 3, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false]);
+
+// Sous-ensemble de consonnes claires pour les exercices de madd.
+const MADD_SET = [
+  ['ب', 'b'], ['ت', 't'], ['ج', 'j'], ['د', 'd'], ['ر', 'r'],
+  ['س', 's'], ['ل', 'l'], ['م', 'm'], ['ن', 'n'], ['ك', 'k'],
+];
+
+function maddLesson(vowel, maddChar, suffix, title) {
+  lessonId += 1;
+  const lid = lessonId;
+  lessons.push([lid, 3, lessons.filter((l) => l[1] === 3).length + 1, title, 'learn', false]);
+  MADD_SET.forEach(([bare, cons], idx) => {
+    itemId += 1;
+    const form = bare + vowel + maddChar;
+    items.push([itemId, lid, idx + 1, 'word', form, cons + suffix, `Allongement : « ${cons}${suffix} »`]);
+  });
+  MADD_SET.slice(0, 4).forEach(([bare, cons], idx) => {
+    const correct = bare + vowel + maddChar;          // long
+    const shortForm = bare + vowel;                    // court (même lettre)
+    const otherLong = MADD_SET[(idx + 1) % MADD_SET.length][0] + vowel + maddChar;
+    const otherShort = MADD_SET[(idx + 2) % MADD_SET.length][0] + vowel;
+    const opts = [correct, shortForm, otherLong, otherShort];
+    const rot = idx % 4;
+    addQuiz(lid, idx + 1, `Quelle case se lit « ${cons}${suffix} » (allongé) ?`, correct, opts.slice(rot).concat(opts.slice(0, rot)));
+  });
+}
+
+maddLesson(FATHA, 'ا', 'â', 'Madd par Alif (â)');
+maddLesson(KASRA, 'ي', 'î', 'Madd par Yâ (î)');
+maddLesson(DAMMA, 'و', 'oû', 'Madd par Wâw (oû)');
+
+// Révision madd (mélange â / î / oû).
+const MADD_REV = [['بَا', 'bâ'], ['بِي', 'bî'], ['بُو', 'boû'], ['نَا', 'nâ'], ['نِي', 'nî'], ['نُو', 'noû']];
+lessonId += 1;
+{
+  const lid = lessonId;
+  lessons.push([lid, 3, lessons.filter((l) => l[1] === 3).length + 1, 'Révision des voyelles longues', 'exam', false]);
+  MADD_REV.forEach(([ar, tr], idx) => {
+    itemId += 1;
+    items.push([itemId, lid, idx + 1, 'word', ar, tr, `Se lit « ${tr} »`]);
+  });
+  MADD_REV.slice(0, 4).forEach(([ar, tr], idx) => {
+    const opts = [ar, MADD_REV[(idx + 1) % MADD_REV.length][0], MADD_REV[(idx + 3) % MADD_REV.length][0], MADD_REV[(idx + 5) % MADD_REV.length][0]];
+    addQuiz(lid, idx + 1, `Quelle case se lit « ${tr} » ?`, ar, opts);
+  });
+}
+
+// ---------- Niveaux 4-5 : placeholders ----------
 const more = [
-  [3, 3, 'Les voyelles longues (madd)', 'Allongement par Alif, Yâ et Wâw.', false,
-    ['Madd par Alif (â)', 'Madd par Yâ (î)', 'Madd par Wâw (oû)']],
   [4, 4, 'Le tanwîn', 'Les doubles voyelles : -an, -in, -oun.', false,
     ['Tanwîn fatha (-an)', 'Tanwîn kasra (-in)', 'Tanwîn dhômma (-oun)']],
   [5, 5, 'Règles de lecture', 'Chadda, hamzatoul wasl, lettres solaires et lunaires.', true,
@@ -147,7 +194,7 @@ const sql = `-- ============================================================
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
 -- Méthode : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako),
 -- utilisée avec l'autorisation de l'auteur, fusionnée avec la Qaïda Nourania.
--- Niveaux 1-2 détaillés ; niveaux 3-5 : placeholders.
+-- Niveaux 1-3 détaillés ; niveaux 4-5 : placeholders.
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.

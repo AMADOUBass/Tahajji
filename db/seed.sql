@@ -2,7 +2,7 @@
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
 -- Méthode : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako),
 -- utilisée avec l'autorisation de l'auteur, fusionnée avec la Qaïda Nourania.
--- Niveaux 1-2 détaillés ; niveaux 3-5 : placeholders.
+-- Niveaux 1-3 détaillés ; niveaux 4-5 : placeholders.
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.
@@ -13,7 +13,7 @@ truncate table quiz_questions, lesson_items, lessons, levels restart identity ca
 insert into levels (id, position, title, description, is_premium) values
   (1, 1, 'L’alphabet — la voyelle « a »', 'Les 28 lettres lues avec la fatha (a), dans l’ordre de la méthode.', false),
   (2, 2, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false),
-  (3, 3, 'Les voyelles longues (madd)', 'Allongement par Alif, Yâ et Wâw.', false),
+  (3, 3, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false),
   (4, 4, 'Le tanwîn', 'Les doubles voyelles : -an, -in, -oun.', false),
   (5, 5, 'Règles de lecture', 'Chadda, hamzatoul wasl, lettres solaires et lunaires.', true);
 
@@ -38,13 +38,14 @@ insert into lessons (id, level_id, position, title, lesson_type, is_premium) val
   (18, 3, 1, 'Madd par Alif (â)', 'learn', false),
   (19, 3, 2, 'Madd par Yâ (î)', 'learn', false),
   (20, 3, 3, 'Madd par Wâw (oû)', 'learn', false),
-  (21, 4, 1, 'Tanwîn fatha (-an)', 'learn', false),
-  (22, 4, 2, 'Tanwîn kasra (-in)', 'learn', false),
-  (23, 4, 3, 'Tanwîn dhômma (-oun)', 'learn', false),
-  (24, 5, 1, 'La chadda', 'learn', true),
-  (25, 5, 2, 'Hamzatoul wasl', 'learn', true),
-  (26, 5, 3, 'Lettres solaires et lunaires', 'learn', true),
-  (27, 5, 4, 'Lecture de versets', 'learn', true);
+  (21, 3, 4, 'Révision des voyelles longues', 'exam', false),
+  (22, 4, 1, 'Tanwîn fatha (-an)', 'learn', false),
+  (23, 4, 2, 'Tanwîn kasra (-in)', 'learn', false),
+  (24, 4, 3, 'Tanwîn dhômma (-oun)', 'learn', false),
+  (25, 5, 1, 'La chadda', 'learn', true),
+  (26, 5, 2, 'Hamzatoul wasl', 'learn', true),
+  (27, 5, 3, 'Lettres solaires et lunaires', 'learn', true),
+  (28, 5, 4, 'Lecture de versets', 'learn', true);
 
 insert into lesson_items (id, lesson_id, position, item_type, arabic_text, transliteration, translation_fr, audio_url) values
   (1, 1, 1, 'letter', 'أَ', 'a', 'Lettre Alif / Hamza — son « a »', null),
@@ -142,7 +143,43 @@ insert into lesson_items (id, lesson_id, position, item_type, arabic_text, trans
   (93, 17, 3, 'letter', 'بُ', 'bou', 'Se lit « bou »', null),
   (94, 17, 4, 'letter', 'تَ', 'ta', 'Se lit « ta »', null),
   (95, 17, 5, 'letter', 'تِ', 'ti', 'Se lit « ti »', null),
-  (96, 17, 6, 'letter', 'تُ', 'tou', 'Se lit « tou »', null);
+  (96, 17, 6, 'letter', 'تُ', 'tou', 'Se lit « tou »', null),
+  (97, 18, 1, 'word', 'بَا', 'bâ', 'Allongement : « bâ »', null),
+  (98, 18, 2, 'word', 'تَا', 'tâ', 'Allongement : « tâ »', null),
+  (99, 18, 3, 'word', 'جَا', 'jâ', 'Allongement : « jâ »', null),
+  (100, 18, 4, 'word', 'دَا', 'dâ', 'Allongement : « dâ »', null),
+  (101, 18, 5, 'word', 'رَا', 'râ', 'Allongement : « râ »', null),
+  (102, 18, 6, 'word', 'سَا', 'sâ', 'Allongement : « sâ »', null),
+  (103, 18, 7, 'word', 'لَا', 'lâ', 'Allongement : « lâ »', null),
+  (104, 18, 8, 'word', 'مَا', 'mâ', 'Allongement : « mâ »', null),
+  (105, 18, 9, 'word', 'نَا', 'nâ', 'Allongement : « nâ »', null),
+  (106, 18, 10, 'word', 'كَا', 'kâ', 'Allongement : « kâ »', null),
+  (107, 19, 1, 'word', 'بِي', 'bî', 'Allongement : « bî »', null),
+  (108, 19, 2, 'word', 'تِي', 'tî', 'Allongement : « tî »', null),
+  (109, 19, 3, 'word', 'جِي', 'jî', 'Allongement : « jî »', null),
+  (110, 19, 4, 'word', 'دِي', 'dî', 'Allongement : « dî »', null),
+  (111, 19, 5, 'word', 'رِي', 'rî', 'Allongement : « rî »', null),
+  (112, 19, 6, 'word', 'سِي', 'sî', 'Allongement : « sî »', null),
+  (113, 19, 7, 'word', 'لِي', 'lî', 'Allongement : « lî »', null),
+  (114, 19, 8, 'word', 'مِي', 'mî', 'Allongement : « mî »', null),
+  (115, 19, 9, 'word', 'نِي', 'nî', 'Allongement : « nî »', null),
+  (116, 19, 10, 'word', 'كِي', 'kî', 'Allongement : « kî »', null),
+  (117, 20, 1, 'word', 'بُو', 'boû', 'Allongement : « boû »', null),
+  (118, 20, 2, 'word', 'تُو', 'toû', 'Allongement : « toû »', null),
+  (119, 20, 3, 'word', 'جُو', 'joû', 'Allongement : « joû »', null),
+  (120, 20, 4, 'word', 'دُو', 'doû', 'Allongement : « doû »', null),
+  (121, 20, 5, 'word', 'رُو', 'roû', 'Allongement : « roû »', null),
+  (122, 20, 6, 'word', 'سُو', 'soû', 'Allongement : « soû »', null),
+  (123, 20, 7, 'word', 'لُو', 'loû', 'Allongement : « loû »', null),
+  (124, 20, 8, 'word', 'مُو', 'moû', 'Allongement : « moû »', null),
+  (125, 20, 9, 'word', 'نُو', 'noû', 'Allongement : « noû »', null),
+  (126, 20, 10, 'word', 'كُو', 'koû', 'Allongement : « koû »', null),
+  (127, 21, 1, 'word', 'بَا', 'bâ', 'Se lit « bâ »', null),
+  (128, 21, 2, 'word', 'بِي', 'bî', 'Se lit « bî »', null),
+  (129, 21, 3, 'word', 'بُو', 'boû', 'Se lit « boû »', null),
+  (130, 21, 4, 'word', 'نَا', 'nâ', 'Se lit « nâ »', null),
+  (131, 21, 5, 'word', 'نِي', 'nî', 'Se lit « nî »', null),
+  (132, 21, 6, 'word', 'نُو', 'noû', 'Se lit « noû »', null);
 
 insert into quiz_questions (id, lesson_id, position, question_type, prompt, arabic_text, audio_url, correct_answer, options) values
   (1, 1, 1, 'recognize_letter', 'Quelle case se lit « a » ?', 'أَ', null, 'أَ', '["أَ","إِ","أُ","حَ"]'),
@@ -212,7 +249,23 @@ insert into quiz_questions (id, lesson_id, position, question_type, prompt, arab
   (65, 17, 1, 'recognize_letter', 'Quelle case se lit « ba » ?', 'بَ', null, 'بَ', '["بَ","بِ","تَ","تُ"]'),
   (66, 17, 2, 'recognize_letter', 'Quelle case se lit « bi » ?', 'بِ', null, 'بِ', '["بِ","بُ","تِ","بَ"]'),
   (67, 17, 3, 'recognize_letter', 'Quelle case se lit « bou » ?', 'بُ', null, 'بُ', '["بُ","تَ","تُ","بِ"]'),
-  (68, 17, 4, 'recognize_letter', 'Quelle case se lit « ta » ?', 'تَ', null, 'تَ', '["تَ","تِ","بَ","بُ"]');
+  (68, 17, 4, 'recognize_letter', 'Quelle case se lit « ta » ?', 'تَ', null, 'تَ', '["تَ","تِ","بَ","بُ"]'),
+  (69, 18, 1, 'recognize_letter', 'Quelle case se lit « bâ » (allongé) ?', 'بَا', null, 'بَا', '["بَا","بَ","تَا","جَ"]'),
+  (70, 18, 2, 'recognize_letter', 'Quelle case se lit « tâ » (allongé) ?', 'تَا', null, 'تَا', '["تَ","جَا","دَ","تَا"]'),
+  (71, 18, 3, 'recognize_letter', 'Quelle case se lit « jâ » (allongé) ?', 'جَا', null, 'جَا', '["دَا","رَ","جَا","جَ"]'),
+  (72, 18, 4, 'recognize_letter', 'Quelle case se lit « dâ » (allongé) ?', 'دَا', null, 'دَا', '["سَ","دَا","دَ","رَا"]'),
+  (73, 19, 1, 'recognize_letter', 'Quelle case se lit « bî » (allongé) ?', 'بِي', null, 'بِي', '["بِي","بِ","تِي","جِ"]'),
+  (74, 19, 2, 'recognize_letter', 'Quelle case se lit « tî » (allongé) ?', 'تِي', null, 'تِي', '["تِ","جِي","دِ","تِي"]'),
+  (75, 19, 3, 'recognize_letter', 'Quelle case se lit « jî » (allongé) ?', 'جِي', null, 'جِي', '["دِي","رِ","جِي","جِ"]'),
+  (76, 19, 4, 'recognize_letter', 'Quelle case se lit « dî » (allongé) ?', 'دِي', null, 'دِي', '["سِ","دِي","دِ","رِي"]'),
+  (77, 20, 1, 'recognize_letter', 'Quelle case se lit « boû » (allongé) ?', 'بُو', null, 'بُو', '["بُو","بُ","تُو","جُ"]'),
+  (78, 20, 2, 'recognize_letter', 'Quelle case se lit « toû » (allongé) ?', 'تُو', null, 'تُو', '["تُ","جُو","دُ","تُو"]'),
+  (79, 20, 3, 'recognize_letter', 'Quelle case se lit « joû » (allongé) ?', 'جُو', null, 'جُو', '["دُو","رُ","جُو","جُ"]'),
+  (80, 20, 4, 'recognize_letter', 'Quelle case se lit « doû » (allongé) ?', 'دُو', null, 'دُو', '["سُ","دُو","دُ","رُو"]'),
+  (81, 21, 1, 'recognize_letter', 'Quelle case se lit « bâ » ?', 'بَا', null, 'بَا', '["بَا","بِي","نَا","نُو"]'),
+  (82, 21, 2, 'recognize_letter', 'Quelle case se lit « bî » ?', 'بِي', null, 'بِي', '["بِي","بُو","نِي","بَا"]'),
+  (83, 21, 3, 'recognize_letter', 'Quelle case se lit « boû » ?', 'بُو', null, 'بُو', '["بُو","نَا","نُو","بِي"]'),
+  (84, 21, 4, 'recognize_letter', 'Quelle case se lit « nâ » ?', 'نَا', null, 'نَا', '["نَا","نِي","بَا","بُو"]');
 
 select setval(pg_get_serial_sequence('levels', 'id'),         (select max(id) from levels));
 select setval(pg_get_serial_sequence('lessons', 'id'),        (select max(id) from lessons));
