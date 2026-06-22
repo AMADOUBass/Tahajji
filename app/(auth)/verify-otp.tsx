@@ -29,8 +29,8 @@ export default function VerifyOtpScreen() {
 
   const submit = async () => {
     setMessage(null);
-    if (code.trim().length < 6) {
-      setMessage('Entre le code à 6 chiffres reçu par e-mail.');
+    if (code.trim().length < 8) {
+      setMessage('Entre le code à 8 chiffres reçu par e-mail.');
       return;
     }
     setLoading(true);
@@ -68,21 +68,22 @@ export default function VerifyOtpScreen() {
       <View style={{ marginTop: spacing.xl }}>
         <AppText variant="h2">Vérifie ton e-mail</AppText>
         <AppText variant="body" tone="secondary" style={{ marginTop: spacing.sm }}>
-          On a envoyé un code à 6 chiffres à{' '}
+          On a envoyé un code à 8 chiffres à{' '}
           <AppText variant="bodyStrong">{email}</AppText>. Saisis-le ci-dessous.
         </AppText>
       </View>
 
       <TextInput
         value={code}
-        onChangeText={(t) => setCode(t.replace(/[^0-9]/g, '').slice(0, 10))}
-        placeholder="––––––"
+        onChangeText={(t) => setCode(t.replace(/[^0-9]/g, '').slice(0, 8))}
+        placeholder="––––––––"
         placeholderTextColor={colors.textSecondary}
         keyboardType="number-pad"
+        maxLength={8}
         style={{
           borderWidth: 1.5, borderColor: colors.primary, backgroundColor: colors.surface,
           borderRadius: radius.md, height: 64, marginTop: spacing.xl,
-          fontFamily: fonts.bold, fontSize: 26, color: colors.text,
+          fontFamily: fonts.bold, fontSize: 24, color: colors.text,
           textAlign: 'center', letterSpacing: 6,
         }}
       />
