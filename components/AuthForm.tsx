@@ -58,6 +58,12 @@ export function AuthForm({ mode }: AuthFormProps) {
     setLoading(true);
     const res = isSignUp ? await signUp(email.trim(), password) : await signIn(email.trim(), password);
     setLoading(false);
+
+    // Compte existant mais e-mail non confirmé → on l'envoie confirmer (sécurité).
+    if (res.error && /confirm/i.test(res.error)) {
+      router.push({ pathname: '/(auth)/verify-otp', params: { email: email.trim(), type: 'signup' } });
+      return;
+    }
     if (res.error) {
       setMessage(res.error);
     } else if (res.needsConfirmation) {
