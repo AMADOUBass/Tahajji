@@ -81,7 +81,7 @@ levels.push([1, 1, 'L’alphabet — la voyelle « a »', 'Les 28 lettres lues a
 letterLessons(1, FATHA, 4, (g) => g.map((l) => l[1].split(' ')[0]).join(' · '));
 
 // ---------- Niveau 2 : voyelles brèves ----------
-levels.push([2, 2, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false]);
+levels.push([2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false]);
 let part = 0;
 letterLessons(2, KASRA, 7, () => `La kasra (i) — partie ${++part}`);
 part = 0;
@@ -127,7 +127,7 @@ lessonId += 1;
 }
 
 // ---------- Niveau 3 : voyelles longues (madd) ----------
-levels.push([3, 3, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false]);
+levels.push([3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false]);
 
 // Sous-ensemble de consonnes claires pour les exercices de madd.
 const MADD_SET = [
@@ -176,7 +176,7 @@ lessonId += 1;
 }
 
 // ---------- Niveau 4 : le tanwîn ----------
-levels.push([4, 4, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false]);
+levels.push([4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false]);
 
 const TANWIN = {
   f: { suffix: 'ane', short: 'َ', title: 'Tanwîn fatha (-an)' },
@@ -223,14 +223,11 @@ lessonId += 1;
   });
 }
 
-// ---------- Niveau 5 : règles de lecture (premium) ----------
-levels.push([5, 5, 'Règles de lecture', 'Chadda, alif maqsoura, hamzatoul wasl, lettres solaires/lunaires, chiffres et versets.', true]);
-
 // Crée une leçon « contenu » : items + (jusqu'à 4) quiz « Quel … se lit … ? ».
-function contentLesson(title, lessonType, itemType, entries, promptFn) {
+function contentLesson(levelId, premium, title, lessonType, itemType, entries, promptFn) {
   lessonId += 1;
   const lid = lessonId;
-  lessons.push([lid, 5, lessons.filter((l) => l[1] === 5).length + 1, title, lessonType, true]);
+  lessons.push([lid, levelId, lessons.filter((l) => l[1] === levelId).length + 1, title, lessonType, premium]);
   entries.forEach(([ar, tr, desc], idx) => {
     itemId += 1;
     items.push([itemId, lid, idx + 1, itemType, ar, tr, desc ?? `Se lit « ${tr} »`]);
@@ -242,8 +239,23 @@ function contentLesson(title, lessonType, itemType, entries, promptFn) {
   });
 }
 
+// ---------- Unité « Les chiffres arabes » (GRATUITE, position 2) ----------
+levels.push([6, 2, 'Les chiffres arabes', 'Lire les chiffres ٠ à ٩.', false]);
+const numPrompt = (e) => `Quel chiffre est « ${e[1]} » ?`;
+contentLesson(6, false, 'Les chiffres ٠–٤', 'learn', 'word', [
+  ['٠', 'sifr', '0 — صِفْر'], ['١', 'wâḥid', '1 — وَاحِد'], ['٢', 'ithnân', '2 — اثْنَان'],
+  ['٣', 'thalâtha', '3 — ثَلَاثَة'], ['٤', 'arbaʿa', '4 — أَرْبَعَة'],
+], numPrompt);
+contentLesson(6, false, 'Les chiffres ٥–٩', 'learn', 'word', [
+  ['٥', 'khamsa', '5 — خَمْسَة'], ['٦', 'sitta', '6 — سِتَّة'], ['٧', 'sabʿa', '7 — سَبْعَة'],
+  ['٨', 'thamâniya', '8 — ثَمَانِيَة'], ['٩', 'tisʿa', '9 — تِسْعَة'],
+], numPrompt);
+
+// ---------- Niveau 5 : règles de lecture (premium, position 6) ----------
+levels.push([5, 6, 'Règles de lecture', 'Chadda, alif maqsoura, hamzatoul wasl, lettres solaires/lunaires et versets.', true]);
+
 // 1. La chadda
-contentLesson('La chadda', 'learn', 'word', [
+contentLesson(5, true, 'La chadda', 'learn', 'word', [
   ['إِنَّ', 'inna', 'chadda sur le « n » — prolongé'],
   ['ثُمَّ', 'thumma', 'chadda sur le « m » — prolongé'],
   ['حَقَّ', 'ḥaqqa', 'chadda sur le « q »'],
@@ -253,7 +265,7 @@ contentLesson('La chadda', 'learn', 'word', [
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
 // 2. Alif maqsoura (ى se lit â)
-contentLesson('Alif maqsoura (ى)', 'learn', 'word', [
+contentLesson(5, true, 'Alif maqsoura (ى)', 'learn', 'word', [
   ['عَلَى', 'ʿalâ', 'le ى final se lit « â »'],
   ['إِلَى', 'ilâ', 'le ى final se lit « â »'],
   ['مُوسَى', 'mûsâ', 'le ى final se lit « â »'],
@@ -261,7 +273,7 @@ contentLesson('Alif maqsoura (ى)', 'learn', 'word', [
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
 // 3. Hamzatoul wasl (ٱ)
-contentLesson('Hamzatoul wasl (ٱ)', 'learn', 'word', [
+contentLesson(5, true, 'Hamzatoul wasl (ٱ)', 'learn', 'word', [
   ['ٱلْحَمْدُ', 'al-ḥamdu', 'lue « a » devant un lâm'],
   ['ٱهْدِنَا', 'ihdinâ', 'lue « i » (3ᵉ lettre kasra/fatha)'],
   ['ٱنْظُرْ', 'ounẓur', 'lue « ou » (3ᵉ lettre dhômma)'],
@@ -269,7 +281,7 @@ contentLesson('Hamzatoul wasl (ٱ)', 'learn', 'word', [
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
 // 4. Lettres solaires et lunaires
-contentLesson('Lettres solaires et lunaires', 'learn', 'word', [
+contentLesson(5, true, 'Lettres solaires et lunaires', 'learn', 'word', [
   ['ٱلْقَمَر', 'al-qamar', 'lunaire : on entend le « l »'],
   ['ٱلْأَمْر', 'al-amr', 'lunaire : on entend le « l »'],
   ['ٱلشَّمْس', 'ach-chams', 'solaire : le « l » disparaît, lettre redoublée'],
@@ -278,16 +290,8 @@ contentLesson('Lettres solaires et lunaires', 'learn', 'word', [
   ['ٱلطَّيْر', 'aṭ-ṭayr', 'solaire'],
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
-// 5. Les chiffres arabes
-contentLesson('Les chiffres (٠-٩)', 'learn', 'word', [
-  ['٠', 'sifr', '0 — صِفْر'], ['١', 'wâḥid', '1 — وَاحِد'], ['٢', 'ithnân', '2 — اثْنَان'],
-  ['٣', 'thalâtha', '3 — ثَلَاثَة'], ['٤', 'arbaʿa', '4 — أَرْبَعَة'], ['٥', 'khamsa', '5 — خَمْسَة'],
-  ['٦', 'sitta', '6 — سِتَّة'], ['٧', 'sabʿa', '7 — سَبْعَة'], ['٨', 'thamâniya', '8 — ثَمَانِيَة'],
-  ['٩', 'tisʿa', '9 — تِسْعَة'],
-], (e) => `Quel chiffre est « ${e[1]} » ?`);
-
-// 6. Lecture de versets (sourate Al-Ikhlas)
-contentLesson('Lecture de versets', 'exam', 'verse', [
+// 5. Lecture de versets (sourate Al-Ikhlas)
+contentLesson(5, true, 'Lecture de versets', 'exam', 'verse', [
   ['قُلْ هُوَ ٱللَّهُ أَحَدٌ', 'Al-Ikhlas 1', 'Dis : « Il est Allah, Unique.'],
   ['ٱللَّهُ ٱلصَّمَدُ', 'Al-Ikhlas 2', 'Allah, Le Seul imploré.'],
   ['لَمْ يَلِدْ وَلَمْ يُولَدْ', 'Al-Ikhlas 3', 'Il n’a pas engendré et n’a pas été engendré.'],

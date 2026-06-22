@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
 
@@ -25,6 +25,20 @@ export default function QuizScreen() {
   const [selected, setSelected] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [hearts, setHearts] = useState(5);
+
+  // Mélange les réponses (positions aléatoires) — stable tant qu'on est sur la
+  // même question, re-mélangé à la question suivante / à chaque nouvelle tentative.
+  const shuffledOptions = useMemo(() => {
+    const opts = questions?.[qIndex]?.options;
+    if (!opts) return [];
+    const a = [...opts];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions, qIndex]);
 
   // Leçon sans quiz (mock partiel) : on valide directement et on célèbre.
   useEffect(() => {
@@ -120,7 +134,7 @@ export default function QuizScreen() {
 
         {/* Options */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.xl }}>
-          {(question.options ?? []).map((option) => {
+          {shuffledOptions.map((option) => {
             const isAnswer = option === question.correctAnswer;
             const isPicked = option === selected;
             let borderColor = colors.border;
