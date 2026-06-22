@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { AppText, Screen, StatPill } from '@/components/ui';
+import { AppText, InfoModal, Screen, StatPill, type InfoRow } from '@/components/ui';
 import { useLevelsWithProgress, useProfile } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -23,10 +23,20 @@ export default function ParcoursScreen() {
   const { colors } = useTheme();
   const { data: profile } = useProfile();
   const { data: levels, isLoading } = useLevelsWithProgress();
+  const [infoVisible, setInfoVisible] = useState(false);
+
+  const statRows: InfoRow[] = [
+    { icon: 'flame', color: colors.flame, label: 'Série (streak)', description: 'Le nombre de jours d\'affilée où tu apprends. Reviens chaque jour pour ne pas la perdre !' },
+    { icon: 'star', color: colors.gold, label: 'XP — points d\'expérience', description: 'Gagnés en terminant des leçons et des quiz. Ils font monter ton niveau.' },
+    { icon: 'heart', color: colors.coral, label: 'Cœurs (vies)', description: 'Tes essais pendant un quiz : tu en perds un à chaque mauvaise réponse.' },
+    { icon: 'star', color: colors.gold, label: 'Étoiles des leçons', description: 'La note de chaque leçon, de 1 à 3 : ⭐ terminé · ⭐⭐ bien · ⭐⭐⭐ maîtrise.' },
+  ];
 
   return (
     <Screen>
-      {/* En-tête : série, XP, vies */}
+      <InfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} title="Comment ça marche ?" rows={statRows} />
+
+      {/* En-tête : série, XP, vies (tap → explication) */}
       <View
         style={{
           flexDirection: 'row',
@@ -36,9 +46,9 @@ export default function ParcoursScreen() {
           paddingVertical: spacing.md,
         }}
       >
-        <StatPill icon="flame" iconColor={colors.flame} value={profile?.streakCount ?? 0} />
-        <StatPill icon="star" iconColor={colors.gold} value={profile?.xp ?? 0} />
-        <StatPill icon="heart" iconColor={colors.coral} value={5} />
+        <StatPill icon="flame" iconColor={colors.flame} value={profile?.streakCount ?? 0} onPress={() => setInfoVisible(true)} />
+        <StatPill icon="star" iconColor={colors.gold} value={profile?.xp ?? 0} onPress={() => setInfoVisible(true)} />
+        <StatPill icon="heart" iconColor={colors.coral} value={5} onPress={() => setInfoVisible(true)} />
       </View>
 
       <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl }} edges={[]}>

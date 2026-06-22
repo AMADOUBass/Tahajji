@@ -54,3 +54,4 @@ example
 
 # Coran importé (généré par scripts/build_quran_sql.mjs — 2,4 Mo)
 db/import_quran.sql
+db/import_quran_*.sql
