@@ -26,7 +26,14 @@ export default function ProfileScreen() {
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.sm }}>
         <AppText variant="h2">Profil</AppText>
-        <Ionicons name="settings-outline" size={22} color={colors.textSecondary} />
+        <Pressable
+          onPress={() => router.push('/profile/edit')}
+          hitSlop={10}
+          style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, opacity: pressed ? 0.6 : 1 })}
+        >
+          <Ionicons name="create-outline" size={20} color={colors.primary} />
+          <AppText variant="bodyStrong" color={colors.primary}>Modifier</AppText>
+        </Pressable>
       </View>
 
       {/* Identité */}
@@ -37,7 +44,9 @@ export default function ProfileScreen() {
         </View>
         <View style={{ flex: 1 }}>
           <AppText variant="h3">{displayName}</AppText>
-          <AppText variant="caption" tone="secondary" style={{ marginTop: 2 }}>Niveau débutant</AppText>
+          <AppText variant="caption" tone="secondary" style={{ marginTop: 2 }}>
+            {profile?.bio?.trim() ? profile.bio : 'Niveau débutant'}
+          </AppText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.sm, alignSelf: 'flex-start', backgroundColor: 'rgba(201,154,63,0.16)', paddingVertical: 4, paddingHorizontal: spacing.sm, borderRadius: 999 }}>
             <Ionicons name="star" size={12} color={colors.gold} />
             <AppText variant="caption" color={colors.gold}>Niveau {profile?.currentLevel ?? 1}</AppText>

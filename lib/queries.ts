@@ -50,6 +50,7 @@ const toVerse = (r: Row<'verses'>): Verse => ({
 const toProfile = (r: Row<'profiles'>): Profile => ({
   id: r.id, displayName: r.display_name ?? 'Apprenant', locale: r.locale, currentLevel: r.current_level,
   xp: r.xp, streakCount: r.streak_count, lastActiveDate: r.last_active_date, isPremium: r.is_premium,
+  avatarUrl: r.avatar_url, bio: r.bio,
 });
 
 export const queryKeys = {
@@ -256,6 +257,26 @@ export function useCompleteLesson() {
     onSuccess: () => {
       const userId = useAuthStore.getState().userId;
       queryClient.invalidateQueries({ queryKey: queryKeys.progress(userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
+    },
+  });
+}
+
+/** Met à jour le profil de l'utilisateur (nom affiché, bio). */
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (patch: { displayName?: string; bio?: string | null }) => {
+      const userId = useAuthStore.getState().userId;
+      if (!userId) throw new Error('Non authentifié');
+      const update: Database['public']['Tables']['profiles']['Update'] = {};
+      if (patch.displayName !== undefined) update.display_name = patch.displayName;
+      if (patch.bio !== undefined) update.bio = patch.bio;
+      const { error } = await supabase.from('profiles').update(update).eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      const userId = useAuthStore.getState().userId;
       queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
     },
   });

@@ -20,6 +20,8 @@ export interface Database {
           streak_count: number;
           last_active_date: string | null;
           is_premium: boolean;
+          avatar_url: string | null;
+          bio: string | null;
           created_at: Timestamp;
         };
         Insert: {
@@ -31,6 +33,8 @@ export interface Database {
           streak_count?: number;
           last_active_date?: string | null;
           is_premium?: boolean;
+          avatar_url?: string | null;
+          bio?: string | null;
         };
         Update: {
           display_name?: string | null;
@@ -40,6 +44,8 @@ export interface Database {
           streak_count?: number;
           last_active_date?: string | null;
           is_premium?: boolean;
+          avatar_url?: string | null;
+          bio?: string | null;
         };
         Relationships: [];
       };

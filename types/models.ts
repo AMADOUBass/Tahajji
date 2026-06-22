@@ -20,6 +20,8 @@ export interface Profile {
   streakCount: number;
   lastActiveDate: string | null;
   isPremium: boolean;
+  avatarUrl: string | null;
+  bio: string | null;
 }
 
 export interface Level {
