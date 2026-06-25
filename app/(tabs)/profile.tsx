@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Pressable, Switch, View } from 'react-native';
+import { Alert, Pressable, Switch, View } from 'react-native';
 
 import { AppText, Card, ProgressBar, Screen } from '@/components/ui';
 import { computeBadges, levelFromXp } from '@/lib/gamification';
+import { cancelDailyReminder, ensureNotificationPermission, scheduleDailyReminder } from '@/lib/notifications';
 import { useProfile, useProgress, useSetPremium } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import { useAuthStore } from '@/store/auth';
+import { usePrefsStore } from '@/store/prefs';
 import { useThemeStore } from '@/store/theme';
 
 export default function ProfileScreen() {
@@ -18,6 +20,24 @@ export default function ProfileScreen() {
   const setPremium = useSetPremium();
   const setPreference = useThemeStore((s) => s.setPreference);
   const signOut = useAuthStore((s) => s.signOut);
+  const remindersEnabled = usePrefsStore((s) => s.remindersEnabled);
+  const reminderHour = usePrefsStore((s) => s.reminderHour);
+  const setRemindersEnabled = usePrefsStore((s) => s.setRemindersEnabled);
+
+  const toggleReminders = async (value: boolean) => {
+    if (value) {
+      const ok = await ensureNotificationPermission();
+      if (!ok) {
+        Alert.alert('Notifications désactivées', 'Autorise les notifications dans les réglages du téléphone pour recevoir le rappel quotidien.');
+        return;
+      }
+      await scheduleDailyReminder(reminderHour);
+      setRemindersEnabled(true);
+    } else {
+      await cancelDailyReminder();
+      setRemindersEnabled(false);
+    }
+  };
 
   const lessonsCompleted = (progress ?? []).filter((p) => p.status === 'completed').length;
   const displayName = profile?.displayName ?? 'Apprenant';
@@ -115,6 +135,14 @@ export default function ProfileScreen() {
           <Switch
             value={scheme === 'dark'}
             onValueChange={(v) => setPreference(v ? 'dark' : 'light')}
+            trackColor={{ true: colors.primary, false: colors.locked }}
+            thumbColor={colors.onPrimary}
+          />
+        </SettingRow>
+        <SettingRow icon="notifications-outline" label="Rappel quotidien">
+          <Switch
+            value={remindersEnabled}
+            onValueChange={toggleReminders}
             trackColor={{ true: colors.primary, false: colors.locked }}
             thumbColor={colors.onPrimary}
           />
