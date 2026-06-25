@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Pressable, Switch, View } from 'react-native';
 
-import { AppText, Card, Screen } from '@/components/ui';
+import { AppText, Card, ProgressBar, Screen } from '@/components/ui';
+import { computeBadges, levelFromXp } from '@/lib/gamification';
 import { useProfile, useProgress, useSetPremium } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -21,6 +22,9 @@ export default function ProfileScreen() {
   const lessonsCompleted = (progress ?? []).filter((p) => p.status === 'completed').length;
   const displayName = profile?.displayName ?? 'Apprenant';
   const initial = displayName.charAt(0).toUpperCase();
+  const xp = profile?.xp ?? 0;
+  const { level, xpInLevel, xpForLevel, progress: levelProgress } = levelFromXp(xp);
+  const badges = computeBadges({ xp, streak: profile?.streakCount ?? 0, completedCount: lessonsCompleted, level });
 
   return (
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
@@ -49,16 +53,47 @@ export default function ProfileScreen() {
           </AppText>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.sm, alignSelf: 'flex-start', backgroundColor: 'rgba(201,154,63,0.16)', paddingVertical: 4, paddingHorizontal: spacing.sm, borderRadius: 999 }}>
             <Ionicons name="star" size={12} color={colors.gold} />
-            <AppText variant="caption" color={colors.gold}>Niveau {profile?.currentLevel ?? 1}</AppText>
+            <AppText variant="caption" color={colors.gold}>Niveau {level}</AppText>
           </View>
         </View>
       </View>
 
+      {/* Progression vers le niveau suivant */}
+      <View style={{ marginTop: spacing.lg }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs }}>
+          <AppText variant="caption" tone="secondary">Niveau {level}</AppText>
+          <AppText variant="caption" tone="secondary">{xpInLevel}/{xpForLevel} XP</AppText>
+        </View>
+        <ProgressBar value={levelProgress} height={8} />
+      </View>
+
       {/* Stats */}
       <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl }}>
-        <StatCard value={profile?.xp ?? 0} label="XP total" />
+        <StatCard value={xp} label="XP total" />
         <StatCard value={profile?.streakCount ?? 0} label="Série (jours)" color={colors.flame} />
         <StatCard value={lessonsCompleted} label="Leçons" />
+      </View>
+
+      {/* Badges */}
+      <AppText variant="title" style={{ marginTop: spacing.xl, marginBottom: spacing.md }}>Badges</AppText>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
+        {badges.map((b) => (
+          <View key={b.id} style={{ alignItems: 'center', width: 88, gap: 6 }}>
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: b.earned ? colors.gold : colors.locked,
+              }}
+            >
+              <Ionicons name={b.icon} size={26} color={b.earned ? '#fff' : colors.lockedInk} />
+            </View>
+            <AppText variant="caption" tone={b.earned ? 'default' : 'secondary'} align="center">{b.label}</AppText>
+          </View>
+        ))}
       </View>
 
       {/* Premium / paywall */}

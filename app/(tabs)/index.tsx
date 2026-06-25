@@ -16,11 +16,8 @@ import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import type { LessonWithProgress, LevelWithLessons } from '@/types/models';
 
-// Décalage horizontal des nœuds : serpentin doux qui reste proche de la ligne centrale.
-const OFFSETS = [0, -28, 28, -22, 22, -28, 28, -22];
-const ROW_H = 150; // distance verticale entre les centres de deux nœuds
-const NODE_AREA = 88; // hauteur de la zone du nœud (nœud centré → centre à 44)
-const NODE_CY = NODE_AREA / 2;
+// Décalage horizontal des nœuds : serpentin doux organique (façon Duolingo).
+const OFFSETS = [0, -48, -68, -40, 14, 40, 12, -42];
 
 export default function ParcoursScreen() {
   const { colors } = useTheme();
@@ -104,16 +101,11 @@ function LevelSection({ level }: { level: LevelWithLessons }) {
         </View>
       </View>
 
-      {/* Serpentin de nœuds reliés par des segments (chemin qui suit la courbe) */}
-      <View style={{ marginTop: spacing.xl }}>
+      {/* Serpentin de nœuds (zigzag doux) */}
+      <View style={{ alignItems: 'center', gap: spacing.xl, marginTop: spacing.xl }}>
         {level.lessons.map((lesson, i) => (
           <Animated.View key={lesson.id} entering={FadeInDown.delay(i * 70).springify().damping(14)}>
-            <LessonNode
-              lesson={lesson}
-              offset={OFFSETS[i % OFFSETS.length]}
-              nextOffset={i < level.lessons.length - 1 ? OFFSETS[(i + 1) % OFFSETS.length] : null}
-              premiumLevel={level.isPremium}
-            />
+            <LessonNode lesson={lesson} offset={OFFSETS[i % OFFSETS.length]} premiumLevel={level.isPremium} />
           </Animated.View>
         ))}
       </View>
@@ -124,12 +116,10 @@ function LevelSection({ level }: { level: LevelWithLessons }) {
 function LessonNode({
   lesson,
   offset,
-  nextOffset,
   premiumLevel,
 }: {
   lesson: LessonWithProgress;
   offset: number;
-  nextOffset: number | null;
   premiumLevel: boolean;
 }) {
   const { colors } = useTheme();
@@ -174,86 +164,77 @@ function LessonNode({
   else if (inProgress) { icon = 'star'; iconColor = '#FFFFFF'; }
   else if (needsPremium) { icon = 'lock-closed'; iconColor = colors.lockedInk; }
 
-  // Segment reliant ce nœud au suivant (suit la courbe du serpentin).
-  let connector = null;
-  if (nextOffset !== null) {
-    const dx = nextOffset - offset;
-    const len = Math.hypot(dx, ROW_H);
-    const angle = (Math.atan2(ROW_H, dx) * 180) / Math.PI;
-    connector = (
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          top: NODE_CY + ROW_H / 2 - 2,
-          left: '50%',
-          marginLeft: (offset + nextOffset) / 2 - len / 2,
-          width: len,
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: colors.primaryLight,
-          transform: [{ rotate: `${angle}deg` }],
-        }}
-      />
-    );
-  }
-
   return (
-    <View style={{ height: ROW_H }}>
-      {connector}
-      <View style={{ alignItems: 'center', transform: [{ translateX: offset }] }}>
-        <View style={{ height: NODE_AREA, alignItems: 'center', justifyContent: 'center' }}>
-          {inProgress ? (
-            <Animated.View
-              pointerEvents="none"
-              style={[
-                { position: 'absolute', width: size, height: size, borderRadius: size / 2, backgroundColor: colors.gold },
-                pulseStyle,
-              ]}
-            />
-          ) : null}
-          <Pressable
-            onPress={onPress}
-            style={({ pressed }) => ({
-              width: size,
-              height: size,
-              borderRadius: lesson.lessonType === 'exam' ? radius.lg : size / 2,
-              backgroundColor: bg,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderBottomWidth: 6,
-              borderBottomColor: shadow,
-              opacity: pressed ? 0.9 : 1,
-            })}
-          >
-            <Ionicons name={icon} size={size * 0.42} color={iconColor} />
-          </Pressable>
-        </View>
-
-        {completed && lesson.stars > 0 ? (
-          <View style={{ flexDirection: 'row', gap: 2, marginTop: spacing.xs }}>
-            {Array.from({ length: 3 }).map((_, s) => (
-              <Ionicons key={s} name="star" size={12} color={s < lesson.stars ? colors.gold : colors.locked} />
-            ))}
-          </View>
-        ) : null}
-
-        <AppText
-          variant="caption"
-          align="center"
-          numberOfLines={2}
-          color={locked && !inProgress ? colors.lockedInk : colors.text}
-          style={{ marginTop: spacing.xs, width: 116, fontFamily: fonts.semibold }}
+    <View style={{ transform: [{ translateX: offset }], alignItems: 'center' }}>
+      {/* Bulle « Commencer » au-dessus de l'étape active */}
+      {inProgress ? (
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            borderWidth: 1.5,
+            borderColor: colors.gold,
+            borderRadius: radius.md,
+            paddingVertical: spacing.sm,
+            paddingHorizontal: spacing.md,
+            marginBottom: spacing.sm,
+          }}
         >
-          {lesson.title}
-        </AppText>
-        {needsPremium ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
-            <Ionicons name="diamond" size={10} color={colors.gold} />
-            <AppText variant="caption" color={colors.gold} style={{ fontSize: 10 }}>Premium</AppText>
-          </View>
+          <AppText variant="overline" color={colors.primary}>Commencer</AppText>
+        </View>
+      ) : null}
+
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        {inProgress ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              { position: 'absolute', width: size, height: size, borderRadius: size / 2, backgroundColor: colors.gold },
+              pulseStyle,
+            ]}
+          />
         ) : null}
+        <Pressable
+          onPress={onPress}
+          style={({ pressed }) => ({
+            width: size,
+            height: size,
+            borderRadius: lesson.lessonType === 'exam' ? radius.lg : size / 2,
+            backgroundColor: bg,
+            alignItems: 'center',
+            justifyContent: 'center',
+            // « ombre » solide = effet 3D
+            borderBottomWidth: 6,
+            borderBottomColor: shadow,
+            opacity: pressed ? 0.9 : 1,
+          })}
+        >
+          <Ionicons name={icon} size={size * 0.42} color={iconColor} />
+        </Pressable>
       </View>
+
+      {completed && lesson.stars > 0 ? (
+        <View style={{ flexDirection: 'row', gap: 2, marginTop: spacing.xs }}>
+          {Array.from({ length: 3 }).map((_, s) => (
+            <Ionicons key={s} name="star" size={12} color={s < lesson.stars ? colors.gold : colors.locked} />
+          ))}
+        </View>
+      ) : null}
+
+      <AppText
+        variant="caption"
+        align="center"
+        numberOfLines={1}
+        color={locked && !inProgress ? colors.lockedInk : colors.text}
+        style={{ marginTop: spacing.xs, width: 160, fontFamily: fonts.semibold, fontSize: 11.5 }}
+      >
+        {lesson.title}
+      </AppText>
+      {needsPremium ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
+          <Ionicons name="diamond" size={10} color={colors.gold} />
+          <AppText variant="caption" color={colors.gold} style={{ fontSize: 10 }}>Premium</AppText>
+        </View>
+      ) : null}
     </View>
   );
 }

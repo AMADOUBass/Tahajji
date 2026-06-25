@@ -83,9 +83,9 @@ letterLessons(1, FATHA, 4, (g) => g.map((l) => l[1].split(' ')[0]).join(' · '))
 // ---------- Niveau 2 : voyelles brèves ----------
 levels.push([2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false]);
 let part = 0;
-letterLessons(2, KASRA, 7, () => `La kasra (i) — partie ${++part}`);
+letterLessons(2, KASRA, 7, () => `Kasra (i) · ${++part}`);
 part = 0;
-letterLessons(2, DAMMA, 7, () => `La dhômma (ou) — partie ${++part}`);
+letterLessons(2, DAMMA, 7, () => `Dhômma (ou) · ${++part}`);
 
 // Soukoûne (mots simples du registre coranique).
 const SUKUN = [
@@ -281,7 +281,7 @@ contentLesson(5, true, 'Hamzatoul wasl (ٱ)', 'learn', 'word', [
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
 // 4. Lettres solaires et lunaires
-contentLesson(5, true, 'Lettres solaires et lunaires', 'learn', 'word', [
+contentLesson(5, true, 'Solaires & lunaires', 'learn', 'word', [
   ['ٱلْقَمَر', 'al-qamar', 'lunaire : on entend le « l »'],
   ['ٱلْأَمْر', 'al-amr', 'lunaire : on entend le « l »'],
   ['ٱلشَّمْس', 'ach-chams', 'solaire : le « l » disparaît, lettre redoublée'],
