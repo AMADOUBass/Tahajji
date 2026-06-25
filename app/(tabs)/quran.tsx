@@ -8,6 +8,7 @@ import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { useSurahs } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { useReadingStore } from '@/store/reading';
 import type { Surah } from '@/types/models';
 
 export default function QuranScreen() {
@@ -15,6 +16,13 @@ export default function QuranScreen() {
   const router = useRouter();
   const { data: surahs, isLoading } = useSurahs();
   const [query, setQuery] = useState('');
+
+  // Carte « Reprendre » : dernière lecture mémorisée (ou démarrage Al-Fatiha).
+  const { lastSurahId, lastSurahName, lastVerse } = useReadingStore();
+  const hasResume = lastSurahId !== null;
+  const resumeId = lastSurahId ?? 1;
+  const resumeSurah = surahs?.find((s) => s.id === resumeId);
+  const resumeProgress = resumeSurah ? Math.min(1, lastVerse / resumeSurah.verseCount) : 0;
 
   const filtered = useMemo(() => {
     if (!surahs) return [];
@@ -79,9 +87,9 @@ export default function QuranScreen() {
         ) : null}
       </View>
 
-      {/* Reprendre (cliquable) */}
+      {/* Reprendre / Commencer (selon la dernière lecture) */}
       <Pressable
-        onPress={() => router.push({ pathname: '/surah/[id]', params: { id: '1' } })}
+        onPress={() => router.push({ pathname: '/surah/[id]', params: { id: String(resumeId) } })}
         style={({ pressed }) => ({
           flexDirection: 'row',
           alignItems: 'center',
@@ -94,12 +102,16 @@ export default function QuranScreen() {
         })}
       >
         <View style={{ width: 46, height: 46, borderRadius: 12, backgroundColor: 'rgba(201,154,63,0.25)', alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="bookmark" size={22} color={colors.gold} />
+          <Ionicons name={hasResume ? 'bookmark' : 'play'} size={22} color={colors.gold} />
         </View>
         <View style={{ flex: 1 }}>
-          <AppText variant="overline" tone="gold">Reprendre</AppText>
-          <AppText variant="title" color={colors.onPrimaryContainer} style={{ marginTop: 2 }}>Al-Fatiha</AppText>
-          <ProgressBar value={0.62} height={5} trackColor="rgba(255,255,255,0.18)" style={{ marginTop: spacing.sm }} />
+          <AppText variant="overline" tone="gold">{hasResume ? 'Reprendre' : 'Commencer'}</AppText>
+          <AppText variant="title" color={colors.onPrimaryContainer} style={{ marginTop: 2 }}>
+            {hasResume ? `${lastSurahName} · verset ${lastVerse}` : (resumeSurah?.nameFr ?? 'Al-Fatiha')}
+          </AppText>
+          {hasResume ? (
+            <ProgressBar value={resumeProgress} height={5} trackColor="rgba(255,255,255,0.18)" style={{ marginTop: spacing.sm }} />
+          ) : null}
         </View>
         <Ionicons name="chevron-forward" size={20} color={colors.onPrimaryContainer} />
       </Pressable>

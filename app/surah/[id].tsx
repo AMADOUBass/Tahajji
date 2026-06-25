@@ -8,6 +8,7 @@ import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { useSurahs, useVerses } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { useReadingStore } from '@/store/reading';
 import type { Verse } from '@/types/models';
 
 const fmt = (s: number) => {
@@ -36,6 +37,13 @@ export default function SurahScreen() {
     currentIndexRef.current = currentIndex;
   }, [currentIndex]);
 
+  // Mémorise la dernière lecture (carte « Reprendre » du Coran).
+  const setLastRead = useReadingStore((s) => s.setLastRead);
+  const lastSurahId = useReadingStore((s) => s.lastSurahId);
+  useEffect(() => {
+    if (surah && lastSurahId !== surahId) setLastRead(surahId, surah.nameFr, 1);
+  }, [surah, surahId, lastSurahId, setLastRead]);
+
   // Lecture même en mode silencieux (iOS).
   useEffect(() => {
     setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
@@ -43,13 +51,14 @@ export default function SurahScreen() {
 
   const playVerse = useCallback(
     (index: number) => {
-      const url = verses?.[index]?.audioUrl;
-      if (!url) return;
+      const v = verses?.[index];
+      if (!v?.audioUrl) return;
       setCurrentIndex(index);
-      player.replace({ uri: url });
+      setLastRead(surahId, surah?.nameFr ?? `Sourate ${surahId}`, v.number);
+      player.replace({ uri: v.audioUrl });
       player.play();
     },
-    [verses, player],
+    [verses, player, surahId, surah, setLastRead],
   );
 
   const togglePlay = () => {
