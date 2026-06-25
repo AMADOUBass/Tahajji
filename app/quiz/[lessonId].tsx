@@ -84,7 +84,7 @@ export default function QuizScreen() {
   }
 
   function finish(stars: number) {
-    completeLesson.mutate({ lessonId, stars, xpGained: XP_PER_LESSON });
+    completeLesson.mutate({ lessonId, stars });
     const accuracy = questions!.length ? Math.round((correctCount / questions!.length) * 100) : 100;
     router.replace({
       pathname: '/level-complete/[id]',

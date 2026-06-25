@@ -168,7 +168,16 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      complete_lesson: {
+        Args: { p_lesson_id: number; p_stars: number };
+        Returns: undefined;
+      };
+      set_premium: {
+        Args: { p_value: boolean };
+        Returns: undefined;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

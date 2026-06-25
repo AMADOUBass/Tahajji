@@ -224,35 +224,16 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
   return { data, isLoading };
 }
 
-/** Termine une leçon : enregistre la complétion + ajoute l'XP (1ʳᵉ fois). */
+/**
+ * Termine une leçon via la fonction serveur sécurisée : la progression et l'XP
+ * sont gérés CÔTÉ SERVEUR (l'XP n'est pas falsifiable par le client).
+ */
 export function useCompleteLesson() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ lessonId, stars, xpGained }: { lessonId: number; stars: number; xpGained: number }) => {
-      const userId = useAuthStore.getState().userId;
-      if (!userId) throw new Error('Non authentifié');
-
-      // Déjà terminée ? (pour ne pas recréditer l'XP)
-      const { data: existing } = await supabase
-        .from('user_progress').select('status, stars').eq('user_id', userId).eq('lesson_id', lessonId).maybeSingle();
-      const firstTime = !existing || existing.status !== 'completed';
-
-      const { error: upErr } = await supabase.from('user_progress').upsert(
-        {
-          user_id: userId,
-          lesson_id: lessonId,
-          status: 'completed',
-          stars: Math.max(stars, existing?.stars ?? 0),
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,lesson_id' },
-      );
-      if (upErr) throw upErr;
-
-      if (firstTime) {
-        const { data: prof } = await supabase.from('profiles').select('xp').eq('id', userId).single();
-        await supabase.from('profiles').update({ xp: (prof?.xp ?? 0) + xpGained }).eq('id', userId);
-      }
+    mutationFn: async ({ lessonId, stars }: { lessonId: number; stars: number }) => {
+      const { error } = await supabase.rpc('complete_lesson', { p_lesson_id: lessonId, p_stars: stars });
+      if (error) throw error;
     },
     onSuccess: () => {
       const userId = useAuthStore.getState().userId;
@@ -282,14 +263,16 @@ export function useUpdateProfile() {
   });
 }
 
-/** Bascule premium (placeholder paywall / réglage démo). */
+/**
+ * Bascule premium via une fonction serveur (placeholder).
+ * ⚠️ Sera remplacé par le webhook RevenueCat (service_role) ; le client ne pourra
+ * alors plus s'octroyer le premium.
+ */
 export function useSetPremium() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (isPremium: boolean) => {
-      const userId = useAuthStore.getState().userId;
-      if (!userId) throw new Error('Non authentifié');
-      const { error } = await supabase.from('profiles').update({ is_premium: isPremium }).eq('id', userId);
+      const { error } = await supabase.rpc('set_premium', { p_value: isPremium });
       if (error) throw error;
     },
     onSuccess: () => {
