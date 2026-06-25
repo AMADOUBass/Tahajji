@@ -23,8 +23,8 @@ export default function ResetPasswordScreen() {
 
   const submit = async () => {
     setMessage(null);
-    if (password.length < 6) {
-      setMessage('Le mot de passe doit faire au moins 6 caractères.');
+    if (password.length < 8) {
+      setMessage('Le mot de passe doit faire au moins 8 caractères.');
       return;
     }
     if (password !== confirm) {

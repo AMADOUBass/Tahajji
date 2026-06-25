@@ -51,8 +51,8 @@ export function AuthForm({ mode }: AuthFormProps) {
       setMessage('Entre une adresse e-mail valide.');
       return;
     }
-    if (password.length < 6) {
-      setMessage('Le mot de passe doit faire au moins 6 caractères.');
+    if (password.length < 8) {
+      setMessage('Le mot de passe doit faire au moins 8 caractères.');
       return;
     }
     setLoading(true);
