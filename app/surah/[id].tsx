@@ -1,13 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { useCallback, useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
-import { playAudioUrl } from '@/lib/audio';
 import { useSurahs, useVerses } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import type { Verse } from '@/types/models';
+
+const fmt = (s: number) => {
+  if (!s || Number.isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+};
 
 export default function SurahScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,6 +26,48 @@ export default function SurahScreen() {
   const { data: surahs } = useSurahs();
   const surah = surahs?.find((s) => s.id === surahId);
   const { data: verses, isLoading } = useVerses(surahId);
+
+  const player = useAudioPlayer(undefined);
+  const status = useAudioPlayerStatus(player);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+
+  // Lecture même en mode silencieux (iOS).
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+  }, []);
+
+  const playVerse = useCallback(
+    (index: number) => {
+      const url = verses?.[index]?.audioUrl;
+      if (!url) return;
+      setCurrentIndex(index);
+      player.replace({ uri: url });
+      player.play();
+    },
+    [verses, player],
+  );
+
+  const togglePlay = () => {
+    if (currentIndex === null) {
+      playVerse(0);
+      return;
+    }
+    if (status.playing) player.pause();
+    else player.play();
+  };
+
+  // Enchaînement automatique au verset suivant.
+  useEffect(() => {
+    if (status.didJustFinish && currentIndex !== null && verses) {
+      const next = currentIndex + 1;
+      if (next < verses.length && verses[next]?.audioUrl) playVerse(next);
+      else setCurrentIndex(null);
+    }
+  }, [status.didJustFinish, currentIndex, verses, playVerse]);
+
+  const hasAudio = !!verses?.some((v) => v.audioUrl);
+  const progress = status.duration ? status.currentTime / status.duration : 0;
+  const currentNumber = currentIndex !== null && verses ? verses[currentIndex]?.number : null;
 
   return (
     <Screen contentStyle={{ flex: 1 }}>
@@ -43,55 +93,99 @@ export default function SurahScreen() {
         <Ionicons name="list" size={22} color={colors.textSecondary} />
       </View>
 
-      <Screen scroll edges={[]} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: 120 }}>
+      <Screen scroll edges={[]} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: 130 }}>
         {/* Ornement basmala */}
         <View style={{ alignItems: 'center', paddingVertical: spacing.lg }}>
           <ArabicText size="title" color={colors.gold} align="center">۞</ArabicText>
         </View>
 
-        {isLoading
-          ? <AppText tone="secondary" align="center">Chargement…</AppText>
-          : verses!.map((v, i) => <VerseRow key={v.id} verse={v} last={i === verses!.length - 1} />)}
+        {isLoading ? (
+          <AppText tone="secondary" align="center">Chargement…</AppText>
+        ) : (
+          verses!.map((v, i) => (
+            <VerseRow
+              key={v.id}
+              verse={v}
+              last={i === verses!.length - 1}
+              isCurrent={currentIndex === i}
+              playing={currentIndex === i && status.playing}
+              onPlay={() => playVerse(i)}
+            />
+          ))
+        )}
       </Screen>
 
       {/* Lecteur audio */}
-      <View
-        style={{
-          position: 'absolute',
-          left: spacing.lg,
-          right: spacing.lg,
-          bottom: spacing.xl,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: spacing.md,
-          backgroundColor: colors.primaryContainer,
-          borderRadius: radius.lg,
-          padding: spacing.md,
-        }}
-      >
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="play" size={20} color="#2E2118" />
+      {hasAudio ? (
+        <View
+          style={{
+            position: 'absolute',
+            left: spacing.lg,
+            right: spacing.lg,
+            bottom: spacing.xl,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.md,
+            backgroundColor: colors.primaryContainer,
+            borderRadius: radius.lg,
+            padding: spacing.md,
+          }}
+        >
+          <Pressable
+            onPress={togglePlay}
+            style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Ionicons name={status.playing ? 'pause' : 'play'} size={20} color="#2E2118" />
+          </Pressable>
+          <View style={{ flex: 1 }}>
+            <AppText variant="label" color={colors.onPrimaryContainer}>
+              {currentNumber ? `Récitation · verset ${currentNumber}` : 'Réciter la sourate'}
+            </AppText>
+            <ProgressBar value={progress} height={4} trackColor="rgba(255,255,255,0.2)" style={{ marginTop: spacing.sm }} />
+          </View>
+          <AppText variant="caption" color="rgba(255,253,247,0.7)">{fmt(status.currentTime)}</AppText>
         </View>
-        <View style={{ flex: 1 }}>
-          <AppText variant="label" color={colors.onPrimaryContainer}>Récitation · verset 1</AppText>
-          <ProgressBar value={0.25} height={4} trackColor="rgba(255,255,255,0.2)" style={{ marginTop: spacing.sm }} />
-        </View>
-        <AppText variant="caption" color="rgba(255,253,247,0.7)">0:14</AppText>
-      </View>
+      ) : null}
     </Screen>
   );
 }
 
-function VerseRow({ verse, last }: { verse: Verse; last: boolean }) {
+function VerseRow({
+  verse,
+  last,
+  isCurrent,
+  playing,
+  onPlay,
+}: {
+  verse: Verse;
+  last: boolean;
+  isCurrent: boolean;
+  playing: boolean;
+  onPlay: () => void;
+}) {
   const { colors } = useTheme();
   return (
-    <View style={{ paddingVertical: spacing.lg, borderBottomWidth: last ? 0 : 1, borderBottomColor: colors.line }}>
+    <View
+      style={{
+        paddingVertical: spacing.lg,
+        paddingHorizontal: isCurrent ? spacing.md : 0,
+        marginHorizontal: isCurrent ? -spacing.md : 0,
+        borderRadius: isCurrent ? radius.md : 0,
+        backgroundColor: isCurrent ? 'rgba(201,154,63,0.10)' : 'transparent',
+        borderBottomWidth: last || isCurrent ? 0 : 1,
+        borderBottomColor: colors.line,
+      }}
+    >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md }}>
         <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1.5, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}>
           <AppText variant="caption" color={colors.gold}>{verse.number}</AppText>
         </View>
-        <Pressable onPress={() => playAudioUrl(verse.audioUrl)} hitSlop={8}>
-          <Ionicons name="volume-medium-outline" size={18} color={colors.textSecondary} />
+        <Pressable onPress={onPlay} hitSlop={8} disabled={!verse.audioUrl}>
+          <Ionicons
+            name={playing ? 'volume-high' : 'volume-medium-outline'}
+            size={18}
+            color={isCurrent ? colors.gold : colors.textSecondary}
+          />
         </Pressable>
       </View>
       <ArabicText size="body" align="right" style={{ lineHeight: 60 }}>{verse.arabicText}</ArabicText>
