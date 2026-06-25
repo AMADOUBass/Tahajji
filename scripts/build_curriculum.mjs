@@ -330,3 +330,20 @@ select setval(pg_get_serial_sequence('quiz_questions', 'id'), (select max(id) fr
 
 writeFileSync('db/seed.sql', sql, 'utf8');
 console.log(`OK — ${levels.length} niveaux, ${lessons.length} leçons, ${items.length} items, ${quizzes.length} quiz → db/seed.sql`);
+
+// ---------- Manifeste audio (clips à ENREGISTRER : lettres/syllabes/mots) ----------
+// Les versets du Coran ne sont PAS ici (récupérables en ligne).
+const lessonsById = Object.fromEntries(lessons.map((l) => [l[0], l]));
+const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+const csv = ['id,type,arabe,translitteration,a_dire,unite,fichier']
+  .concat(
+    items
+      .filter((it) => it[3] !== 'verse')
+      .map((it) => {
+        const lvl = lessonsById[it[1]]?.[1] ?? '';
+        return [it[0], it[3], q(it[4]), q(it[5]), q(it[6]), lvl, `items/${it[0]}.mp3`].join(',');
+      }),
+  )
+  .join('\n');
+writeFileSync('db/audio_manifest.csv', csv, 'utf8');
+console.log(`Manifeste audio : ${items.filter((it) => it[3] !== 'verse').length} clips → db/audio_manifest.csv`);
