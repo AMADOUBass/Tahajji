@@ -115,7 +115,7 @@ const REV = [['بَ', 'ba'], ['بِ', 'bi'], ['بُ', 'bou'], ['تَ', 'ta'], ['
 lessonId += 1;
 {
   const lid = lessonId;
-  lessons.push([lid, 2, lessons.filter((l) => l[1] === 2).length + 1, 'Révision des voyelles', 'exam', false]);
+  lessons.push([lid, 2, lessons.filter((l) => l[1] === 2).length + 1, 'Révision (brèves)', 'exam', false]);
   REV.forEach(([ar, tr], idx) => {
     itemId += 1;
     items.push([itemId, lid, idx + 1, 'letter', ar, tr, `Se lit « ${tr} »`]);
@@ -164,7 +164,7 @@ const MADD_REV = [['بَا', 'bâ'], ['بِي', 'bî'], ['بُو', 'boû'], ['ن
 lessonId += 1;
 {
   const lid = lessonId;
-  lessons.push([lid, 3, lessons.filter((l) => l[1] === 3).length + 1, 'Révision des voyelles longues', 'exam', false]);
+  lessons.push([lid, 3, lessons.filter((l) => l[1] === 3).length + 1, 'Révision (madd)', 'exam', false]);
   MADD_REV.forEach(([ar, tr], idx) => {
     itemId += 1;
     items.push([itemId, lid, idx + 1, 'word', ar, tr, `Se lit « ${tr} »`]);
