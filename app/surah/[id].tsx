@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
@@ -30,6 +30,11 @@ export default function SurahScreen() {
   const player = useAudioPlayer(undefined);
   const status = useAudioPlayerStatus(player);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const currentIndexRef = useRef<number | null>(null);
+  const finishHandledRef = useRef(false);
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   // Lecture même en mode silencieux (iOS).
   useEffect(() => {
@@ -56,14 +61,21 @@ export default function SurahScreen() {
     else player.play();
   };
 
-  // Enchaînement automatique au verset suivant.
+  // Enchaînement automatique au verset suivant (une seule fois par fin).
   useEffect(() => {
-    if (status.didJustFinish && currentIndex !== null && verses) {
-      const next = currentIndex + 1;
-      if (next < verses.length && verses[next]?.audioUrl) playVerse(next);
-      else setCurrentIndex(null);
+    if (!status.didJustFinish) {
+      finishHandledRef.current = false;
+      return;
     }
-  }, [status.didJustFinish, currentIndex, verses, playVerse]);
+    if (finishHandledRef.current) return;
+    finishHandledRef.current = true;
+
+    const idx = currentIndexRef.current;
+    if (idx === null || !verses) return;
+    const next = idx + 1;
+    if (next < verses.length && verses[next]?.audioUrl) playVerse(next);
+    else setCurrentIndex(null);
+  }, [status.didJustFinish, verses, playVerse]);
 
   const hasAudio = !!verses?.some((v) => v.audioUrl);
   const progress = status.duration ? status.currentTime / status.duration : 0;
