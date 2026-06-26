@@ -1,6 +1,6 @@
 -- ============================================================
 -- Tahajji — Migration 0005 : système de cœurs (vies).
--- 5 cœurs max, recharge 1 / 30 min, premium = illimité.
+-- 5 cœurs max, recharge 1 / 10 min, premium = illimité.
 -- Géré côté serveur (non falsifiable) ; le client lit hearts + hearts_updated_at
 -- et calcule la recharge pour l'affichage.
 -- À exécuter APRÈS 0004. SQL Editor.
@@ -23,7 +23,7 @@ declare
   v_user uuid := auth.uid();
   v_h int; v_ts timestamptz; v_prem boolean;
   v_max int := 5;
-  v_interval interval := interval '30 minutes';
+  v_interval interval := interval '10 minutes';
   v_ticks int;
 begin
   if v_user is null then raise exception 'not authenticated'; end if;
@@ -59,7 +59,7 @@ declare
   v_user uuid := auth.uid();
   v_h int; v_ts timestamptz;
   v_max int := 5;
-  v_interval interval := interval '30 minutes';
+  v_interval interval := interval '10 minutes';
   v_ticks int;
 begin
   if v_user is null then raise exception 'not authenticated'; end if;

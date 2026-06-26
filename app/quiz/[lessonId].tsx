@@ -1,30 +1,45 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
-import { useCompleteLesson, useQuizQuestions } from '@/lib/queries';
+import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
+import { useCompleteLesson, useConsumeHeart, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 const XP_PER_LESSON = 50;
 
 export default function QuizScreen() {
-  const { lessonId: lessonIdParam } = useLocalSearchParams<{ lessonId: string }>();
+  const { lessonId: lessonIdParam, review } = useLocalSearchParams<{ lessonId: string; review?: string }>();
   const lessonId = Number(lessonIdParam);
+  const isReview = review === '1';
   const router = useRouter();
   const { colors } = useTheme();
 
   const { data: questions, isLoading } = useQuizQuestions(lessonId);
+  const { data: profile } = useProfile();
   const completeLesson = useCompleteLesson();
+  const consumeHeart = useConsumeHeart();
+  const refillHearts = useRefillHearts();
+  const unlimited = profile?.isPremium ?? false;
 
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
-  const [hearts, setHearts] = useState(5);
+
+  // Cœurs : initialisés depuis le serveur (avec recharge), décrément optimiste.
+  const [heartsLeft, setHeartsLeft] = useState(MAX_HEARTS);
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (!seededRef.current && profile) {
+      seededRef.current = true;
+      setHeartsLeft(effectiveHearts(profile).count);
+    }
+  }, [profile]);
 
   // Mélange les réponses (positions aléatoires) — stable tant qu'on est sur la
   // même question, re-mélangé à la question suivante / à chaque nouvelle tentative.
@@ -67,8 +82,10 @@ export default function QuizScreen() {
     setSelected(option);
     if (option === question.correctAnswer) {
       setCorrectCount((c) => c + 1);
-    } else {
-      setHearts((h) => Math.max(0, h - 1));
+    } else if (!isReview && !unlimited) {
+      // Perte d'un cœur (côté serveur), décrément immédiat à l'écran.
+      setHeartsLeft((h) => Math.max(0, h - 1));
+      consumeHeart.mutate();
     }
   }
 
@@ -84,6 +101,11 @@ export default function QuizScreen() {
   }
 
   function finish(stars: number) {
+    // Mode révision : on regagne un cœur, sans recompléter la leçon.
+    if (isReview) {
+      refillHearts.mutate(1, { onSuccess: () => router.replace('/') });
+      return;
+    }
     completeLesson.mutate({ lessonId, stars });
     const accuracy = questions!.length ? Math.round((correctCount / questions!.length) * 100) : 100;
     router.replace({
@@ -103,7 +125,7 @@ export default function QuizScreen() {
           <ProgressBar value={(qIndex + 1) / questions.length} color={colors.success} style={{ flex: 1 }} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <Ionicons name="heart" size={18} color={colors.coral} />
-            <AppText variant="label">{hearts}</AppText>
+            <AppText variant="label">{unlimited ? '∞' : heartsLeft}</AppText>
           </View>
         </View>
 

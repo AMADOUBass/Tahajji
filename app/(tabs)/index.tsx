@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { AppText, InfoModal, ProgressBar, Screen, StatPill, type InfoRow } from '@/components/ui';
+import { effectiveHearts, formatCountdown } from '@/lib/hearts';
 import { useLevelsWithProgress, useProfile } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -21,14 +22,36 @@ const OFFSETS = [0, -48, -68, -40, 14, 40, 12, -42];
 
 export default function ParcoursScreen() {
   const { colors } = useTheme();
+  const router = useRouter();
   const { data: profile } = useProfile();
   const { data: levels, isLoading } = useLevelsWithProgress();
   const [infoVisible, setInfoVisible] = useState(false);
 
+  const hearts = effectiveHearts(profile);
+  const reviewLessonId = useMemo(() => {
+    for (const lvl of levels) for (const l of lvl.lessons) if (l.status === 'completed') return l.id;
+    return null;
+  }, [levels]);
+
+  const handleOutOfHearts = () => {
+    Alert.alert(
+      'Plus de cœurs ❤️',
+      reviewLessonId
+        ? `Révise une leçon pour regagner un cœur, ou attends ${formatCountdown(hearts.secondsToNext)}.`
+        : `Tu regagnes un cœur dans ${formatCountdown(hearts.secondsToNext)}.`,
+      reviewLessonId
+        ? [
+            { text: 'Plus tard', style: 'cancel' },
+            { text: 'Réviser', onPress: () => router.push({ pathname: '/quiz/[lessonId]', params: { lessonId: String(reviewLessonId), review: '1' } }) },
+          ]
+        : [{ text: 'OK' }],
+    );
+  };
+
   const statRows: InfoRow[] = [
     { icon: 'flame', color: colors.flame, label: 'Série (streak)', description: 'Le nombre de jours d\'affilée où tu apprends. Reviens chaque jour pour ne pas la perdre !' },
     { icon: 'star', color: colors.gold, label: 'XP — points d\'expérience', description: 'Gagnés en terminant des leçons et des quiz. Ils font monter ton niveau.' },
-    { icon: 'heart', color: colors.coral, label: 'Cœurs (vies)', description: 'Tes essais pendant un quiz : tu en perds un à chaque mauvaise réponse.' },
+    { icon: 'heart', color: colors.coral, label: 'Cœurs (vies)', description: 'Tu en perds un par mauvaise réponse. Rechargés avec le temps (1 / 10 min) ou en révisant. Illimités en Premium.' },
     { icon: 'star', color: colors.gold, label: 'Étoiles des leçons', description: 'La note de chaque leçon, de 1 à 3 : ⭐ terminé · ⭐⭐ bien · ⭐⭐⭐ maîtrise.' },
   ];
 
@@ -48,7 +71,7 @@ export default function ParcoursScreen() {
       >
         <StatPill icon="flame" iconColor={colors.flame} value={profile?.streakCount ?? 0} onPress={() => setInfoVisible(true)} />
         <StatPill icon="star" iconColor={colors.gold} value={profile?.xp ?? 0} onPress={() => setInfoVisible(true)} />
-        <StatPill icon="heart" iconColor={colors.coral} value={5} onPress={() => setInfoVisible(true)} />
+        <StatPill icon="heart" iconColor={colors.coral} value={hearts.unlimited ? '∞' : hearts.count} onPress={() => setInfoVisible(true)} />
       </View>
 
       <ScrollView
@@ -58,13 +81,31 @@ export default function ParcoursScreen() {
       >
         {isLoading
           ? <AppText tone="secondary" align="center" style={{ marginTop: spacing.xxl }}>Chargement…</AppText>
-          : levels.map((level) => <LevelSection key={level.id} level={level} />)}
+          : levels.map((level) => (
+              <LevelSection
+                key={level.id}
+                level={level}
+                heartsCount={hearts.count}
+                unlimited={hearts.unlimited}
+                onOutOfHearts={handleOutOfHearts}
+              />
+            ))}
       </ScrollView>
     </Screen>
   );
 }
 
-function LevelSection({ level }: { level: LevelWithLessons }) {
+function LevelSection({
+  level,
+  heartsCount,
+  unlimited,
+  onOutOfHearts,
+}: {
+  level: LevelWithLessons;
+  heartsCount: number;
+  unlimited: boolean;
+  onOutOfHearts: () => void;
+}) {
   const { colors } = useTheme();
   const total = level.lessons.length;
   const done = level.lessons.filter((l) => l.status === 'completed').length;
@@ -105,7 +146,14 @@ function LevelSection({ level }: { level: LevelWithLessons }) {
       <View style={{ alignItems: 'center', gap: spacing.xl, marginTop: spacing.xl }}>
         {level.lessons.map((lesson, i) => (
           <Animated.View key={lesson.id} entering={FadeInDown.delay(i * 70).springify().damping(14)}>
-            <LessonNode lesson={lesson} offset={OFFSETS[i % OFFSETS.length]} premiumLevel={level.isPremium} />
+            <LessonNode
+              lesson={lesson}
+              offset={OFFSETS[i % OFFSETS.length]}
+              premiumLevel={level.isPremium}
+              heartsCount={heartsCount}
+              unlimited={unlimited}
+              onOutOfHearts={onOutOfHearts}
+            />
           </Animated.View>
         ))}
       </View>
@@ -117,10 +165,16 @@ function LessonNode({
   lesson,
   offset,
   premiumLevel,
+  heartsCount,
+  unlimited,
+  onOutOfHearts,
 }: {
   lesson: LessonWithProgress;
   offset: number;
   premiumLevel: boolean;
+  heartsCount: number;
+  unlimited: boolean;
+  onOutOfHearts: () => void;
 }) {
   const { colors } = useTheme();
   const router = useRouter();
@@ -149,9 +203,13 @@ function LessonNode({
       router.push('/paywall');
       return;
     }
-    if (!locked) {
-      router.push({ pathname: '/lesson/[id]', params: { id: String(lesson.id) } });
+    if (locked) return;
+    // Plus de cœurs (hors premium) → on propose de réviser / d'attendre.
+    if (!unlimited && heartsCount <= 0) {
+      onOutOfHearts();
+      return;
     }
+    router.push({ pathname: '/lesson/[id]', params: { id: String(lesson.id) } });
   };
 
   const size = inProgress ? 86 : completed ? 70 : 64;

@@ -50,7 +50,7 @@ const toVerse = (r: Row<'verses'>): Verse => ({
 const toProfile = (r: Row<'profiles'>): Profile => ({
   id: r.id, displayName: r.display_name ?? 'Apprenant', locale: r.locale, currentLevel: r.current_level,
   xp: r.xp, streakCount: r.streak_count, lastActiveDate: r.last_active_date, isPremium: r.is_premium,
-  avatarUrl: r.avatar_url, bio: r.bio,
+  avatarUrl: r.avatar_url, bio: r.bio, hearts: r.hearts, heartsUpdatedAt: r.hearts_updated_at,
 });
 
 export const queryKeys = {
@@ -254,6 +254,37 @@ export function useUpdateProfile() {
       if (patch.displayName !== undefined) update.display_name = patch.displayName;
       if (patch.bio !== undefined) update.bio = patch.bio;
       const { error } = await supabase.from('profiles').update(update).eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      const userId = useAuthStore.getState().userId;
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
+    },
+  });
+}
+
+/** Consomme un cœur (mauvaise réponse). Renvoie le nombre de cœurs restant. */
+export function useConsumeHeart() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc('consume_heart');
+      if (error) throw error;
+      return data as number;
+    },
+    onSuccess: () => {
+      const userId = useAuthStore.getState().userId;
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });
+    },
+  });
+}
+
+/** Regagne des cœurs (ex. après une révision). */
+export function useRefillHearts() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (amount: number) => {
+      const { error } = await supabase.rpc('refill_hearts', { p_amount: amount });
       if (error) throw error;
     },
     onSuccess: () => {

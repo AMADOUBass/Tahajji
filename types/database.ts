@@ -22,6 +22,8 @@ export interface Database {
           is_premium: boolean;
           avatar_url: string | null;
           bio: string | null;
+          hearts: number;
+          hearts_updated_at: Timestamp;
           created_at: Timestamp;
         };
         Insert: {
@@ -176,6 +178,14 @@ export interface Database {
       set_premium: {
         Args: { p_value: boolean };
         Returns: undefined;
+      };
+      consume_heart: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      refill_hearts: {
+        Args: { p_amount: number };
+        Returns: number;
       };
     };
     Enums: Record<string, never>;

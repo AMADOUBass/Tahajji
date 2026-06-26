@@ -22,6 +22,8 @@ export interface Profile {
   isPremium: boolean;
   avatarUrl: string | null;
   bio: string | null;
+  hearts: number;
+  heartsUpdatedAt: string;
 }
 
 export interface Level {
