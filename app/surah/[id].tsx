@@ -6,7 +6,7 @@ import { Pressable, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { useSurahs, useVerses } from '@/lib/queries';
-import { radius, spacing } from '@/lib/theme';
+import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import { useReadingStore } from '@/store/reading';
 import type { Verse } from '@/types/models';
@@ -197,16 +197,30 @@ function VerseRow({
         borderBottomColor: colors.line,
       }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md }}>
         <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1.5, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}>
           <AppText variant="caption" color={colors.gold}>{verse.number}</AppText>
         </View>
-        <Pressable onPress={onPlay} hitSlop={8} disabled={!verse.audioUrl}>
-          <Ionicons
-            name={playing ? 'volume-high' : 'volume-medium-outline'}
-            size={18}
-            color={isCurrent ? colors.gold : colors.textSecondary}
-          />
+        {/* Bouton « Écouter » bien visible */}
+        <Pressable
+          onPress={onPlay}
+          hitSlop={8}
+          disabled={!verse.audioUrl}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            backgroundColor: isCurrent ? colors.gold : colors.primaryLight,
+            borderRadius: 999,
+            paddingVertical: 7,
+            paddingHorizontal: 14,
+            opacity: verse.audioUrl ? 1 : 0.4,
+          }}
+        >
+          <Ionicons name={playing ? 'pause' : 'play'} size={15} color={isCurrent ? '#2E2118' : colors.primary} />
+          <AppText variant="caption" color={isCurrent ? '#2E2118' : colors.primary} style={{ fontFamily: fonts.semibold }}>
+            {playing ? 'En lecture' : 'Écouter'}
+          </AppText>
         </Pressable>
       </View>
       <ArabicText size="body" align="right" style={{ lineHeight: 60 }}>{verse.arabicText}</ArabicText>
