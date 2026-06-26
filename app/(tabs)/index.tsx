@@ -204,9 +204,13 @@ function LessonNode({
       return;
     }
     if (locked) return;
-    // Cœurs requis seulement pour les EXAMENS ; les leçons normales sont libres.
-    if (lesson.lessonType === 'exam' && !unlimited && heartsCount <= 0) {
-      onOutOfHearts();
+    // Examen : cœurs requis + accès direct au quiz (pas d'écran d'apprentissage).
+    if (lesson.lessonType === 'exam') {
+      if (!unlimited && heartsCount <= 0) {
+        onOutOfHearts();
+        return;
+      }
+      router.push({ pathname: '/quiz/[lessonId]', params: { lessonId: String(lesson.id) } });
       return;
     }
     router.push({ pathname: '/lesson/[id]', params: { id: String(lesson.id) } });

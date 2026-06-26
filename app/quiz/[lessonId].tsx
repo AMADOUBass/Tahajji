@@ -12,6 +12,7 @@ import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 const XP_PER_LESSON = 50;
+const PASS_THRESHOLD = 70; // % minimum pour valider un examen
 
 export default function QuizScreen() {
   const { lessonId: lessonIdParam, review } = useLocalSearchParams<{ lessonId: string; review?: string }>();
@@ -111,8 +112,27 @@ export default function QuizScreen() {
       refillHearts.mutate(1, { onSuccess: () => router.replace('/') });
       return;
     }
-    completeLesson.mutate({ lessonId, stars });
     const accuracy = questions!.length ? Math.round((correctCount / questions!.length) * 100) : 100;
+
+    // Examen : il faut ≥ 70 % pour valider l'unité (sinon échec, à refaire).
+    if (isExam) {
+      const passed = accuracy >= PASS_THRESHOLD;
+      if (passed) completeLesson.mutate({ lessonId, stars });
+      router.replace({
+        pathname: '/level-complete/[id]',
+        params: {
+          id: String(lessonId),
+          stars: String(passed ? stars : 0),
+          xp: String(passed ? XP_PER_LESSON : 0),
+          accuracy: String(accuracy),
+          exam: '1',
+          passed: passed ? '1' : '0',
+        },
+      });
+      return;
+    }
+
+    completeLesson.mutate({ lessonId, stars });
     router.replace({
       pathname: '/level-complete/[id]',
       params: { id: String(lessonId), stars: String(stars), xp: String(XP_PER_LESSON), accuracy: String(accuracy) },

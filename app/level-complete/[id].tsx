@@ -9,7 +9,7 @@ import { spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 export default function LevelCompleteScreen() {
-  const params = useLocalSearchParams<{ id: string; stars?: string; xp?: string; accuracy?: string }>();
+  const params = useLocalSearchParams<{ id: string; stars?: string; xp?: string; accuracy?: string; exam?: string; passed?: string }>();
   const router = useRouter();
   const { colors } = useTheme();
 
@@ -17,6 +17,9 @@ export default function LevelCompleteScreen() {
   const stars = Number(params.stars ?? 3);
   const xp = Number(params.xp ?? 50);
   const accuracy = Number(params.accuracy ?? 100);
+  const isExam = params.exam === '1';
+  const passed = params.passed !== '0';
+  const failed = isExam && !passed;
 
   const { data: lessons } = useLessons();
   const lesson = lessons?.find((l) => l.id === lessonId);
@@ -24,6 +27,42 @@ export default function LevelCompleteScreen() {
     !!lesson && !lessons?.some((l) => l.levelId === lesson.levelId && l.position === lesson.position + 1);
 
   const onPrimary = colors.onPrimaryContainer;
+
+  // --- Examen échoué : on invite à réessayer (l'unité reste verrouillée) ---
+  if (failed) {
+    return (
+      <Screen background={colors.primaryContainer} contentStyle={{ flex: 1, alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.xl }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg }}>
+          <Animated.View
+            entering={ZoomIn.springify().damping(12)}
+            style={{ width: 128, height: 128, borderRadius: 64, backgroundColor: 'rgba(217,101,75,0.18)', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <View style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="refresh" size={52} color="#fff" />
+            </View>
+          </Animated.View>
+
+          <Animated.View entering={FadeInUp.delay(150)} style={{ alignItems: 'center', gap: spacing.lg }}>
+            <AppText variant="overline" color={colors.coral}>Examen non validé</AppText>
+            <AppText variant="h2" color={onPrimary} align="center">Presque ! Réessaie</AppText>
+            <AppText variant="body" color="rgba(255,253,247,0.85)" align="center">
+              Il te faut au moins 70 % pour valider l’unité. Tu y es presque !
+            </AppText>
+          </Animated.View>
+
+          <Animated.View entering={FadeInUp.delay(400)} style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg, alignSelf: 'stretch' }}>
+            <StatBox value={`${accuracy}%`} label="Ton score" highlight={colors.coral} />
+            <StatBox value="70%" label="Objectif" highlight={onPrimary} />
+          </Animated.View>
+        </View>
+
+        <Button label="Réessayer l’examen" variant="gold" onPress={() => router.replace({ pathname: '/quiz/[lessonId]', params: { lessonId: String(lessonId) } })} />
+        <Pressable style={{ marginTop: spacing.md, paddingVertical: spacing.sm }} onPress={() => router.replace('/')}>
+          <AppText variant="bodyStrong" align="center" color="rgba(255,253,247,0.8)">Plus tard</AppText>
+        </Pressable>
+      </Screen>
+    );
+  }
 
   return (
     <Screen background={colors.primaryContainer} contentStyle={{ flex: 1, alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.xl }}>
@@ -42,16 +81,16 @@ export default function LevelCompleteScreen() {
           }}
         >
           <View style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="star" size={52} color="#fff" />
+            <Ionicons name={isExam ? 'ribbon' : 'star'} size={52} color="#fff" />
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(150)} style={{ alignItems: 'center', gap: spacing.lg }}>
           <AppText variant="overline" tone="gold">
-            {isLastOfLevel ? `Niveau ${lesson?.levelId} terminé` : 'Leçon terminée'}
+            {isExam ? 'Examen réussi' : isLastOfLevel ? `Niveau ${lesson?.levelId} terminé` : 'Leçon terminée'}
           </AppText>
           <AppText variant="h2" color={onPrimary} align="center">
-            {isLastOfLevel ? 'Bravo, niveau bouclé !' : 'Bien joué, continue !'}
+            {isExam ? 'Unité validée, bravo !' : isLastOfLevel ? 'Bravo, niveau bouclé !' : 'Bien joué, continue !'}
           </AppText>
         </Animated.View>
 

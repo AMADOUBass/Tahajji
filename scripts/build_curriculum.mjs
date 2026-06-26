@@ -48,6 +48,27 @@ function addQuiz(lid, pos, prompt, correct, options) {
   quizzes.push([quizId, lid, pos, 'recognize_letter', prompt, correct, JSON.stringify(options)]);
 }
 
+// Examen de fin d'unité : `count` questions de reconnaissance mélangées sur TOUTE
+// l'unité. Pas d'items (pas d'écran d'apprentissage) — l'examen va direct au quiz.
+function unitExam(levelId, premium, title, pool, count = 8) {
+  lessonId += 1;
+  const lid = lessonId;
+  lessons.push([lid, levelId, lessons.filter((l) => l[1] === levelId).length + 1, title, 'exam', premium]);
+  const n = Math.min(count, pool.length);
+  for (let i = 0; i < n; i++) {
+    const [ar, tr] = pool[i % pool.length];
+    const others = pool.filter((p) => p[0] !== ar);
+    const opts = [
+      ar,
+      others[i % others.length][0],
+      others[(i + 1) % others.length][0],
+      others[(i + 2) % others.length][0],
+    ];
+    const rot = i % 4;
+    addQuiz(lid, i + 1, `Quelle case se lit « ${tr} » ?`, ar, opts.slice(rot).concat(opts.slice(0, rot)));
+  }
+}
+
 // Leçons « une voyelle appliquée aux lettres » (niveaux alphabet/voyelles).
 function letterLessons(levelId, vowel, chunk, titler) {
   for (let i = 0; i < LETTERS.length; i += chunk) {
@@ -79,6 +100,7 @@ function letterLessons(levelId, vowel, chunk, titler) {
 // ---------- Niveau 1 : la fatha ----------
 levels.push([1, 1, 'L’alphabet — la voyelle « a »', 'Les 28 lettres lues avec la fatha (a), dans l’ordre de la méthode.', false]);
 letterLessons(1, FATHA, 4, (g) => g.map((l) => l[1].split(' ')[0]).join(' · '));
+unitExam(1, false, 'Examen — l’alphabet', LETTERS.map(([bare, , cons]) => [vocalize(bare, FATHA), sound(cons, FATHA) || 'a']));
 
 // ---------- Niveau 2 : voyelles brèves ----------
 levels.push([2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false]);
@@ -110,21 +132,13 @@ lessonId += 1;
   });
 }
 
-// Révision des voyelles brèves (mélange a/i/ou).
-const REV = [['بَ', 'ba'], ['بِ', 'bi'], ['بُ', 'bou'], ['تَ', 'ta'], ['تِ', 'ti'], ['تُ', 'tou']];
-lessonId += 1;
-{
-  const lid = lessonId;
-  lessons.push([lid, 2, lessons.filter((l) => l[1] === 2).length + 1, 'Révision (brèves)', 'exam', false]);
-  REV.forEach(([ar, tr], idx) => {
-    itemId += 1;
-    items.push([itemId, lid, idx + 1, 'letter', ar, tr, `Se lit « ${tr} »`]);
-  });
-  REV.slice(0, 4).forEach(([ar, tr], idx) => {
-    const opts = [ar, REV[(idx + 1) % REV.length][0], REV[(idx + 3) % REV.length][0], REV[(idx + 5) % REV.length][0]];
-    addQuiz(lid, idx + 1, `Quelle case se lit « ${tr} » ?`, ar, opts);
-  });
-}
+// Examen de fin d'unité (voyelles brèves) : mélange a/i/ou + soukoûne.
+const BREVES_POOL = [
+  ['بَ', 'ba'], ['بِ', 'bi'], ['بُ', 'bou'], ['تَ', 'ta'], ['تِ', 'ti'], ['تُ', 'tou'],
+  ['دَ', 'da'], ['دِ', 'di'], ['دُ', 'dou'],
+  ...SUKUN.map(([ar, tr]) => [ar, tr]),
+];
+unitExam(2, false, 'Examen — voyelles brèves', BREVES_POOL);
 
 // ---------- Niveau 3 : voyelles longues (madd) ----------
 levels.push([3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false]);
@@ -159,21 +173,14 @@ maddLesson(FATHA, 'ا', 'â', 'Madd par Alif (â)');
 maddLesson(KASRA, 'ي', 'î', 'Madd par Yâ (î)');
 maddLesson(DAMMA, 'و', 'oû', 'Madd par Wâw (oû)');
 
-// Révision madd (mélange â / î / oû).
-const MADD_REV = [['بَا', 'bâ'], ['بِي', 'bî'], ['بُو', 'boû'], ['نَا', 'nâ'], ['نِي', 'nî'], ['نُو', 'noû']];
-lessonId += 1;
-{
-  const lid = lessonId;
-  lessons.push([lid, 3, lessons.filter((l) => l[1] === 3).length + 1, 'Révision (madd)', 'exam', false]);
-  MADD_REV.forEach(([ar, tr], idx) => {
-    itemId += 1;
-    items.push([itemId, lid, idx + 1, 'word', ar, tr, `Se lit « ${tr} »`]);
-  });
-  MADD_REV.slice(0, 4).forEach(([ar, tr], idx) => {
-    const opts = [ar, MADD_REV[(idx + 1) % MADD_REV.length][0], MADD_REV[(idx + 3) % MADD_REV.length][0], MADD_REV[(idx + 5) % MADD_REV.length][0]];
-    addQuiz(lid, idx + 1, `Quelle case se lit « ${tr} » ?`, ar, opts);
-  });
+// Examen de fin d'unité (madd) : mélange â / î / oû sur plusieurs lettres.
+const MADD_POOL = [];
+for (const [bare, cons] of MADD_SET) {
+  MADD_POOL.push([bare + FATHA + 'ا', cons + 'â']);
+  MADD_POOL.push([bare + KASRA + 'ي', cons + 'î']);
+  MADD_POOL.push([bare + DAMMA + 'و', cons + 'oû']);
 }
+unitExam(3, false, 'Examen — voyelles longues', MADD_POOL);
 
 // ---------- Niveau 4 : le tanwîn ----------
 levels.push([4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false]);
@@ -207,21 +214,14 @@ for (const kind of ['f', 'k', 'd']) {
   });
 }
 
-// Révision tanwîn.
-const TAN_REV = [['بًا', 'bane'], ['بٍ', 'bine'], ['بٌ', 'boune'], ['نًا', 'nane'], ['نٍ', 'nine'], ['نٌ', 'noune']];
-lessonId += 1;
-{
-  const lid = lessonId;
-  lessons.push([lid, 4, lessons.filter((l) => l[1] === 4).length + 1, 'Révision du tanwîn', 'exam', false]);
-  TAN_REV.forEach(([ar, tr], idx) => {
-    itemId += 1;
-    items.push([itemId, lid, idx + 1, 'word', ar, tr, `Se lit « ${tr} »`]);
-  });
-  TAN_REV.slice(0, 4).forEach(([ar, tr], idx) => {
-    const opts = [ar, TAN_REV[(idx + 1) % TAN_REV.length][0], TAN_REV[(idx + 3) % TAN_REV.length][0], TAN_REV[(idx + 5) % TAN_REV.length][0]];
-    addQuiz(lid, idx + 1, `Quelle case se lit « ${tr} » ?`, ar, opts);
-  });
+// Examen de fin d'unité (tanwîn) : -an / -in / -oun sur plusieurs lettres.
+const TAN_POOL = [];
+for (const [bare, cons] of MADD_SET) {
+  TAN_POOL.push([tform(bare, 'f'), cons + 'ane']);
+  TAN_POOL.push([tform(bare, 'k'), cons + 'ine']);
+  TAN_POOL.push([tform(bare, 'd'), cons + 'oune']);
 }
+unitExam(4, false, 'Examen — tanwîn', TAN_POOL);
 
 // Crée une leçon « contenu » : items + (jusqu'à 4) quiz « Quel … se lit … ? ».
 function contentLesson(levelId, premium, title, lessonType, itemType, entries, promptFn) {
@@ -250,6 +250,10 @@ contentLesson(6, false, 'Les chiffres ٥–٩', 'learn', 'word', [
   ['٥', 'khamsa', '5 — خَمْسَة'], ['٦', 'sitta', '6 — سِتَّة'], ['٧', 'sabʿa', '7 — سَبْعَة'],
   ['٨', 'thamâniya', '8 — ثَمَانِيَة'], ['٩', 'tisʿa', '9 — تِسْعَة'],
 ], numPrompt);
+unitExam(6, false, 'Examen — les chiffres', [
+  ['٠', 'sifr'], ['١', 'wâḥid'], ['٢', 'ithnân'], ['٣', 'thalâtha'], ['٤', 'arbaʿa'],
+  ['٥', 'khamsa'], ['٦', 'sitta'], ['٧', 'sabʿa'], ['٨', 'thamâniya'], ['٩', 'tisʿa'],
+]);
 
 // ---------- Niveau 5 : règles de lecture (premium, position 6) ----------
 levels.push([5, 6, 'Règles de lecture', 'Chadda, alif maqsoura, hamzatoul wasl, lettres solaires/lunaires et versets.', true]);
@@ -290,13 +294,20 @@ contentLesson(5, true, 'Solaires & lunaires', 'learn', 'word', [
   ['ٱلطَّيْر', 'aṭ-ṭayr', 'solaire'],
 ], (e) => `Quel mot se lit « ${e[1]} » ?`);
 
-// 5. Lecture de versets (sourate Al-Ikhlas)
-contentLesson(5, true, 'Lecture de versets', 'exam', 'verse', [
+// 5. Lecture de versets (sourate Al-Ikhlas) — leçon de lecture (pas l'examen).
+contentLesson(5, true, 'Lecture de versets', 'learn', 'verse', [
   ['قُلْ هُوَ ٱللَّهُ أَحَدٌ', 'Al-Ikhlas 1', 'Dis : « Il est Allah, Unique.'],
   ['ٱللَّهُ ٱلصَّمَدُ', 'Al-Ikhlas 2', 'Allah, Le Seul imploré.'],
   ['لَمْ يَلِدْ وَلَمْ يُولَدْ', 'Al-Ikhlas 3', 'Il n’a pas engendré et n’a pas été engendré.'],
   ['وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ', 'Al-Ikhlas 4', 'Et nul n’est égal à Lui. »'],
 ], (e) => `Quel verset signifie « ${e[2]} » ?`);
+
+// Examen de fin d'unité (règles) : mélange chadda / alif maqsoura / hamza / solaires-lunaires.
+unitExam(5, true, 'Examen — règles', [
+  ['إِنَّ', 'inna'], ['ثُمَّ', 'thumma'], ['حَقَّ', 'ḥaqqa'], ['مَدَّ', 'madda'],
+  ['عَلَى', 'ʿalâ'], ['إِلَى', 'ilâ'], ['مُوسَى', 'mûsâ'],
+  ['ٱلْقَمَر', 'al-qamar'], ['ٱلشَّمْس', 'ach-chams'], ['ٱلرَّحْمَٰن', 'ar-raḥmân'],
+]);
 
 const sql = `-- ============================================================
 -- Tahajji — Curriculum (généré par scripts/build_curriculum.mjs).
