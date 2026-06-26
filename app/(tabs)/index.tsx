@@ -220,11 +220,13 @@ function LessonNode({
   const bg = completed ? colors.primary : inProgress ? colors.gold : colors.locked;
   const shadow = completed ? colors.primaryDark : inProgress ? '#A87F2E' : 'rgba(0,0,0,0.08)';
 
+  const isExam = lesson.lessonType === 'exam';
   let icon: keyof typeof Ionicons.glyphMap = 'lock-closed';
   let iconColor = colors.lockedInk;
   if (completed) { icon = 'checkmark'; iconColor = colors.onPrimary; }
-  else if (inProgress) { icon = 'star'; iconColor = '#FFFFFF'; }
   else if (needsPremium) { icon = 'lock-closed'; iconColor = colors.lockedInk; }
+  else if (isExam && !locked) { icon = 'ribbon'; iconColor = '#FFFFFF'; }
+  else if (inProgress) { icon = 'star'; iconColor = '#FFFFFF'; }
 
   return (
     <View style={{ transform: [{ translateX: offset }], alignItems: 'center' }}>
@@ -291,6 +293,12 @@ function LessonNode({
       >
         {lesson.title}
       </AppText>
+      {isExam ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2, backgroundColor: 'rgba(201,154,63,0.16)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.sm }}>
+          <Ionicons name="ribbon" size={11} color={colors.gold} />
+          <AppText variant="caption" color={colors.gold} style={{ fontSize: 10, fontFamily: fonts.semibold, letterSpacing: 0.5 }}>EXAMEN</AppText>
+        </View>
+      ) : null}
       {needsPremium ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
           <Ionicons name="diamond" size={10} color={colors.gold} />
