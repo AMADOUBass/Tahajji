@@ -7,7 +7,7 @@ import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
 import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
-import { useCompleteLesson, useConsumeHeart, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
+import { useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -22,10 +22,15 @@ export default function QuizScreen() {
 
   const { data: questions, isLoading } = useQuizQuestions(lessonId);
   const { data: profile } = useProfile();
+  const { data: lessons } = useLessons();
   const completeLesson = useCompleteLesson();
   const consumeHeart = useConsumeHeart();
   const refillHearts = useRefillHearts();
   const unlimited = profile?.isPremium ?? false;
+
+  // Les cœurs ne servent qu'aux EXAMENS (les leçons d'apprentissage sont libres).
+  const isExam = lessons?.find((l) => l.id === lessonId)?.lessonType === 'exam';
+  const heartsActive = isExam && !isReview && !unlimited;
 
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -82,8 +87,8 @@ export default function QuizScreen() {
     setSelected(option);
     if (option === question.correctAnswer) {
       setCorrectCount((c) => c + 1);
-    } else if (!isReview && !unlimited) {
-      // Perte d'un cœur (côté serveur), décrément immédiat à l'écran.
+    } else if (heartsActive) {
+      // Perte d'un cœur (examens uniquement) — côté serveur + décrément à l'écran.
       setHeartsLeft((h) => Math.max(0, h - 1));
       consumeHeart.mutate();
     }
@@ -123,10 +128,12 @@ export default function QuizScreen() {
             <Ionicons name="close" size={24} color={colors.textSecondary} />
           </Pressable>
           <ProgressBar value={(qIndex + 1) / questions.length} color={colors.success} style={{ flex: 1 }} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Ionicons name="heart" size={18} color={colors.coral} />
-            <AppText variant="label">{unlimited ? '∞' : heartsLeft}</AppText>
-          </View>
+          {heartsActive ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Ionicons name="heart" size={18} color={colors.coral} />
+              <AppText variant="label">{heartsLeft}</AppText>
+            </View>
+          ) : null}
         </View>
 
         {/* Énoncé (ré-anime à chaque question) */}

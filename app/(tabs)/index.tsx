@@ -51,7 +51,7 @@ export default function ParcoursScreen() {
   const statRows: InfoRow[] = [
     { icon: 'flame', color: colors.flame, label: 'Série (streak)', description: 'Le nombre de jours d\'affilée où tu apprends. Reviens chaque jour pour ne pas la perdre !' },
     { icon: 'star', color: colors.gold, label: 'XP — points d\'expérience', description: 'Gagnés en terminant des leçons et des quiz. Ils font monter ton niveau.' },
-    { icon: 'heart', color: colors.coral, label: 'Cœurs (vies)', description: 'Tu en perds un par mauvaise réponse. Rechargés avec le temps (1 / 10 min) ou en révisant. Illimités en Premium.' },
+    { icon: 'heart', color: colors.coral, label: 'Cœurs (vies)', description: 'Les leçons sont libres ; les cœurs ne servent qu\'aux examens (−1 par erreur). Rechargés (1 / 10 min) ou en révisant. Illimités en Premium.' },
     { icon: 'star', color: colors.gold, label: 'Étoiles des leçons', description: 'La note de chaque leçon, de 1 à 3 : ⭐ terminé · ⭐⭐ bien · ⭐⭐⭐ maîtrise.' },
   ];
 
@@ -204,8 +204,8 @@ function LessonNode({
       return;
     }
     if (locked) return;
-    // Plus de cœurs (hors premium) → on propose de réviser / d'attendre.
-    if (!unlimited && heartsCount <= 0) {
+    // Cœurs requis seulement pour les EXAMENS ; les leçons normales sont libres.
+    if (lesson.lessonType === 'exam' && !unlimited && heartsCount <= 0) {
       onOutOfHearts();
       return;
     }
