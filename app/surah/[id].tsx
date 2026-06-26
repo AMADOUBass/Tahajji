@@ -160,7 +160,7 @@ export default function SurahScreen() {
           </Pressable>
           <View style={{ flex: 1 }}>
             <AppText variant="label" color={colors.onPrimaryContainer}>
-              {currentNumber ? `Récitation · verset ${currentNumber}` : 'Réciter la sourate'}
+              {currentNumber ? `Récitation · verset ${currentNumber}` : 'Écouter la sourate'}
             </AppText>
             <ProgressBar value={progress} height={4} trackColor="rgba(255,255,255,0.2)" style={{ marginTop: spacing.sm }} />
           </View>
