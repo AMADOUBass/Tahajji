@@ -197,6 +197,7 @@ function LessonNode({
   const locked = lesson.status === 'locked';
   const inProgress = lesson.status === 'in_progress';
   const completed = lesson.status === 'completed';
+  const isExam = lesson.lessonType === 'exam';
 
   // Halo pulsant pour le nœud en cours (façon « nodepulse » de la maquette).
   const pulse = useSharedValue(0);
@@ -230,11 +231,13 @@ function LessonNode({
     router.push({ pathname: '/lesson/[id]', params: { id: String(lesson.id) } });
   };
 
-  const size = inProgress ? 86 : completed ? 70 : 64;
+  // L'examen est un « checkpoint » de fin d'unité → nœud plus imposant.
+  const size = isExam
+    ? (inProgress ? 96 : completed ? 82 : 76)
+    : (inProgress ? 86 : completed ? 70 : 64);
   const bg = completed ? colors.primary : inProgress ? colors.gold : colors.locked;
   const shadow = completed ? colors.primaryDark : inProgress ? '#A87F2E' : 'rgba(0,0,0,0.08)';
 
-  const isExam = lesson.lessonType === 'exam';
   let icon: keyof typeof Ionicons.glyphMap = 'lock-closed';
   let iconColor = colors.lockedInk;
   if (completed) { icon = 'checkmark'; iconColor = colors.onPrimary; }

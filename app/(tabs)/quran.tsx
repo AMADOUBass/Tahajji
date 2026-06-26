@@ -14,7 +14,7 @@ import type { Surah } from '@/types/models';
 export default function QuranScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { data: surahs, isLoading } = useSurahs();
+  const { data: surahs, isLoading, isError, refetch } = useSurahs();
   const [query, setQuery] = useState('');
 
   // Carte « Reprendre » : dernière lecture mémorisée (ou démarrage Al-Fatiha).
@@ -120,6 +120,18 @@ export default function QuranScreen() {
       <View style={{ marginTop: spacing.lg }}>
         {isLoading ? (
           <AppText tone="secondary" align="center" style={{ marginTop: spacing.xl }}>Chargement…</AppText>
+        ) : isError ? (
+          <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xl }}>
+            <Ionicons name="cloud-offline-outline" size={40} color={colors.textSecondary} />
+            <AppText tone="secondary" align="center">Connexion impossible.{'\n'}Vérifie ta connexion internet.</AppText>
+            <Pressable
+              onPress={() => refetch()}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primaryLight, borderRadius: radius.md, paddingVertical: spacing.md, paddingHorizontal: spacing.xl }}
+            >
+              <Ionicons name="refresh" size={18} color={colors.primary} />
+              <AppText variant="bodyStrong" color={colors.primary}>Réessayer</AppText>
+            </Pressable>
+          </View>
         ) : filtered.length === 0 ? (
           <AppText tone="secondary" align="center" style={{ marginTop: spacing.xl }}>
             Aucune sourate pour « {query} ».
