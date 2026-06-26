@@ -47,7 +47,13 @@
       ],
       "expo-sqlite",
       "expo-audio",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "color": "#4A3526"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,
