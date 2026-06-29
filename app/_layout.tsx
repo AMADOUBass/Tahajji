@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -6,20 +6,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { appFonts } from '@/lib/fonts';
+import { OFFLINE_MAX_AGE, asyncStoragePersister, queryClient } from '@/lib/queryPersist';
 import { useTheme } from '@/lib/useTheme';
 import { useAuthStore } from '@/store/auth';
 
 // Garde le splash visible tant que les polices ne sont pas prêtes.
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 2,
-    },
-  },
-});
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
@@ -40,7 +32,10 @@ export default function RootLayout() {
   }, [ready]);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: asyncStoragePersister, maxAge: OFFLINE_MAX_AGE, buster: 'v1' }}
+    >
       <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       {/*
         Garde de route déclarative (patron expo-router) : selon `isAuthenticated`,
@@ -69,6 +64,6 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
         </Stack.Protected>
       </Stack>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
