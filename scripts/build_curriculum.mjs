@@ -358,3 +358,56 @@ const csv = ['id,type,arabe,translitteration,a_dire,unite,fichier']
   .join('\n');
 writeFileSync('db/audio_manifest.csv', csv, 'utf8');
 console.log(`Manifeste audio : ${items.filter((it) => it[3] !== 'verse').length} clips → db/audio_manifest.csv`);
+
+// ---------- Document de validation religieuse (Markdown lisible) ----------
+// Liste TOUT le contenu (lettres, mots, translittérations, sens, quiz) pour une
+// relecture par une autorité compétente avant publication.
+const itemTypeLabel = { letter: 'Lettre', word: 'Mot', verse: 'Verset' };
+const md = [];
+md.push('# Document de validation du contenu — Tahajji\n');
+md.push('> À relire et **valider par une autorité religieuse compétente** avant publication.');
+md.push('> Merci d’annoter directement (✔ correct / ✘ à corriger) chaque ligne douteuse.\n');
+md.push('## Sources');
+md.push('- **Méthode pédagogique** : « La mine des novices pour la lecture du saint Coran » (RECI, Bamako), utilisée avec l’autorisation de l’auteur, fusionnée avec la Qaïda Nourania.');
+md.push('- **Texte coranique** : rasm ‘Uthmani (Hafs).');
+md.push('- **Traduction des sens** : Muhammad Hamidullah.');
+md.push('- **Récitation (versets)** : Mishary Rashid Alafasy.\n');
+md.push(`*Total : ${levels.length} unités, ${lessons.length} leçons, ${items.length} éléments, ${quizzes.length} questions de quiz.*\n`);
+md.push('---\n');
+
+const levelsByPos = [...levels].sort((a, b) => a[1] - b[1]);
+for (const lvl of levelsByPos) {
+  md.push(`## Unité ${lvl[1]} — ${lvl[2]}${lvl[4] ? ' _(premium)_' : ''}`);
+  if (lvl[3]) md.push(`_${lvl[3]}_\n`);
+
+  const lvlLessons = lessons.filter((l) => l[1] === lvl[0]).sort((a, b) => a[2] - b[2]);
+  for (const les of lvlLessons) {
+    const typeLabel = les[4] === 'exam' ? 'examen' : 'leçon';
+    md.push(`### ${les[3]}  *(${typeLabel})*`);
+
+    const lesItems = items.filter((it) => it[1] === les[0]).sort((a, b) => a[2] - b[2]);
+    if (lesItems.length) {
+      md.push('| # | Type | Arabe | Translittération | Sens / description |');
+      md.push('|---|------|-------|------------------|--------------------|');
+      for (const it of lesItems) {
+        md.push(`| ${it[2]} | ${itemTypeLabel[it[3]] ?? it[3]} | ${it[4]} | ${it[5]} | ${it[6]} |`);
+      }
+      md.push('');
+    }
+
+    const lesQuiz = quizzes.filter((q2) => q2[1] === les[0]).sort((a, b) => a[2] - b[2]);
+    if (lesQuiz.length) {
+      md.push('**Questions :**');
+      for (const qz of lesQuiz) {
+        let opts = [];
+        try { opts = JSON.parse(qz[6]); } catch { opts = []; }
+        md.push(`- ${qz[4]}  →  réponse : **${qz[5]}**  ·  choix : ${opts.join(' / ')}`);
+      }
+      md.push('');
+    }
+  }
+  md.push('---\n');
+}
+
+writeFileSync('docs/validation_contenu.md', md.join('\n'), 'utf8');
+console.log('Document de validation → docs/validation_contenu.md');
