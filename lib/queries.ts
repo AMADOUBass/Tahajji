@@ -233,11 +233,42 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
 export function useCompleteLesson() {
   const queryClient = useQueryClient();
   return useMutation({
+    // Clé alignée avec setMutationDefaults (reprise hors-ligne après redémarrage).
+    mutationKey: ['complete_lesson'],
     mutationFn: async ({ lessonId, stars }: { lessonId: number; stars: number }) => {
       const { error } = await supabase.rpc('complete_lesson', { p_lesson_id: lessonId, p_stars: stars });
       if (error) throw error;
     },
-    onSuccess: () => {
+    // Mise à jour optimiste : la leçon est marquée terminée localement TOUT DE
+    // SUITE (même hors-ligne) → la leçon suivante se débloque sans attendre le
+    // serveur. La vraie mutation se synchronise au retour du réseau.
+    onMutate: async ({ lessonId, stars }) => {
+      const userId = useAuthStore.getState().userId;
+      const key = queryKeys.progress(userId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<UserProgress[]>(key);
+      queryClient.setQueryData<UserProgress[]>(key, (old) => {
+        const list = old ? [...old] : [];
+        const idx = list.findIndex((p) => p.lessonId === lessonId);
+        if (idx >= 0) {
+          list[idx] = {
+            ...list[idx],
+            status: 'completed',
+            stars: Math.max(list[idx].stars, stars),
+            completedAt: list[idx].completedAt ?? new Date().toISOString(),
+          };
+        } else {
+          list.push({ lessonId, status: 'completed', stars, completedAt: new Date().toISOString() });
+        }
+        return list;
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      const userId = useAuthStore.getState().userId;
+      if (ctx?.previous) queryClient.setQueryData(queryKeys.progress(userId), ctx.previous);
+    },
+    onSettled: () => {
       const userId = useAuthStore.getState().userId;
       queryClient.invalidateQueries({ queryKey: queryKeys.progress(userId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.profile(userId) });

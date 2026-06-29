@@ -9,9 +9,19 @@
  * Source de vérité = serveur. À chaque retour du réseau, React Query rafraîchit
  * en arrière-plan ; tant qu'on est hors-ligne, les données en cache s'affichent.
  */
+import NetInfo from '@react-native-community/netinfo';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, onlineManager } from '@tanstack/react-query';
 import Storage from 'expo-sqlite/kv-store';
+
+import { supabase } from '@/lib/supabase';
+
+// Branche l'état réseau réel (NetInfo) à React Query. Hors-ligne : les requêtes
+// ne tournent pas dans le vide et les mutations (progression, cœurs, profil) sont
+// mises en PAUSE, puis rejouées automatiquement au retour du réseau.
+onlineManager.setEventListener((setOnline) =>
+  NetInfo.addEventListener((state) => setOnline(!!state.isConnected && state.isInternetReachable !== false)),
+);
 
 // 14 jours : durée de conservation hors-ligne du contenu.
 export const OFFLINE_MAX_AGE = 1000 * 60 * 60 * 24 * 14;
@@ -25,6 +35,18 @@ export const queryClient = new QueryClient({
       retry: 2,
       refetchOnReconnect: true,
     },
+  },
+});
+
+// Défaut de mutation pour `complete_lesson` : indispensable pour que les
+// validations de leçons faites HORS-LIGNE soient rejouées vers le serveur au
+// retour du réseau, MÊME après un redémarrage de l'app (les mutations en pause
+// sont persistées puis reprises via cette fonction). La clé doit correspondre au
+// `mutationKey` de useCompleteLesson.
+queryClient.setMutationDefaults(['complete_lesson'], {
+  mutationFn: async ({ lessonId, stars }: { lessonId: number; stars: number }) => {
+    const { error } = await supabase.rpc('complete_lesson', { p_lesson_id: lessonId, p_stars: stars });
+    if (error) throw error;
   },
 });
 

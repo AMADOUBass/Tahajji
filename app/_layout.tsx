@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { appFonts } from '@/lib/fonts';
 import { OFFLINE_MAX_AGE, asyncStoragePersister, queryClient } from '@/lib/queryPersist';
 import { useTheme } from '@/lib/useTheme';
@@ -64,6 +65,7 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
         </Stack.Protected>
       </Stack>
+      <OfflineBanner />
     </PersistQueryClientProvider>
   );
 }
