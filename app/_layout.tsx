@@ -64,6 +64,8 @@ export default function RootLayout() {
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
         </Stack.Protected>
+        {/* Pages légales : accessibles connecté ou non (lien depuis l'inscription). */}
+        <Stack.Screen name="legal/[doc]" />
       </Stack>
       <OfflineBanner />
     </PersistQueryClientProvider>

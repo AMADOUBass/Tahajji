@@ -161,6 +161,26 @@ export default function ProfileScreen() {
           </SettingRow>
         </Pressable>
       </Card>
+
+      {/* À propos & légal */}
+      <AppText variant="title" style={{ marginTop: spacing.xl, marginBottom: spacing.md }}>À propos & légal</AppText>
+      <Card padded={false} style={{ paddingHorizontal: spacing.lg }}>
+        <Pressable onPress={() => router.push('/legal/about')}>
+          <SettingRow icon="information-circle-outline" label="À propos & crédits" first>
+            <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+          </SettingRow>
+        </Pressable>
+        <Pressable onPress={() => router.push('/legal/privacy')}>
+          <SettingRow icon="lock-closed-outline" label="Confidentialité">
+            <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+          </SettingRow>
+        </Pressable>
+        <Pressable onPress={() => router.push('/legal/terms')}>
+          <SettingRow icon="document-text-outline" label="Conditions d’utilisation">
+            <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+          </SettingRow>
+        </Pressable>
+      </Card>
     </Screen>
   );
 }
