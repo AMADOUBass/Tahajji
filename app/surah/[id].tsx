@@ -26,7 +26,7 @@ export default function SurahScreen() {
 
   const { data: surahs } = useSurahs();
   const surah = surahs?.find((s) => s.id === surahId);
-  const { data: verses, isLoading } = useVerses(surahId);
+  const { data: verses, isLoading, isError, refetch } = useVerses(surahId);
 
   const player = useAudioPlayer(undefined);
   const status = useAudioPlayerStatus(player);
@@ -122,6 +122,18 @@ export default function SurahScreen() {
 
         {isLoading ? (
           <AppText tone="secondary" align="center">Chargement…</AppText>
+        ) : isError ? (
+          <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xl }}>
+            <Ionicons name="cloud-offline-outline" size={40} color={colors.textSecondary} />
+            <AppText tone="secondary" align="center">Connexion impossible.{'\n'}Vérifie ta connexion internet.</AppText>
+            <Pressable
+              onPress={() => refetch()}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primaryLight, borderRadius: radius.md, paddingVertical: spacing.md, paddingHorizontal: spacing.xl }}
+            >
+              <Ionicons name="refresh" size={18} color={colors.primary} />
+              <AppText variant="bodyStrong" color={colors.primary}>Réessayer</AppText>
+            </Pressable>
+          </View>
         ) : (
           verses!.map((v, i) => (
             <VerseRow
