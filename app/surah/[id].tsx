@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
+import { cacheAudioBatch, cachedAudioUri, cachedCount } from '@/lib/audioCache';
 import { useSurahs, useVerses } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -55,11 +56,29 @@ export default function SurahScreen() {
       if (!v?.audioUrl) return;
       setCurrentIndex(index);
       setLastRead(surahId, surah?.nameFr ?? `Sourate ${surahId}`, v.number);
-      player.replace({ uri: v.audioUrl });
+      // Fichier local s'il a été téléchargé, sinon streaming.
+      player.replace({ uri: cachedAudioUri(v.audioUrl) ?? v.audioUrl });
       player.play();
     },
     [verses, player, surahId, surah, setLastRead],
   );
+
+  // Téléchargement hors-ligne des récitations de la sourate.
+  const verseUrls = useMemo(() => (verses ?? []).map((v) => v.audioUrl), [verses]);
+  const [dlState, setDlState] = useState<'idle' | 'downloading' | 'done'>('idle');
+  const [dlPct, setDlPct] = useState(0);
+  useEffect(() => {
+    const total = verseUrls.filter(Boolean).length;
+    if (total > 0 && cachedCount(verseUrls) >= total) setDlState('done');
+  }, [verseUrls]);
+
+  const onDownload = async () => {
+    if (dlState === 'downloading' || dlState === 'done') return;
+    setDlState('downloading');
+    setDlPct(0);
+    await cacheAudioBatch(verseUrls, (d, t) => setDlPct(t ? Math.round((d / t) * 100) : 0));
+    setDlState('done');
+  };
 
   const togglePlay = () => {
     if (currentIndex === null) {
@@ -111,7 +130,20 @@ export default function SurahScreen() {
           <AppText variant="title">{surah?.nameFr ?? 'Sourate'}</AppText>
           <AppText variant="caption" tone="secondary">{surah ? `${surah.verseCount} versets` : ''}</AppText>
         </View>
-        <Ionicons name="list" size={22} color={colors.textSecondary} />
+        {/* Téléchargement hors-ligne */}
+        {hasAudio ? (
+          <Pressable onPress={onDownload} hitSlop={8} disabled={dlState !== 'idle'}>
+            {dlState === 'done' ? (
+              <Ionicons name="cloud-done" size={22} color={colors.success} />
+            ) : dlState === 'downloading' ? (
+              <AppText variant="caption" color={colors.primary}>{dlPct}%</AppText>
+            ) : (
+              <Ionicons name="cloud-download-outline" size={22} color={colors.textSecondary} />
+            )}
+          </Pressable>
+        ) : (
+          <View style={{ width: 22 }} />
+        )}
       </View>
 
       <Screen scroll edges={[]} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: 130 }}>
