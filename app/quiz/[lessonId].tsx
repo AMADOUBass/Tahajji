@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
@@ -47,6 +47,9 @@ export default function QuizScreen() {
   const seededRef = useRef(false);
   // Verrou anti double-tap sur « Continuer » (évite de sauter une question).
   const advancingRef = useRef(false);
+  // Tremblement de la grille d'options sur mauvaise réponse.
+  const shake = useSharedValue(0);
+  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
   useEffect(() => {
     if (!seededRef.current && profile) {
       seededRef.current = true;
@@ -126,6 +129,12 @@ export default function QuizScreen() {
     } else {
       hapticError();
       playWrongSound();
+      shake.value = withSequence(
+        withTiming(-8, { duration: 50 }),
+        withTiming(8, { duration: 50 }),
+        withTiming(-6, { duration: 50 }),
+        withTiming(0, { duration: 50 }),
+      );
       if (heartsActive) {
         // Perte d'un cœur (examens uniquement) — côté serveur + décrément à l'écran.
         setHeartsLeft((h) => Math.max(0, h - 1));
@@ -224,7 +233,7 @@ export default function QuizScreen() {
         ) : null}
 
         {/* Options */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.xl }}>
+        <Animated.View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.xl }, shakeStyle]}>
           {shuffledOptions.map((option) => {
             const isAnswer = option === question.correctAnswer;
             const isPicked = option === selected;
@@ -268,7 +277,7 @@ export default function QuizScreen() {
               </Pressable>
             );
           })}
-        </View>
+        </Animated.View>
       </View>
 
       {/* Panneau de feedback */}
