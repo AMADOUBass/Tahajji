@@ -62,3 +62,13 @@ docs/cours_arabe.txt
 
 # Audio généré (TTS)
 audio_out/
+
+# Tests : artefacts (le code des tests, lui, reste versionné)
+coverage/
+.jest-cache/
+
+# Fichiers PDF (specs, exports… non nécessaires au dépôt)
+*.pdf
+
+# Cache outils
+.eslintcache
