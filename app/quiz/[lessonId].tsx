@@ -32,12 +32,15 @@ export default function QuizScreen() {
   const unlimited = profile?.isPremium ?? false;
 
   // Les cœurs ne servent qu'aux EXAMENS (les leçons d'apprentissage sont libres).
-  const isExam = lessons?.find((l) => l.id === lessonId)?.lessonType === 'exam';
+  const lesson = lessons?.find((l) => l.id === lessonId);
+  const isExam = lesson?.lessonType === 'exam';
   const heartsActive = isExam && !isReview && !unlimited;
 
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  // Écran d'intro avant un examen (« Commencer l'examen »).
+  const [started, setStarted] = useState(false);
 
   // Cœurs : initialisés depuis le serveur (avec recharge), décrément optimiste.
   const [heartsLeft, setHeartsLeft] = useState(MAX_HEARTS);
@@ -81,6 +84,32 @@ export default function QuizScreen() {
   }
 
   if (questions.length === 0) return null;
+
+  // Écran d'introduction de l'examen (avant la 1re question).
+  if (isExam && !isReview && !started) {
+    return (
+      <Screen contentStyle={{ flex: 1, paddingHorizontal: spacing.lg }}>
+        <View style={{ flexDirection: 'row', paddingVertical: spacing.sm }}>
+          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
+            <Ionicons name="close" size={24} color={colors.textSecondary} />
+          </Pressable>
+        </View>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
+          <View style={{ width: 96, height: 96, borderRadius: 28, backgroundColor: 'rgba(201,154,63,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="ribbon" size={46} color={colors.gold} />
+          </View>
+          <AppText variant="overline" tone="gold" style={{ marginTop: spacing.sm }}>Examen de fin d’unité</AppText>
+          <AppText variant="h2" align="center">{lesson?.title ?? 'Examen'}</AppText>
+          <View style={{ gap: spacing.md, alignSelf: 'stretch', marginTop: spacing.lg, paddingHorizontal: spacing.md }}>
+            <ExamFact icon="help-circle-outline" color={colors.primary} text={`${questions.length} questions, mélangées sur toute l’unité`} />
+            <ExamFact icon="ribbon-outline" color={colors.gold} text={`${PASS_THRESHOLD}% de bonnes réponses pour valider`} />
+            {heartsActive ? <ExamFact icon="heart" color={colors.coral} text="Tes cœurs sont en jeu (−1 par erreur)" /> : null}
+          </View>
+        </View>
+        <Button label="Commencer l’examen" variant="gold" onPress={() => setStarted(true)} style={{ marginBottom: spacing.xl }} />
+      </Screen>
+    );
+  }
 
   const question = questions[qIndex];
   const answered = selected !== null;
@@ -160,6 +189,7 @@ export default function QuizScreen() {
             <Ionicons name="close" size={24} color={colors.textSecondary} />
           </Pressable>
           <ProgressBar value={(qIndex + 1) / questions.length} color={colors.success} style={{ flex: 1 }} />
+          <AppText variant="label" tone="secondary">{qIndex + 1}/{questions.length}</AppText>
           {heartsActive ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
               <Ionicons name="heart" size={18} color={colors.coral} />
@@ -198,6 +228,7 @@ export default function QuizScreen() {
           {shuffledOptions.map((option) => {
             const isAnswer = option === question.correctAnswer;
             const isPicked = option === selected;
+            const dim = answered && !isAnswer && !isPicked;
             let borderColor = colors.border;
             let borderWidth = 1;
             if (answered && isAnswer) { borderColor = colors.success; borderWidth = 2.5; }
@@ -207,16 +238,20 @@ export default function QuizScreen() {
               <Pressable
                 key={option}
                 onPress={() => onSelect(option)}
+                disabled={answered}
+                accessibilityRole="button"
                 style={{
                   width: '47%',
                   flexGrow: 1,
+                  minHeight: 76,
                   backgroundColor: colors.surface,
                   borderColor,
                   borderWidth,
                   borderRadius: radius.lg,
-                  paddingVertical: spacing.xl,
+                  paddingVertical: spacing.lg,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  opacity: dim ? 0.45 : 1,
                 }}
               >
                 <ArabicText size="title" align="center">{option}</ArabicText>
@@ -266,9 +301,11 @@ export default function QuizScreen() {
               <AppText variant="title" color={isCorrect ? colors.success : colors.coral}>
                 {isCorrect ? "Bravo, c'est ça !" : 'Presque ! Continue.'}
               </AppText>
-              <AppText variant="caption" tone="secondary">
-                La bonne réponse : {question.correctAnswer}
-              </AppText>
+              {!isCorrect ? (
+                <AppText variant="caption" tone="secondary">
+                  La bonne réponse : {question.correctAnswer}
+                </AppText>
+              ) : null}
             </View>
           </View>
           <Button
@@ -279,6 +316,15 @@ export default function QuizScreen() {
         </Animated.View>
       ) : null}
     </Screen>
+  );
+}
+
+function ExamFact({ icon, text, color }: { icon: keyof typeof Ionicons.glyphMap; text: string; color: string }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
+      <Ionicons name={icon} size={20} color={color} />
+      <AppText variant="body" style={{ flex: 1 }}>{text}</AppText>
+    </View>
   );
 }
 
