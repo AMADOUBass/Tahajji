@@ -4,6 +4,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { deriveLessonStatuses } from '@/lib/progress';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/auth';
 import type { Database } from '@/types/database';
@@ -205,7 +206,11 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
   const refetch = () => { levelsQ.refetch(); lessonsQ.refetch(); progressQ.refetch(); };
   if (!levelsQ.data || !lessonsQ.data) return { data: [], isLoading, isError, refetch };
 
-  const completions = new Map((progressQ.data ?? []).map((p) => [p.lessonId, p]));
+  const completedStars = new Map(
+    (progressQ.data ?? [])
+      .filter((p) => p.status === 'completed')
+      .map((p) => [p.lessonId, p.stars] as const),
+  );
   const levels = [...levelsQ.data].sort((a, b) => a.position - b.position);
   const lessons = [...lessonsQ.data].sort(
     (a, b) =>
@@ -213,21 +218,8 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
         (levels.find((l) => l.id === b.levelId)?.position ?? 0) || a.position - b.position,
   );
 
-  // Statut dérivé en parcourant les leçons dans l'ordre global.
-  const statusById = new Map<number, { status: ProgressStatus; stars: number }>();
-  let prevCompleted = true;
-  for (const lesson of lessons) {
-    const done = completions.get(lesson.id);
-    if (done && done.status === 'completed') {
-      statusById.set(lesson.id, { status: 'completed', stars: done.stars });
-      prevCompleted = true;
-    } else if (prevCompleted) {
-      statusById.set(lesson.id, { status: 'in_progress', stars: 0 });
-      prevCompleted = false;
-    } else {
-      statusById.set(lesson.id, { status: 'locked', stars: 0 });
-    }
-  }
+  // Statut dérivé : 1re leçon non terminée = in_progress ; suivantes = locked.
+  const statusById = deriveLessonStatuses(lessons.map((l) => l.id), completedStars);
 
   const data: LevelWithLessons[] = levels.map((level) => ({
     ...level,
