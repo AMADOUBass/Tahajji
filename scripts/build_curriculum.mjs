@@ -431,3 +431,31 @@ where item_type in ('letter', 'word');
 `;
 writeFileSync('db/audio_lessons.sql', audioLessonsSql, 'utf8');
 console.log('SQL audio leçons → db/audio_lessons.sql');
+
+// ---------- Liste lisible des audios à trouver/enregistrer (par unité) ----------
+const audioItems = items.filter((it) => it[3] !== 'verse');
+const aud = [];
+aud.push('# Audios à enregistrer / trouver — Tahajji\n');
+aud.push(`Total : **${audioItems.length} clips** (les versets du Coran ne sont PAS ici : déjà en ligne).`);
+aud.push('Chaque ligne = un son à obtenir. Prononcer la colonne « À dire », enregistrer en MP3,');
+aud.push('nommer le fichier comme indiqué (`items/{id}.mp3`). Voir aussi `db/audio_manifest.csv`.\n');
+
+for (const lvl of levelsByPos) {
+  const lvlItems = [];
+  for (const les of lessons.filter((l) => l[1] === lvl[0]).sort((a, b) => a[2] - b[2])) {
+    for (const it of audioItems.filter((it2) => it2[1] === les[0]).sort((a, b) => a[2] - b[2])) {
+      lvlItems.push(it);
+    }
+  }
+  if (!lvlItems.length) continue;
+  aud.push(`## Unité ${lvl[1]} — ${lvl[2]} _(${lvlItems.length} clips)_`);
+  aud.push('| Fichier | Arabe | Translit. | À dire |');
+  aud.push('|---------|-------|-----------|--------|');
+  for (const it of lvlItems) {
+    aud.push(`| items/${it[0]}.mp3 | ${it[4]} | ${it[5]} | ${it[6]} |`);
+  }
+  aud.push('');
+}
+
+writeFileSync('docs/audio_a_enregistrer.md', aud.join('\n'), 'utf8');
+console.log(`Liste audio lisible → docs/audio_a_enregistrer.md (${audioItems.length} clips)`);

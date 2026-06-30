@@ -59,3 +59,6 @@ db/import_quran_*.sql
 # Document pédagogique source (droits de l'auteur — ne pas publier)
 docs/cours_arabe.pdf
 docs/cours_arabe.txt
+
+# Audio généré (TTS)
+audio_out/
