@@ -102,9 +102,12 @@ export default function LessonScreen() {
             onPress={() => onListen(item.audioUrl)}
             style={{ marginTop: spacing.lg }}
           />
-          <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
-            {item.audioUrl ? '🔁 Répète à voix haute après l’écoute' : '🎙️ Audio bientôt disponible'}
-          </AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: spacing.sm }}>
+            <Ionicons name={item.audioUrl ? 'repeat' : 'time-outline'} size={14} color={colors.textSecondary} />
+            <AppText variant="caption" tone="secondary">
+              {item.audioUrl ? 'Répète à voix haute après l’écoute' : 'Audio bientôt disponible'}
+            </AppText>
+          </View>
         </View>
       ) : null}
 
