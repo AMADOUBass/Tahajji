@@ -65,9 +65,8 @@ export default function RootLayout() {
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
         </Stack.Protected>
-        {/* Pages légales : accessibles connecté ou non. fullScreenModal = couvre tout
-            l'écran même quand ouvert depuis une modale (paywall) — pas de demi-fiche. */}
-        <Stack.Screen name="legal/[doc]" options={{ presentation: 'fullScreenModal' }} />
+        {/* Pages légales : accessibles connecté ou non (lien depuis l'inscription). */}
+        <Stack.Screen name="legal/[doc]" />
       </Stack>
       <OfflineBanner />
     </PersistQueryClientProvider>
