@@ -58,7 +58,6 @@ export default function QuizScreen() {
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questions, qIndex]);
 
   // Leçon sans quiz (mock partiel) : on valide directement et on célèbre.

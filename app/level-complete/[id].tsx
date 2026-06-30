@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable, Share, View } from 'react-native';
 import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 
 import { AppText, Button, Confetti, Screen } from '@/components/ui';
@@ -116,7 +116,10 @@ export default function LevelCompleteScreen() {
       </View>
 
       <Button label="Continuer" variant="gold" onPress={() => router.replace('/')} />
-      <Pressable style={{ marginTop: spacing.md, paddingVertical: spacing.sm }}>
+      <Pressable
+        style={{ marginTop: spacing.md, paddingVertical: spacing.sm }}
+        onPress={() => Share.share({ message: 'J’apprends à lire le Coran, pas à pas, avec Tahajji.' }).catch(() => {})}
+      >
         <AppText variant="bodyStrong" align="center" color="rgba(255,253,247,0.8)">Partager ma réussite</AppText>
       </Pressable>
     </Screen>

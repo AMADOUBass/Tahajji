@@ -52,7 +52,7 @@ export default function ForgotPasswordScreen() {
       <View style={{ marginTop: spacing.xl }}>
         <AppText variant="h2">Mot de passe oublié</AppText>
         <AppText variant="body" tone="secondary" style={{ marginTop: spacing.sm }}>
-          Entre ton e-mail : on t'envoie un lien pour choisir un nouveau mot de passe.
+          Entre ton e-mail : on t’envoie un lien pour choisir un nouveau mot de passe.
         </AppText>
       </View>
 

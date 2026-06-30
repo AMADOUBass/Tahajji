@@ -49,7 +49,7 @@ export default function PaywallScreen() {
         </View>
         <AppText variant="h2" align="center" style={{ marginTop: spacing.lg }}>Va plus loin avec Premium</AppText>
         <AppText variant="body" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
-          Débloque l'apprentissage avancé et tes certificats.
+          Débloque l’apprentissage avancé et tes certificats.
         </AppText>
       </View>
 
