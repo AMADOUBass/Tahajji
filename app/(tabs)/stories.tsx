@@ -19,7 +19,7 @@ const CATEGORIES: Record<string, { label: string; icon: keyof typeof Ionicons.gl
 
 export default function StoriesScreen() {
   const { colors } = useTheme();
-  const { data: stories, isLoading, isError, refetch } = useStories();
+  const { data: stories, isLoading, isError, isFetching, refetch } = useStories();
 
   // Regroupe par catégorie en gardant l'ordre (déjà trié par position).
   const groups = useMemo(() => {
@@ -33,7 +33,7 @@ export default function StoriesScreen() {
   }, [stories]);
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
+    <Screen scroll onRefresh={refetch} refreshing={isFetching && !isLoading} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
       <AppText variant="h2" style={{ marginTop: spacing.sm }}>Histoires</AppText>
       <AppText variant="body" tone="secondary" style={{ marginTop: spacing.xs }}>
         Les récits des prophètes et de l’islam, pour apprendre en s’inspirant.

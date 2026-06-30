@@ -123,7 +123,7 @@ export default function SurahScreen() {
           borderBottomColor: colors.line,
         }}
       >
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Retour">
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </Pressable>
         <View style={{ flex: 1, alignItems: 'center' }}>

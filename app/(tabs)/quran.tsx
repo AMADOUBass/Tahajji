@@ -14,7 +14,7 @@ import type { Surah } from '@/types/models';
 export default function QuranScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { data: surahs, isLoading, isError, refetch } = useSurahs();
+  const { data: surahs, isLoading, isError, isFetching, refetch } = useSurahs();
   const [query, setQuery] = useState('');
 
   // Carte « Reprendre » : dernière lecture mémorisée (ou démarrage Al-Fatiha).
@@ -37,7 +37,7 @@ export default function QuranScreen() {
   }, [surahs, query]);
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
+    <Screen scroll onRefresh={refetch} refreshing={isFetching && !isLoading} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
       {/* Titre + badge gratuit */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.sm }}>
         <AppText variant="h2">Le Coran</AppText>

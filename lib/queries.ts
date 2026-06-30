@@ -182,7 +182,7 @@ export function useProgress() {
  * Règle de déblocage : la 1ʳᵉ leçon est ouverte ; une leçon s'ouvre quand la
  * précédente (ordre global niveau→position) est terminée.
  */
-export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: boolean; isError: boolean; refetch: () => void } {
+export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: boolean; isError: boolean; isFetching: boolean; refetch: () => void } {
   const levelsQ = useQuery({
     queryKey: queryKeys.levels,
     queryFn: async () => {
@@ -203,8 +203,9 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
 
   const isLoading = levelsQ.isLoading || lessonsQ.isLoading;
   const isError = levelsQ.isError || lessonsQ.isError;
+  const isFetching = levelsQ.isFetching || lessonsQ.isFetching || progressQ.isFetching;
   const refetch = () => { levelsQ.refetch(); lessonsQ.refetch(); progressQ.refetch(); };
-  if (!levelsQ.data || !lessonsQ.data) return { data: [], isLoading, isError, refetch };
+  if (!levelsQ.data || !lessonsQ.data) return { data: [], isLoading, isError, isFetching, refetch };
 
   const completedStars = new Map(
     (progressQ.data ?? [])
@@ -233,7 +234,7 @@ export function useLevelsWithProgress(): { data: LevelWithLessons[]; isLoading: 
       })),
   }));
 
-  return { data, isLoading, isError, refetch };
+  return { data, isLoading, isError, isFetching, refetch };
 }
 
 /**

@@ -42,7 +42,7 @@ export default function PaywallScreen() {
   return (
     <Screen scroll contentStyle={{ flexGrow: 1, paddingHorizontal: spacing.lg, paddingBottom: spacing.xl }}>
       <View style={{ alignItems: 'flex-end', marginTop: spacing.sm }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
           <Ionicons name="close" size={24} color={colors.textSecondary} />
         </Pressable>
       </View>

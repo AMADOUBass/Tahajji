@@ -8,6 +8,7 @@ import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/u
 import { playAudioUrl } from '@/lib/audio';
 import { hapticError, hapticSuccess } from '@/lib/haptics';
 import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
+import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -41,6 +42,8 @@ export default function QuizScreen() {
   // Cœurs : initialisés depuis le serveur (avec recharge), décrément optimiste.
   const [heartsLeft, setHeartsLeft] = useState(MAX_HEARTS);
   const seededRef = useRef(false);
+  // Verrou anti double-tap sur « Continuer » (évite de sauter une question).
+  const advancingRef = useRef(false);
   useEffect(() => {
     if (!seededRef.current && profile) {
       seededRef.current = true;
@@ -85,12 +88,15 @@ export default function QuizScreen() {
 
   function onSelect(option: string) {
     if (answered) return;
+    advancingRef.current = false;
     setSelected(option);
     if (option === question.correctAnswer) {
       setCorrectCount((c) => c + 1);
       hapticSuccess();
+      playCorrectSound();
     } else {
       hapticError();
+      playWrongSound();
       if (heartsActive) {
         // Perte d'un cœur (examens uniquement) — côté serveur + décrément à l'écran.
         setHeartsLeft((h) => Math.max(0, h - 1));
@@ -100,6 +106,8 @@ export default function QuizScreen() {
   }
 
   function onContinue() {
+    if (advancingRef.current) return;
+    advancingRef.current = true;
     if (qIndex < questions!.length - 1) {
       setQIndex((i) => i + 1);
       setSelected(null);
@@ -148,7 +156,7 @@ export default function QuizScreen() {
       <View style={{ flex: 1, paddingHorizontal: spacing.lg }}>
         {/* En-tête : progression + vies */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
-          <Pressable onPress={() => router.back()} hitSlop={10}>
+          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
             <Ionicons name="close" size={24} color={colors.textSecondary} />
           </Pressable>
           <ProgressBar value={(qIndex + 1) / questions.length} color={colors.success} style={{ flex: 1 }} />

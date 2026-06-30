@@ -54,7 +54,7 @@ export default function LessonScreen() {
     <Screen contentStyle={{ flex: 1, paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
       {/* Barre de progression de la leçon */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Fermer">
           <Ionicons name="close" size={24} color={colors.textSecondary} />
         </Pressable>
         <ProgressBar value={(index + 1) / total} style={{ flex: 1 }} />

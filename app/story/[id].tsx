@@ -29,7 +29,7 @@ export default function StoryScreen() {
           borderBottomColor: colors.line,
         }}
       >
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Retour">
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </Pressable>
         <AppText variant="title" numberOfLines={1} style={{ flex: 1 }}>{story?.title ?? 'Histoire'}</AppText>

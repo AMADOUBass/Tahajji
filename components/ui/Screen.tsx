@@ -3,7 +3,7 @@
  * `scroll` enveloppe le contenu dans un ScrollView.
  */
 import { type ReactNode } from 'react';
-import { ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
+import { RefreshControl, ScrollView, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/lib/useTheme';
@@ -15,6 +15,9 @@ interface ScreenProps {
   background?: string;
   edges?: readonly Edge[];
   contentStyle?: StyleProp<ViewStyle>;
+  /** Tirer pour rafraîchir (écrans `scroll` uniquement). */
+  onRefresh?: () => void;
+  refreshing?: boolean;
 }
 
 export function Screen({
@@ -23,6 +26,8 @@ export function Screen({
   background,
   edges = ['top', 'bottom'],
   contentStyle,
+  onRefresh,
+  refreshing,
 }: ScreenProps) {
   const { colors } = useTheme();
   const bg = background ?? colors.bg;
@@ -34,6 +39,11 @@ export function Screen({
           contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          refreshControl={
+            onRefresh ? (
+              <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />
+            ) : undefined
+          }
         >
           {children}
         </ScrollView>

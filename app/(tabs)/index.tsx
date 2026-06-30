@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { AppText, InfoModal, ProgressBar, Screen, StatPill, type InfoRow } from '@/components/ui';
+import { AppText, InfoModal, ProgressBar, Screen, Skeleton, StatPill, type InfoRow } from '@/components/ui';
 import { effectiveHearts, formatCountdown } from '@/lib/hearts';
 import { useLevelsWithProgress, useProfile } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
@@ -24,7 +24,7 @@ export default function ParcoursScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { data: profile } = useProfile();
-  const { data: levels, isLoading, isError, refetch } = useLevelsWithProgress();
+  const { data: levels, isLoading, isError, isFetching, refetch } = useLevelsWithProgress();
   const [infoVisible, setInfoVisible] = useState(false);
 
   const hearts = effectiveHearts(profile);
@@ -78,9 +78,21 @@ export default function ParcoursScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.primary} colors={[colors.primary]} />
+        }
       >
         {isLoading
-          ? <AppText tone="secondary" align="center" style={{ marginTop: spacing.xxl }}>Chargement…</AppText>
+          ? (
+            <View style={{ marginTop: spacing.xl, gap: spacing.xl }}>
+              <Skeleton height={92} radius={radius.lg} />
+              <View style={{ alignItems: 'center', gap: spacing.xl, marginTop: spacing.md }}>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} width={72} height={72} radius={36} />
+                ))}
+              </View>
+            </View>
+          )
           : isError
           ? (
             <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xxl }}>
