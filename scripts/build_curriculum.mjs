@@ -416,18 +416,31 @@ console.log('Document de validation → docs/validation_contenu.md');
 // Le jour où les clips sont enregistrés et uploadés dans Supabase Storage
 // (bucket public « audio », fichiers nommés items/{id}.mp3 comme dans le
 // manifeste), il suffit de remplacer <BASE> puis d'exécuter ce fichier.
+// Lettres ع isolées : le TTS échoue (son pharyngé) → audio à enregistrer à la
+// main. On ne les active PAS tout de suite (elles afficheront « Audio bientôt »).
+const aynLetterIds = items
+  .filter((it) => it[3] === 'letter' && it[4].includes('ع'))
+  .map((it) => it[0]);
+
 const audioLessonsSql = `-- ============================================================
 -- Tahajji — Branche l'audio des leçons (lettres / mots) sur lesson_items.
--- 1) Enregistre les clips listés dans db/audio_manifest.csv.
--- 2) Nomme chaque fichier items/{id}.mp3 (la colonne « fichier » du manifeste).
+-- 1) Génère/enregistre les clips (TTS : scripts/build_audio_tts.mjs ; manifeste : db/audio_manifest.csv).
+-- 2) Chaque fichier est nommé items/{id}.mp3.
 -- 3) Upload le dossier dans un bucket Supabase Storage PUBLIC nommé « audio ».
 -- 4) Remplace <BASE> ci-dessous par l'URL publique du bucket, puis exécute.
 --    Ex : https://${'<projet>'}.supabase.co/storage/v1/object/public/audio
 -- ============================================================
 
+-- Active les clips disponibles (sauf le ع isolé, à corriger : ${aynLetterIds.join(', ')}).
 update lesson_items
 set audio_url = '<BASE>/items/' || id || '.mp3'
-where item_type in ('letter', 'word');
+where item_type in ('letter', 'word')
+  and id not in (${aynLetterIds.join(', ')});
+
+-- ⏳ Quand les 3 clips ع corrigés (à la main) sont uploadés, exécute ceci :
+-- update lesson_items
+-- set audio_url = '<BASE>/items/' || id || '.mp3'
+-- where id in (${aynLetterIds.join(', ')});
 `;
 writeFileSync('db/audio_lessons.sql', audioLessonsSql, 'utf8');
 console.log('SQL audio leçons → db/audio_lessons.sql');
