@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { cacheAudioBatch, cachedAudioUri, cachedCount } from '@/lib/audioCache';
@@ -34,8 +34,16 @@ export default function SurahScreen() {
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   const currentIndexRef = useRef<number | null>(null);
   const finishHandledRef = useRef(false);
+  // Défilement automatique vers le verset en cours de lecture.
+  const scrollRef = useRef<ScrollView>(null);
+  const versePos = useRef<Record<number, number>>({});
   useEffect(() => {
     currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+  useEffect(() => {
+    if (currentIndex == null) return;
+    const y = versePos.current[currentIndex];
+    if (y != null) scrollRef.current?.scrollTo({ y: Math.max(0, y - 90), animated: true });
   }, [currentIndex]);
 
   // Mémorise la dernière lecture (carte « Reprendre » du Coran).
@@ -146,7 +154,11 @@ export default function SurahScreen() {
         )}
       </View>
 
-      <Screen scroll edges={[]} contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: 130 }}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: 130 }}
+      >
         {/* Ornement basmala */}
         <View style={{ alignItems: 'center', paddingVertical: spacing.lg }}>
           <ArabicText size="title" color={colors.gold} align="center">۞</ArabicText>
@@ -175,10 +187,11 @@ export default function SurahScreen() {
               isCurrent={currentIndex === i}
               playing={currentIndex === i && status.playing}
               onPlay={() => playVerse(i)}
+              onLayout={(y) => { versePos.current[i] = y; }}
             />
           ))
         )}
-      </Screen>
+      </ScrollView>
 
       {/* Lecteur audio */}
       {hasAudio ? (
@@ -221,16 +234,19 @@ function VerseRow({
   isCurrent,
   playing,
   onPlay,
+  onLayout,
 }: {
   verse: Verse;
   last: boolean;
   isCurrent: boolean;
   playing: boolean;
   onPlay: () => void;
+  onLayout?: (y: number) => void;
 }) {
   const { colors } = useTheme();
   return (
     <View
+      onLayout={(e) => onLayout?.(e.nativeEvent.layout.y)}
       style={{
         paddingVertical: spacing.lg,
         paddingHorizontal: isCurrent ? spacing.md : 0,
