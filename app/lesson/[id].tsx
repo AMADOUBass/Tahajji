@@ -6,6 +6,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, Card, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl, vowelVariants } from '@/lib/audio';
+import { hapticLight } from '@/lib/haptics';
 import { useLessonItems } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -25,6 +26,7 @@ export default function LessonScreen() {
     const now = Date.now();
     if (now - lastPlayRef.current < 700) return;
     lastPlayRef.current = now;
+    hapticLight();
     playAudioUrl(url);
   };
 
@@ -42,6 +44,7 @@ export default function LessonScreen() {
   const variants = item ? vowelVariants(item.arabicText) : [];
 
   const goNext = () => {
+    hapticLight();
     if (index < items.length - 1) {
       setIndex((i) => i + 1);
     } else {
