@@ -67,11 +67,20 @@ let rows = raw.slice(1).map((l) => {
   return { id: f[col.id], type: f[col.type], arabe: f[col.arabe], translit: f[col.translitteration], fichier: f[col.fichier] };
 });
 
-// Échantillon représentatif : 3 lettres faciles + 6 difficiles + 3 mots.
+// Échantillon : PAIRES emphatique↔plain (pour comparer à l'oreille) + quelques mots.
+// Écoute chaque paire à la suite : l'emphatique doit être plus « lourde/sombre ».
 if (SAMPLE) {
-  const easy = ['بَ', 'تَ', 'مَ'];
-  const hard = ['صَ', 'ضَ', 'طَ', 'ظَ', 'عَ', 'قَ'];
-  const letters = rows.filter((r) => easy.includes(r.arabe) || hard.includes(r.arabe));
+  const sample = [
+    'سَ', 'صَ', // sa  ↔ ṣa
+    'تَ', 'طَ', // ta  ↔ ṭa
+    'دَ', 'ضَ', // da  ↔ ḍa
+    'ذَ', 'ظَ', // dha ↔ ẓa
+    'كَ', 'قَ', // ka  ↔ qa
+    'حَ', 'عَ', // ḥa  ↔ ʿa
+  ];
+  const letters = sample
+    .map((ar) => rows.find((r) => r.arabe === ar))
+    .filter(Boolean);
   const words = rows.filter((r) => r.type === 'word').slice(0, 3);
   rows = [...letters, ...words];
 }
@@ -105,7 +114,12 @@ async function synthEleven(text) {
   const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`, {
     method: 'POST',
     headers: { 'xi-api-key': ELEVEN_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' }),
+    body: JSON.stringify({
+      text,
+      model_id: 'eleven_multilingual_v2',
+      // Ralenti + stable pour bien entendre les syllabes courtes (lettres isolées).
+      voice_settings: { stability: 0.6, similarity_boost: 0.85, speed: Number(process.env.ELEVEN_SPEED || 0.8) },
+    }),
   });
   if (!res.ok) throw new Error(`${res.status} — ${await res.text()}`);
   return Buffer.from(await res.arrayBuffer());
