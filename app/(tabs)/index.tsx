@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Modal, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { AppText, InfoModal, ProgressBar, Screen, Skeleton, StatPill, type InfoRow } from '@/components/ui';
+import { AppText, Button, InfoModal, ProgressBar, Screen, Skeleton, StatPill, type InfoRow } from '@/components/ui';
 import { effectiveHearts, formatCountdown } from '@/lib/hearts';
 import { useLevelsWithProgress, useProfile } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
@@ -33,19 +33,23 @@ export default function ParcoursScreen() {
     return null;
   }, [levels]);
 
-  const handleOutOfHearts = () => {
-    Alert.alert(
-      'Plus de cœurs ❤️',
-      reviewLessonId
-        ? `Révise une leçon pour regagner un cœur, ou attends ${formatCountdown(hearts.secondsToNext)}.`
-        : `Tu regagnes un cœur dans ${formatCountdown(hearts.secondsToNext)}.`,
-      reviewLessonId
-        ? [
-            { text: 'Plus tard', style: 'cancel' },
-            { text: 'Réviser', onPress: () => router.push({ pathname: '/quiz/[lessonId]', params: { lessonId: String(reviewLessonId), review: '1' } }) },
-          ]
-        : [{ text: 'OK' }],
-    );
+  // Fiche « Plus de cœurs » avec compte à rebours en direct.
+  const [outVisible, setOutVisible] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!outVisible) return;
+    setNow(Date.now());
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [outVisible]);
+  const liveCountdown = formatCountdown(effectiveHearts(profile, now).secondsToNext);
+
+  const handleOutOfHearts = () => setOutVisible(true);
+  const goReview = () => {
+    setOutVisible(false);
+    if (reviewLessonId) {
+      router.push({ pathname: '/quiz/[lessonId]', params: { lessonId: String(reviewLessonId), review: '1' } });
+    }
   };
 
   const statRows: InfoRow[] = [
@@ -117,6 +121,39 @@ export default function ParcoursScreen() {
               />
             ))}
       </ScrollView>
+
+      {/* Fiche « Plus de cœurs » */}
+      <Modal visible={outVisible} transparent animationType="fade" onRequestClose={() => setOutVisible(false)}>
+        <Pressable
+          onPress={() => setOutVisible(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: spacing.xl }}
+        >
+          <Pressable
+            onPress={() => {}}
+            style={{ width: '100%', maxWidth: 360, backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.xl, alignItems: 'center', gap: spacing.md }}
+          >
+            <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(217,101,75,0.14)', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="heart-dislike" size={34} color={colors.coral} />
+            </View>
+            <AppText variant="h3" align="center">Plus de cœurs</AppText>
+            <AppText variant="body" tone="secondary" align="center">
+              {reviewLessonId
+                ? 'Révise une leçon déjà terminée pour regagner un cœur, ou attends la recharge.'
+                : 'Tu regagnes un cœur avec le temps.'}
+            </AppText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+              <AppText variant="label" tone="secondary">Prochain cœur dans {liveCountdown}</AppText>
+            </View>
+            <View style={{ alignSelf: 'stretch', gap: spacing.sm, marginTop: spacing.sm }}>
+              {reviewLessonId ? <Button label="Réviser une leçon" variant="gold" onPress={goReview} /> : null}
+              <Pressable onPress={() => setOutVisible(false)} style={{ paddingVertical: spacing.md, alignItems: 'center' }}>
+                <AppText variant="bodyStrong" color={colors.textSecondary}>Plus tard</AppText>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </Screen>
   );
 }
