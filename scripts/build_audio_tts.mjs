@@ -124,7 +124,11 @@ async function synthEleven(text) {
       text,
       model_id: 'eleven_multilingual_v2',
       // Ralenti + stable pour bien entendre les syllabes courtes (lettres isolées).
-      voice_settings: { stability: 0.6, similarity_boost: 0.85, speed: Number(process.env.ELEVEN_SPEED || 0.8) },
+      voice_settings: {
+        stability: 0.6,
+        similarity_boost: Number(process.env.ELEVEN_SIMILARITY || 0.85),
+        speed: Number(process.env.ELEVEN_SPEED || 0.8),
+      },
     }),
   });
   if (!res.ok) throw new Error(`${res.status} — ${await res.text()}`);
@@ -143,7 +147,10 @@ for (const r of rows) {
   mkdirSync(dirname(path), { recursive: true });
   if (existsSync(path)) { done++; continue; }
   try {
-    const buf = await synth(r.arabe);
+    // En mode --ayn : on teste l'astuce « arabizi » (ع → 3) en envoyant la
+    // translittération avec « 3 » (ex. « 3a ») au lieu de l'arabe.
+    const text = AYN ? r.translit.replace(/ʿ/g, '3') : r.arabe;
+    const buf = await synth(text);
     writeFileSync(path, buf);
     done++;
     process.stdout.write(`\r✓ ${done}/${rows.length}  (${r.arabe} ${r.translit})        `);
