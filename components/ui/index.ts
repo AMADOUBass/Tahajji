@@ -8,6 +8,7 @@ export { Screen } from '@/components/ui/Screen';
 export { Logo } from '@/components/ui/Logo';
 export { Stars } from '@/components/ui/Stars';
 export { Confetti } from '@/components/ui/Confetti';
+export { Skeleton, SkeletonRows } from '@/components/ui/Skeleton';
 export { InfoModal } from '@/components/ui/InfoModal';
 export type { InfoRow } from '@/components/ui/InfoModal';
 export { ArabicText } from '@/components/ArabicText';

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
+import { AppText, ArabicText, ProgressBar, Screen, SkeletonRows } from '@/components/ui';
 import { useSurahs } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -119,7 +119,7 @@ export default function QuranScreen() {
       {/* Liste des sourates (filtrée) */}
       <View style={{ marginTop: spacing.lg }}>
         {isLoading ? (
-          <AppText tone="secondary" align="center" style={{ marginTop: spacing.xl }}>Chargement…</AppText>
+          <SkeletonRows count={7} />
         ) : isError ? (
           <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xl }}>
             <Ionicons name="cloud-offline-outline" size={40} color={colors.textSecondary} />

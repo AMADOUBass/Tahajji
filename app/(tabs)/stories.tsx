@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { AppText, Screen } from '@/components/ui';
+import { AppText, Screen, SkeletonRows } from '@/components/ui';
 import { useStories } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -40,7 +40,7 @@ export default function StoriesScreen() {
       </AppText>
 
       {isLoading ? (
-        <AppText tone="secondary" align="center" style={{ marginTop: spacing.xxl }}>Chargement…</AppText>
+        <SkeletonRows count={6} />
       ) : isError ? (
         <View style={{ alignItems: 'center', gap: spacing.md, marginTop: spacing.xxl }}>
           <Ionicons name="cloud-offline-outline" size={40} color={colors.textSecondary} />
