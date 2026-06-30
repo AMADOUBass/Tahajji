@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
@@ -18,6 +18,15 @@ export default function LessonScreen() {
 
   const { data: items, isLoading } = useLessonItems(lessonId);
   const [index, setIndex] = useState(0);
+
+  // Anti-spam : on ignore les appuis trop rapprochés (sinon les sons s'empilent).
+  const lastPlayRef = useRef(0);
+  const onListen = (url: string | null | undefined) => {
+    const now = Date.now();
+    if (now - lastPlayRef.current < 700) return;
+    lastPlayRef.current = now;
+    playAudioUrl(url);
+  };
 
   if (isLoading || !items) {
     return (
@@ -90,16 +99,12 @@ export default function LessonScreen() {
             label="Écouter"
             icon="volume-high"
             disabled={!item.audioUrl}
-            onPress={() => playAudioUrl(item.audioUrl)}
+            onPress={() => onListen(item.audioUrl)}
             style={{ marginTop: spacing.lg }}
           />
-          {!item.audioUrl ? (
-            <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
-              🎙️ Audio bientôt disponible
-            </AppText>
-          ) : (
-            <Button label="Répéter à voix haute" icon="mic-outline" variant="secondary" style={{ marginTop: spacing.sm }} />
-          )}
+          <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
+            {item.audioUrl ? '🔁 Répète à voix haute après l’écoute' : '🎙️ Audio bientôt disponible'}
+          </AppText>
         </View>
       ) : null}
 
