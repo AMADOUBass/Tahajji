@@ -316,6 +316,8 @@ const sql = `-- ============================================================
 -- Niveaux 1-5 détaillés (curriculum complet).
 -- À exécuter APRÈS 0001_init.sql. (Le Coran : voir import_quran.sql.)
 -- ⚠️ Re-truncate : réinitialise la progression utilisateur (dev).
+-- ⚠️ EFFACE l'audio des leçons (lesson_items.audio_url remis à null) :
+--    APRÈS ce script, RELANCE db/audio_lessons.sql pour rebrancher les sons.
 -- ⚠️ Contenu à FAIRE VALIDER par une autorité avant publication.
 -- ============================================================
 
