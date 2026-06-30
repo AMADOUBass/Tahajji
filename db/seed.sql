@@ -12,9 +12,9 @@ truncate table quiz_questions, lesson_items, lessons, levels restart identity ca
 
 insert into levels (id, position, title, description, is_premium) values
   (1, 1, 'L’alphabet — la voyelle « a »', 'Les 28 lettres lues avec la fatha (a), dans l’ordre de la méthode.', false),
-  (2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false),
-  (3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false),
-  (4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false),
+  (2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', true),
+  (3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', true),
+  (4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', true),
   (6, 2, 'Les chiffres arabes', 'Lire les chiffres ٠ à ٩.', false),
   (5, 6, 'Règles de lecture', 'Chadda, alif maqsoura, hamzatoul wasl, lettres solaires/lunaires et versets.', true);
 

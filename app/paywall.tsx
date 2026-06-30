@@ -1,18 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Alert, Pressable, View } from 'react-native';
 
 import { AppText, Button, Screen } from '@/components/ui';
-import { useSetPremium } from '@/lib/queries';
+import { usePurchases, type PlanId } from '@/lib/purchases';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-type Plan = 'monthly' | 'lifetime' | 'yearly';
+type Plan = PlanId;
 
 const FEATURES = [
-  'Toutes les leçons & règles de tajwid',
+  'Tout le parcours : voyelles, madd, tanwîn & tajwîd',
   'Certificats de fin de niveau',
+  'Cœurs illimités',
+  'Histoires premium',
   'Hors-ligne & sans publicité',
 ];
 
@@ -26,13 +28,16 @@ const PLANS: { id: Plan; label: string; price: string; note: string; badge?: str
 export default function PaywallScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const setPremium = useSetPremium();
+  const { purchase, restore, isProcessing, simulated } = usePurchases();
   const [selected, setSelected] = useState<Plan>('lifetime');
 
-  // Placeholder MVP : pas de vrai paiement. On simule le déblocage premium.
-  const purchase = () => {
-    setPremium.mutate(true, { onSuccess: () => router.back() });
-  };
+  const onBuy = () => purchase(selected, () => router.back());
+  const onRestore = () =>
+    restore((restored) =>
+      restored
+        ? router.back()
+        : Alert.alert('Restauration', 'Aucun achat à restaurer pour ce compte.'),
+    );
 
   return (
     <Screen scroll contentStyle={{ flexGrow: 1, paddingHorizontal: spacing.lg, paddingBottom: spacing.xl }}>
@@ -109,22 +114,32 @@ export default function PaywallScreen() {
 
       <Button
         label={
-          selected === 'lifetime'
-            ? 'Choisir « À vie » — 99,99 $'
-            : selected === 'yearly'
-              ? 'Choisir « Annuel » — 54,99 $'
-              : 'Choisir « Mensuel » — 6,99 $'
+          isProcessing
+            ? 'Patiente…'
+            : selected === 'lifetime'
+              ? 'Choisir « À vie » — 99,99 $'
+              : selected === 'yearly'
+                ? 'Commencer l’essai gratuit — Annuel'
+                : 'Commencer l’essai gratuit — Mensuel'
         }
         variant="gold"
-        onPress={purchase}
+        onPress={onBuy}
+        disabled={isProcessing}
         style={{ marginTop: spacing.xl }}
       />
       <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
-        Tous les prix en dollars canadiens (CAD).
+        {selected === 'lifetime'
+          ? 'Paiement unique. Prix en dollars canadiens (CAD).'
+          : '7 jours d’essai gratuit, puis facturation. Résiliable à tout moment. Prix en CAD.'}
+        {simulated ? ' · (mode démo : achat simulé)' : ''}
       </AppText>
       <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.xl, marginTop: spacing.md }}>
-        <AppText variant="caption" tone="secondary">Restaurer mes achats</AppText>
-        <AppText variant="caption" tone="secondary">Conditions</AppText>
+        <Pressable onPress={onRestore} hitSlop={8}>
+          <AppText variant="caption" color={colors.primary}>Restaurer mes achats</AppText>
+        </Pressable>
+        <Pressable onPress={() => router.push('/legal/terms')} hitSlop={8}>
+          <AppText variant="caption" color={colors.primary}>Conditions</AppText>
+        </Pressable>
       </View>
     </Screen>
   );

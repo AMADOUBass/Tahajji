@@ -147,14 +147,17 @@ export default function ProfileScreen() {
             thumbColor={colors.onPrimary}
           />
         </SettingRow>
-        <SettingRow icon="diamond-outline" label="Premium (démo)">
-          <Switch
-            value={profile?.isPremium ?? false}
-            onValueChange={(v) => setPremium.mutate(v)}
-            trackColor={{ true: colors.gold, false: colors.locked }}
-            thumbColor={colors.onPrimary}
-          />
-        </SettingRow>
+        {/* Toggle de DEV uniquement (jamais en production) : simule le premium. */}
+        {__DEV__ ? (
+          <SettingRow icon="diamond-outline" label="Premium (démo)">
+            <Switch
+              value={profile?.isPremium ?? false}
+              onValueChange={(v) => setPremium.mutate(v)}
+              trackColor={{ true: colors.gold, false: colors.locked }}
+              thumbColor={colors.onPrimary}
+            />
+          </SettingRow>
+        ) : null}
         <Pressable onPress={signOut}>
           <SettingRow icon="log-out-outline" label="Se déconnecter">
             <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />

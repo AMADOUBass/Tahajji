@@ -103,7 +103,7 @@ letterLessons(1, FATHA, 4, (g) => g.map((l) => l[1].split(' ')[0]).join(' · '))
 unitExam(1, false, 'Examen — l’alphabet', LETTERS.map(([bare, , cons]) => [vocalize(bare, FATHA), sound(cons, FATHA) || 'a']));
 
 // ---------- Niveau 2 : voyelles brèves ----------
-levels.push([2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', false]);
+levels.push([2, 3, 'Les voyelles brèves', 'La kasra (i), la dhômma (ou) et le soukoûne.', true]);
 let part = 0;
 letterLessons(2, KASRA, 7, () => `Kasra (i) · ${++part}`);
 part = 0;
@@ -141,7 +141,7 @@ const BREVES_POOL = [
 unitExam(2, false, 'Examen — voyelles brèves', BREVES_POOL);
 
 // ---------- Niveau 3 : voyelles longues (madd) ----------
-levels.push([3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', false]);
+levels.push([3, 4, 'Les voyelles longues (madd)', 'Allongement de la voyelle par Alif, Yâ et Wâw.', true]);
 
 // Sous-ensemble de consonnes claires pour les exercices de madd.
 const MADD_SET = [
@@ -183,7 +183,7 @@ for (const [bare, cons] of MADD_SET) {
 unitExam(3, false, 'Examen — voyelles longues', MADD_POOL);
 
 // ---------- Niveau 4 : le tanwîn ----------
-levels.push([4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', false]);
+levels.push([4, 5, 'Le tanwîn', 'Les doubles voyelles en fin de mot : -an, -in, -oun.', true]);
 
 const TANWIN = {
   f: { suffix: 'ane', short: 'َ', title: 'Tanwîn fatha (-an)' },

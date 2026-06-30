@@ -173,7 +173,7 @@ _Lire les chiffres ٠ à ٩._
 
 ---
 
-## Unité 3 — Les voyelles brèves
+## Unité 3 — Les voyelles brèves _(premium)_
 _La kasra (i), la dhômma (ou) et le soukoûne._
 
 ### Kasra (i) · 1  *(leçon)*
@@ -341,7 +341,7 @@ _La kasra (i), la dhômma (ou) et le soukoûne._
 
 ---
 
-## Unité 4 — Les voyelles longues (madd)
+## Unité 4 — Les voyelles longues (madd) _(premium)_
 _Allongement de la voyelle par Alif, Yâ et Wâw._
 
 ### Madd par Alif (â)  *(leçon)*
@@ -417,7 +417,7 @@ _Allongement de la voyelle par Alif, Yâ et Wâw._
 
 ---
 
-## Unité 5 — Le tanwîn
+## Unité 5 — Le tanwîn _(premium)_
 _Les doubles voyelles en fin de mot : -an, -in, -oun._
 
 ### Tanwîn fatha (-an)  *(leçon)*
