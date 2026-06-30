@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, Share, View } from 'react-native';
 import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 
 import { AppText, Button, Confetti, Screen } from '@/components/ui';
+import { hapticError, hapticSuccess } from '@/lib/haptics';
 import { useLessons } from '@/lib/queries';
 import { spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -20,6 +22,12 @@ export default function LevelCompleteScreen() {
   const isExam = params.exam === '1';
   const passed = params.passed !== '0';
   const failed = isExam && !passed;
+
+  // Vibration de réussite (ou d'échec) à l'arrivée sur l'écran.
+  useEffect(() => {
+    if (failed) hapticError();
+    else hapticSuccess();
+  }, [failed]);
 
   const { data: lessons } = useLessons();
   const lesson = lessons?.find((l) => l.id === lessonId);

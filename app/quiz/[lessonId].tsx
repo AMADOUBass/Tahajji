@@ -6,6 +6,7 @@ import Animated, { Easing, FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { AppText, ArabicText, Button, ProgressBar, Screen } from '@/components/ui';
 import { playAudioUrl } from '@/lib/audio';
+import { hapticError, hapticSuccess } from '@/lib/haptics';
 import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
 import { useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
@@ -87,10 +88,14 @@ export default function QuizScreen() {
     setSelected(option);
     if (option === question.correctAnswer) {
       setCorrectCount((c) => c + 1);
-    } else if (heartsActive) {
-      // Perte d'un cœur (examens uniquement) — côté serveur + décrément à l'écran.
-      setHeartsLeft((h) => Math.max(0, h - 1));
-      consumeHeart.mutate();
+      hapticSuccess();
+    } else {
+      hapticError();
+      if (heartsActive) {
+        // Perte d'un cœur (examens uniquement) — côté serveur + décrément à l'écran.
+        setHeartsLeft((h) => Math.max(0, h - 1));
+        consumeHeart.mutate();
+      }
     }
   }
 
