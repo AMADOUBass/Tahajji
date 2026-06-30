@@ -4,15 +4,24 @@
  * Sinon on joue le fichier LOCAL s'il est déjà en cache, sinon on streame depuis
  * l'URL distante ET on le télécharge en tâche de fond pour la prochaine fois.
  */
-import { createAudioPlayer } from 'expo-audio';
+import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
 import { cacheAudio, cachedAudioUri } from '@/lib/audioCache';
+
+// Joue MÊME si l'iPhone est en mode silencieux (sinon : aucun son). Une seule fois.
+setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+
+// On retient le lecteur courant : sinon il est libéré (GC) avant d'avoir joué.
+let currentPlayer: ReturnType<typeof createAudioPlayer> | null = null;
 
 export function playAudioUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   try {
     const local = cachedAudioUri(url);
+    // libère le lecteur précédent
+    try { currentPlayer?.remove(); } catch {}
     const player = createAudioPlayer({ uri: local ?? url });
+    currentPlayer = player;
     player.play();
     if (!local) void cacheAudio(url); // met en cache pour l'écoute hors-ligne suivante
     return true;
