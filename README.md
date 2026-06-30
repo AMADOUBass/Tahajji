@@ -17,33 +17,40 @@ Expo (React Native) · TypeScript · Supabase
 ## 📖 À propos
 
 La plupart des apps de Coran supposent que tu sais **déjà** lire l'arabe. Tahajji part
-de **zéro** : alphabet → lettres connectées → voyelles → syllabes → lecture de vrais
-versets. Le parcours est structuré sur la **Qaïda Nourania** (méthode d'apprentissage
-éprouvée).
+de **zéro** : alphabet → voyelles → allongements → tanwîn → règles de lecture → vrais
+versets. Le parcours s'appuie sur la méthode **« La mine des novices » (RECI, Bamako,
+avec l'autorisation de l'auteur)**, fusionnée avec la **Qaïda Nourania**.
 
 > **Principe non négociable :** la lecture du Coran (texte, traduction, audio de
-> récitation) reste **gratuite pour toujours**. Le premium ne concerne que l'outil
-> pédagogique (apprentissage avancé, certificats, suivi).
+> récitation) reste **gratuite pour toujours**. Le premium ne concerne que le **cours**
+> (apprentissage avancé, tajwîd, certificats).
 
-## ✨ Fonctionnalités (périmètre MVP)
+## ✨ Fonctionnalités
 
-- 🔐 **Authentification** — email + mot de passe (Supabase Auth), + connexion Google / Apple
-- 🗺️ **Parcours d'apprentissage** — niveaux 1 à 4 (alphabet → syllabes), façon Duolingo
-- 📝 **Leçons interactives** — lettre/mot en arabe + audio + exercice
-- ✅ **Quiz** après chaque leçon (reconnaissance, choix multiple) avec feedback doux
-- 🔥 **Progression** — XP, série (streak), statut des leçons, étoiles
-- 📗 **Bibliothèque Coran** en lecture libre (Juz 'Amma) avec audio par verset
-- 📴 **Mode hors-ligne** — leçons et audio mis en cache localement
-- 💎 **Premium** (placeholder) — un niveau payant pour câbler la logique d'abonnement
+- 🔐 **Auth** — e-mail + confirmation par **code OTP** (Supabase Auth + Resend) ; Google / Apple
+- 🗺️ **Parcours** — 6 unités : alphabet · chiffres · voyelles brèves · madd · tanwîn · règles (tajwîd)
+- 📝 **Leçons** — lettre/mot en arabe + audio + entraînement
+- 🎓 **Examens de fin d'unité** — questions mélangées, **seuil 70 %** pour débloquer la suite
+- ✅ **Quiz** avec feedback doux ; **cœurs** (examens uniquement, recharge 1 / 10 min, premium illimité)
+- 🔥 **Progression** — XP & niveaux, **série** réelle (serveur), badges, étoiles
+- 🔔 **Rappel quotidien** (notification locale)
+- 📗 **Coran complet** (114 sourates) en lecture libre + **audio par verset** + lecteur de sourate
+- 📚 **Histoires** — récits des prophètes, de l'islam, des compagnons, valeurs
+- 📴 **Hors-ligne** — contenu en cache (SQLite), **progression synchronisée** au retour du réseau, **audio téléchargeable**
+- 💎 **Premium** — modèle « cours » (voir ci-dessous), paywall + abstraction RevenueCat
+- ⚖️ **Pages légales** in-app — À propos/crédits, Confidentialité, CGU
 
-**Hors périmètre MVP :** IA de prononciation, tableau de bord parent/enseignant,
-licences institutionnelles, certificats PDF, fonctionnalités sociales.
+### Modèle freemium « cours »
+| Gratuit | Premium |
+|---|---|
+| Alphabet + chiffres + **tout le Coran** | Voyelles, madd, tanwîn, **tajwîd** |
+| Série, badges, examens de base | Certificats, cœurs ∞, histoires premium, hors-ligne, Pratique |
 
 ## 🎨 Identité visuelle
 
 Palette **« Espresso & Crème »** : brun chaud + or sur fond crème parchemin, avec un
-**mode sombre** caramel pour la lecture nocturne. Le texte arabe est mis en valeur via
-la police coranique **Amiri Quran** ; l'interface utilise **Plus Jakarta Sans**.
+**mode sombre** caramel pour la lecture nocturne. Texte arabe en **Amiri Quran** ;
+interface en **Plus Jakarta Sans**. Interface 100 % icônes (Ionicons), sans emoji.
 
 ## 🛠️ Stack technique
 
@@ -51,39 +58,44 @@ la police coranique **Amiri Quran** ; l'interface utilise **Plus Jakarta Sans**.
 |---|---|
 | App mobile | **Expo SDK 54** (React Native 0.81), TypeScript strict |
 | Navigation | **expo-router** (file-based) |
-| Backend | **Supabase** (Auth + PostgreSQL + Storage) |
+| Backend | **Supabase** — Auth + PostgreSQL (RLS) + Storage |
 | Données serveur | **TanStack Query** (React Query) |
 | État local | **Zustand** (persisté via AsyncStorage) |
-| Hors-ligne | **expo-sqlite** + **expo-file-system** |
-| Audio | **expo-audio** |
-| Notifications | **expo-notifications** (rappels de série) |
+| Hors-ligne | **React Query persisté dans SQLite** (`expo-sqlite/kv-store`) + **NetInfo** + cache audio (`expo-file-system`) |
+| Audio | **expo-audio** (récitation everyayah ; sons de leçons générés en TTS) |
+| Notifications | **expo-notifications** (rappel de série) |
 | Animations | **react-native-reanimated** |
-| Abonnements | **RevenueCat** *(post-MVP — nécessite un dev build EAS)* |
+| Tests | **Jest** (jest-expo) + Testing Library |
+| Abonnements | **RevenueCat** *(à brancher au dev build — voir `docs/revenuecat.md`)* |
+
+> **Sécurité** — L'économie (XP, cœurs, premium, série) est **gérée côté serveur**
+> (fonctions `SECURITY DEFINER` + privilèges par colonne) : non falsifiable par le
+> client. Seule la **clé publishable** est dans l'app.
 
 ## 📁 Structure du projet
 
 ```
 app/                  # écrans (expo-router)
-  (auth)/             # welcome, sign-in, sign-up
-  (tabs)/             # parcours (index), quran, practice, profile
-  lesson/[id]         # écran de leçon
-  quiz/[lessonId]     # quiz
-  level-complete/[id] # célébration de fin
-  surah/[id]          # lecteur de sourate
-  paywall             # offre premium
-components/           # AuthForm + kit UI réutilisable (components/ui)
-lib/                  # supabase, queries (React Query), audio, theme, fonts, mock
-store/                # stores Zustand (auth, game, theme)
-types/                # types domaine + types BD
-docs/                 # spec produit + brief de design
-design/               # maquettes haute-fidélité
+  (auth)/             # welcome, sign-in, sign-up, verify-otp, forgot/reset-password
+  (tabs)/             # index (parcours), quran, stories, profile
+  lesson/[id]         # leçon · quiz/[lessonId] · level-complete/[id]
+  surah/[id]          # lecteur de sourate · story/[id] · legal/[doc] · paywall
+components/           # AuthForm + kit UI (components/ui) + OfflineBanner
+lib/                  # supabase, queries, hearts, gamification, audio, audioCache,
+                      # queryPersist (offline), purchases, notifications, theme, legalContent
+store/                # stores Zustand (auth, reading, prefs, theme)
+db/                   # migrations/ (0001→0006) + seeds (seed.sql, stories_seed.sql, import_quran_*, audio_*)
+scripts/              # build_curriculum, build_quran_sql, build_audio_tts…
+__tests__/            # tests unitaires (Jest)
+docs/                 # SETUP (runbook), pipelines audio, validation, revenuecat
 ```
 
 ## 🚀 Démarrage
 
 ### Prérequis
 - Node.js 18+ et npm
-- L'app **Expo Go** (à jour) sur ton téléphone — **compatible SDK 54**
+- L'app **Expo Go** (à jour) — **compatible SDK 54**
+- Un projet **Supabase** (la base doit être initialisée — voir le runbook)
 
 ### Installation
 ```bash
@@ -91,56 +103,63 @@ npm install
 ```
 
 ### Variables d'environnement
-Copie le modèle puis renseigne tes clés Supabase :
-```bash
-cp .env.example .env
+Crée un fichier **`.env`** à la racine :
 ```
+EXPO_PUBLIC_SUPABASE_URL=https://<projet>.supabase.co
+EXPO_PUBLIC_SUPABASE_KEY=sb_publishable_...   # clé PUBLISHABLE uniquement (jamais service_role)
 ```
-EXPO_PUBLIC_SUPABASE_URL=...
-EXPO_PUBLIC_SUPABASE_ANON_KEY=...
-```
-> ℹ️ L'UI fonctionne actuellement sur des **données mock** : tu peux lancer et explorer
-> toute l'app **sans** configurer Supabase. Les clés ne seront requises qu'à
-> l'intégration backend.
+
+### Base de données
+Suis le **runbook** [`docs/SETUP.md`](docs/SETUP.md) : migrations `0001→0006` puis seeds
+(`seed.sql`, `import_quran_1..7.sql`, `audio_verses.sql`, `stories_seed.sql`), réglages Auth,
+et (optionnel) audio des leçons.
 
 ### Lancer l'app
 ```bash
-npx expo start --go
+npx expo start --go -c
 ```
-Puis scanne le QR code avec Expo Go (iOS : appareil photo · Android : Expo Go).
-Si le Wi-Fi bloque la connexion (réseaux d'école/publics) : `npx expo start --go --tunnel`.
+Scanne le QR avec Expo Go. Wi-Fi restreint (école/public) : ajoute `--tunnel`.
+> Un **nouveau fichier de route** nécessite un redémarrage de Metro (pas juste `r`).
 
 ## 📜 Scripts
 
 | Commande | Description |
 |---|---|
-| `npx expo start --go` | Démarre le serveur de dev (Expo Go) |
-| `npm run android` / `npm run ios` | Lance sur émulateur/simulateur |
-| `npx tsc --noEmit` | Vérifie les types (TypeScript strict) |
-| `npx expo-doctor` | Vérifie la santé des dépendances |
-| `npx expo lint` | Lint |
+| `npx expo start --go` | Serveur de dev (Expo Go) |
+| `npm test` | Tests unitaires (Jest) |
+| `npm run android` / `npm run ios` | Émulateur / simulateur |
+| `npx tsc --noEmit` | Vérifie les types |
+| `npx expo lint` | Lint (ESLint) |
+| `node scripts/build_curriculum.mjs` | Régénère le curriculum (seed, manifeste audio, doc de validation) |
+
+## 🧪 Tests
+
+Socle **Jest (jest-expo)** en place. Tests **unitaires** sur la logique pure
+(`__tests__/hearts.test.ts`, `gamification.test.ts`). Les tests **fonctionnels/composants**
+seront ajoutés **après la montée de SDK** (RNTL 14 incompatible avec jest-expo 54 / React 19).
 
 ## 📌 État du projet
 
-- ✅ **UI complète** des 10 écrans du MVP, branchée sur des **données mock typées**
-  comme la future base Supabase (approche *UI-first* → swap backend sans réécrire l'UI).
-- ⏳ **À venir** : intégration Supabase (migration SQL, seed, génération des types,
-  auth réelle), audio réel, cache hors-ligne, puis monétisation (RevenueCat).
+- ✅ **MVP fonctionnel** : auth sécurisée, curriculum 1→6 + examens, Coran complet + lecteur audio,
+  cœurs/série/XP/badges, histoires, **hors-ligne complet**, pages légales, paywall + prépa RevenueCat.
+- ⏳ **Avant publication** : enregistrer/valider l'audio des leçons (3 clips ع à refaire à la main),
+  **validation religieuse** du contenu, crédit auteur + relecture juridique, logo, RevenueCat (dev build),
+  montée au dernier SDK, soumission stores.
 
 ### Notes techniques
-- On développe sur **SDK 54** car l'Expo Go de l'App Store le supporte. **Avant la
-  publication sur Apple**, monter au dernier SDK (`npx expo install expo@latest --fix`).
-- L'audio pédagogique (centaines de clips récités) et la **validation religieuse** du
-  contenu sont le vrai défi du projet — à planifier en parallèle du code.
+- On développe sur **SDK 54** (Expo Go App Store). **Avant Apple** : `npx expo install expo@latest --fix`.
+- L'audio des leçons est généré en **TTS arabe (Fusha)** ; les versets utilisent un vrai récitateur.
+- La **validation religieuse** du contenu (`docs/validation_contenu.md`) est un prérequis de lancement.
 
 ## 📄 Documentation
 
-- [`docs/Spec_App_Apprendre_le_Coran.md`](docs/Spec_App_Apprendre_le_Coran.md) — spec produit
-- [`docs/UI_Design_Brief.md`](docs/UI_Design_Brief.md) — brief de design
-- [`AGENTS.md`](AGENTS.md) — guide de développement (schéma BD, conventions, roadmap)
+- [`docs/SETUP.md`](docs/SETUP.md) — installation, migrations/seeds, checklist de lancement
+- [`docs/audio_pipeline.md`](docs/audio_pipeline.md) — brancher l'audio des leçons
+- [`docs/revenuecat.md`](docs/revenuecat.md) — abonnements (dev build)
+- [`AGENTS.md`](AGENTS.md) — guide de développement
 
 ---
 
 <div align="center">
-<sub>Projet en développement · Coran toujours gratuit, premium = outil pédagogique uniquement.</sub>
+<sub>Projet en développement · Coran toujours gratuit, premium = le cours.</sub>
 </div>
