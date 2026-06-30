@@ -28,6 +28,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const SAMPLE = process.argv.includes('--sample');
+const AYN = process.argv.includes('--ayn'); // ne génère que les clips du ع (test voix)
 
 // --- Choix du service selon la clé présente ---
 const ELEVEN_KEY = process.env.ELEVEN_API_KEY;
@@ -85,6 +86,11 @@ if (SAMPLE) {
   rows = [...letters, ...words];
 }
 
+// Test ciblé du ع : uniquement les clips contenant un ʿayn (vers un dossier à part).
+if (AYN) {
+  rows = rows.filter((r) => r.arabe.includes('ع'));
+}
+
 // --- Synthèse selon le service ---
 const xmlEscape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -127,7 +133,7 @@ async function synthEleven(text) {
 
 const synth = PROVIDER === 'azure' ? synthAzure : synthEleven;
 
-const OUT = SAMPLE ? 'audio_out/sample' : 'audio_out';
+const OUT = AYN ? 'audio_out/test_ayn' : SAMPLE ? 'audio_out/sample' : 'audio_out';
 console.log(`Service : ${PROVIDER} · ${rows.length} clip(s)${SAMPLE ? ' (ÉCHANTILLON)' : ''} → ${OUT}/`);
 
 let done = 0;
