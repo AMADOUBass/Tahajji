@@ -1,16 +1,20 @@
 /**
  * Wrapper audio (expo-av remplacé par expo-audio au SDK 54).
- * Aujourd'hui le contenu mock n'a pas de fichiers audio (audioUrl = null) :
- * playAudioUrl ne fait rien dans ce cas. À l'intégration, les URLs viendront
- * de Supabase Storage et le cache hors-ligne fournira un chemin local.
+ * Si `audioUrl` est null (clip pas encore enregistré), c'est un no-op.
+ * Sinon on joue le fichier LOCAL s'il est déjà en cache, sinon on streame depuis
+ * l'URL distante ET on le télécharge en tâche de fond pour la prochaine fois.
  */
 import { createAudioPlayer } from 'expo-audio';
+
+import { cacheAudio, cachedAudioUri } from '@/lib/audioCache';
 
 export function playAudioUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   try {
-    const player = createAudioPlayer({ uri: url });
+    const local = cachedAudioUri(url);
+    const player = createAudioPlayer({ uri: local ?? url });
     player.play();
+    if (!local) void cacheAudio(url); // met en cache pour l'écoute hors-ligne suivante
     return true;
   } catch {
     return false;

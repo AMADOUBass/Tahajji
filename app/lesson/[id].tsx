@@ -89,10 +89,17 @@ export default function LessonScreen() {
           <Button
             label="Écouter"
             icon="volume-high"
+            disabled={!item.audioUrl}
             onPress={() => playAudioUrl(item.audioUrl)}
             style={{ marginTop: spacing.lg }}
           />
-          <Button label="Répéter à voix haute" icon="mic-outline" variant="secondary" style={{ marginTop: spacing.sm }} />
+          {!item.audioUrl ? (
+            <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.sm }}>
+              🎙️ Audio bientôt disponible
+            </AppText>
+          ) : (
+            <Button label="Répéter à voix haute" icon="mic-outline" variant="secondary" style={{ marginTop: spacing.sm }} />
+          )}
         </View>
       ) : null}
 
