@@ -65,7 +65,7 @@ export default function PaywallScreen() {
             <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(201,154,63,0.18)', alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons name="checkmark" size={13} color={colors.gold} />
             </View>
-            <AppText variant="body">{f}</AppText>
+            <AppText variant="body" style={{ flex: 1 }}>{f}</AppText>
           </View>
         ))}
       </View>
