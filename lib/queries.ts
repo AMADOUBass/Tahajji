@@ -16,6 +16,7 @@ import type {
   ProgressStatus,
   QuizQuestion,
   Surah,
+  Story,
   UserProgress,
   Verse,
 } from '@/types/models';
@@ -43,6 +44,10 @@ const toSurah = (r: Row<'surahs'>): Surah => ({
   id: r.id, number: r.number, nameAr: r.name_ar, nameFr: r.name_fr,
   revelationType: r.revelation_type as Surah['revelationType'], verseCount: r.verse_count,
 });
+const toStory = (r: Row<'stories'>): Story => ({
+  id: r.id, category: r.category, title: r.title, summary: r.summary,
+  content: r.content, icon: r.icon, position: r.position, isValidated: r.is_validated,
+});
 const toVerse = (r: Row<'verses'>): Verse => ({
   id: r.id, surahId: r.surah_id, number: r.number, arabicText: r.arabic_text,
   translationFr: r.translation_fr, translationEn: r.translation_en, audioUrl: r.audio_url,
@@ -59,6 +64,7 @@ export const queryKeys = {
   lessonItems: (lessonId: number) => ['lessonItems', lessonId] as const,
   quiz: (lessonId: number) => ['quiz', lessonId] as const,
   surahs: ['surahs'] as const,
+  stories: ['stories'] as const,
   verses: (surahId: number) => ['verses', surahId] as const,
   profile: (userId: string | null) => ['profile', userId] as const,
   progress: (userId: string | null) => ['progress', userId] as const,
@@ -97,6 +103,18 @@ export function useSurahs() {
       const { data, error } = await supabase.from('surahs').select('*').order('number');
       if (error) throw error;
       return data.map(toSurah);
+    },
+  });
+}
+
+/** Récits de l'onglet « Histoires » (triés par catégorie puis position). */
+export function useStories() {
+  return useQuery({
+    queryKey: queryKeys.stories,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('stories').select('*').order('position');
+      if (error) throw error;
+      return data.map(toStory);
     },
   });
 }

@@ -10,6 +10,12 @@ type Timestamp = string;
 export interface Database {
   public: {
     Tables: {
+      stories: {
+        Row: { id: number; category: string; title: string; summary: string | null; content: string; icon: string | null; position: number; is_validated: boolean; created_at: Timestamp };
+        Insert: { category: string; title: string; summary?: string | null; content: string; icon?: string | null; position?: number; is_validated?: boolean };
+        Update: { category?: string; title?: string; summary?: string | null; content?: string; icon?: string | null; position?: number; is_validated?: boolean };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;

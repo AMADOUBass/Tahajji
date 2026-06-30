@@ -85,6 +85,17 @@ export interface Verse {
   audioUrl: string | null;
 }
 
+export interface Story {
+  id: number;
+  category: string;
+  title: string;
+  summary: string | null;
+  content: string;
+  icon: string | null;
+  position: number;
+  isValidated: boolean;
+}
+
 export interface UserProgress {
   lessonId: number;
   status: ProgressStatus;

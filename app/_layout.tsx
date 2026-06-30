@@ -57,6 +57,7 @@ export default function RootLayout() {
           {/* Célébration : révélation en fondu plutôt qu'un glissé. */}
           <Stack.Screen name="level-complete/[id]" options={{ animation: 'fade', gestureEnabled: false }} />
           <Stack.Screen name="surah/[id]" />
+          <Stack.Screen name="story/[id]" />
           <Stack.Screen name="profile/edit" options={{ presentation: 'modal' }} />
           <Stack.Screen name="reset-password" options={{ gestureEnabled: false }} />
           <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
