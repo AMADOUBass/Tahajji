@@ -45,6 +45,7 @@ export default function ProfileScreen() {
   const xp = profile?.xp ?? 0;
   const { level, xpInLevel, xpForLevel, progress: levelProgress } = levelFromXp(xp);
   const badges = computeBadges({ xp, streak: profile?.streakCount ?? 0, completedCount: lessonsCompleted, level });
+  const earnedCount = badges.filter((b) => b.earned).length;
 
   return (
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
@@ -60,42 +61,45 @@ export default function ProfileScreen() {
         </Pressable>
       </View>
 
-      {/* Identité */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginTop: spacing.lg }}>
-        <View style={{ width: 72, height: 72, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ position: 'absolute', width: 72, height: 72, backgroundColor: colors.primaryLight, borderRadius: 20 }} />
-          <AppText variant="h2" color={colors.primary}>{initial}</AppText>
-        </View>
-        <View style={{ flex: 1 }}>
-          <AppText variant="h3">{displayName}</AppText>
-          <AppText variant="caption" tone="secondary" style={{ marginTop: 2 }}>
-            {profile?.bio?.trim() ? profile.bio : 'Niveau débutant'}
-          </AppText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.sm, alignSelf: 'flex-start', backgroundColor: 'rgba(201,154,63,0.16)', paddingVertical: 4, paddingHorizontal: spacing.sm, borderRadius: 999 }}>
-            <Ionicons name="star" size={12} color={colors.gold} />
-            <AppText variant="caption" color={colors.gold}>Niveau {level}</AppText>
+      {/* Carte héros : identité + niveau + progression */}
+      <View style={{ backgroundColor: colors.primaryContainer, borderRadius: radius.lg, padding: spacing.lg, marginTop: spacing.lg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+          <View style={{ width: 76, height: 76, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 2, borderColor: colors.gold, alignItems: 'center', justifyContent: 'center' }}>
+            <AppText variant="h2" color={colors.gold}>{initial}</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText variant="h3" color={colors.onPrimaryContainer}>{displayName}</AppText>
+            <AppText variant="caption" color="rgba(255,253,247,0.7)" numberOfLines={1} style={{ marginTop: 2 }}>
+              {profile?.bio?.trim() ? profile.bio : 'Niveau débutant'}
+            </AppText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: spacing.sm, alignSelf: 'flex-start', backgroundColor: 'rgba(201,154,63,0.28)', paddingVertical: 4, paddingHorizontal: spacing.sm, borderRadius: 999 }}>
+              <Ionicons name="star" size={12} color={colors.gold} />
+              <AppText variant="caption" color={colors.gold}>Niveau {level}</AppText>
+            </View>
           </View>
         </View>
-      </View>
-
-      {/* Progression vers le niveau suivant */}
-      <View style={{ marginTop: spacing.lg }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs }}>
-          <AppText variant="caption" tone="secondary">Niveau {level}</AppText>
-          <AppText variant="caption" tone="secondary">{xpInLevel}/{xpForLevel} XP</AppText>
+        {/* Progression vers le niveau suivant */}
+        <View style={{ marginTop: spacing.lg }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs }}>
+            <AppText variant="caption" color="rgba(255,253,247,0.7)">Prochain niveau</AppText>
+            <AppText variant="caption" color="rgba(255,253,247,0.85)">{xpInLevel}/{xpForLevel} XP</AppText>
+          </View>
+          <ProgressBar value={levelProgress} height={8} trackColor="rgba(255,255,255,0.18)" />
         </View>
-        <ProgressBar value={levelProgress} height={8} />
       </View>
 
       {/* Stats */}
-      <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.xl }}>
-        <StatCard value={xp} label="XP total" />
-        <StatCard value={profile?.streakCount ?? 0} label="Série (jours)" color={colors.flame} />
-        <StatCard value={lessonsCompleted} label="Leçons" />
+      <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg }}>
+        <StatCard icon="star" value={xp} label="XP total" color={colors.gold} />
+        <StatCard icon="flame" value={profile?.streakCount ?? 0} label="Série (jours)" color={colors.flame} />
+        <StatCard icon="school" value={lessonsCompleted} label="Leçons" color={colors.primary} />
       </View>
 
       {/* Badges */}
-      <AppText variant="title" style={{ marginTop: spacing.xl, marginBottom: spacing.md }}>Badges</AppText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.xl, marginBottom: spacing.md }}>
+        <AppText variant="title">Badges</AppText>
+        <AppText variant="caption" tone="secondary">{earnedCount}/{badges.length} débloqués</AppText>
+      </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
         {badges.map((b) => (
           <View key={b.id} style={{ alignItems: 'center', width: 88, gap: 6 }}>
@@ -188,12 +192,13 @@ export default function ProfileScreen() {
   );
 }
 
-function StatCard({ value, label, color }: { value: number; label: string; color?: string }) {
+function StatCard({ icon, value, label, color }: { icon: keyof typeof Ionicons.glyphMap; value: number; label: string; color?: string }) {
   const { colors } = useTheme();
   return (
-    <Card style={{ flex: 1, alignItems: 'center', paddingVertical: spacing.lg }}>
+    <Card style={{ flex: 1, alignItems: 'center', paddingVertical: spacing.lg, gap: 4 }}>
+      <Ionicons name={icon} size={18} color={color ?? colors.primary} />
       <AppText variant="h3" color={color ?? colors.text}>{value}</AppText>
-      <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: 2 }}>{label}</AppText>
+      <AppText variant="caption" tone="secondary" align="center">{label}</AppText>
     </Card>
   );
 }
