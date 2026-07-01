@@ -6,6 +6,7 @@ import { Pressable, ScrollView, View } from 'react-native';
 
 import { AppText, ArabicText, ProgressBar, Screen } from '@/components/ui';
 import { cacheAudioBatch, cachedAudioUri, cachedCount } from '@/lib/audioCache';
+import { hapticLight } from '@/lib/haptics';
 import { useSurahs, useVerses } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -89,6 +90,7 @@ export default function SurahScreen() {
   };
 
   const togglePlay = () => {
+    hapticLight();
     if (currentIndex === null) {
       playVerse(0);
       return;
@@ -186,7 +188,7 @@ export default function SurahScreen() {
               last={i === verses!.length - 1}
               isCurrent={currentIndex === i}
               playing={currentIndex === i && status.playing}
-              onPlay={() => playVerse(i)}
+              onPlay={() => { hapticLight(); playVerse(i); }}
               onLayout={(y) => { versePos.current[i] = y; }}
             />
           ))
@@ -221,7 +223,9 @@ export default function SurahScreen() {
             </AppText>
             <ProgressBar value={progress} height={4} trackColor="rgba(255,255,255,0.2)" style={{ marginTop: spacing.sm }} />
           </View>
-          <AppText variant="caption" color="rgba(255,253,247,0.7)">{fmt(status.currentTime)}</AppText>
+          <AppText variant="caption" color="rgba(255,253,247,0.7)">
+            {fmt(status.currentTime)}{status.duration ? ` / ${fmt(status.duration)}` : ''}
+          </AppText>
         </View>
       ) : null}
     </Screen>
