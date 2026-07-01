@@ -9,7 +9,7 @@ import { playAudioUrl } from '@/lib/audio';
 import { hapticError, hapticSuccess } from '@/lib/haptics';
 import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
-import { useCompleteLesson, useConsumeHeart, useLessonItems, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
+import { useAllLessonItems, useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -26,7 +26,7 @@ export default function QuizScreen() {
   const { data: questions, isLoading } = useQuizQuestions(lessonId);
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
-  const { data: lessonItems } = useLessonItems(lessonId);
+  const { data: lessonItems } = useAllLessonItems();
   // Infos par lettre/mot (translittération, description, audio) pour enrichir le feedback.
   const infoByArabic = useMemo(
     () => new Map((lessonItems ?? []).map((it) => [it.arabicText, it])),
@@ -213,9 +213,10 @@ export default function QuizScreen() {
           ) : null}
         </View>
 
+        <View style={{ flex: 1, justifyContent: 'center', paddingBottom: spacing.xxl }}>
         {/* Énoncé (ré-anime à chaque question) */}
         <Animated.View key={qIndex} entering={FadeIn.duration(300)}>
-          <AppText variant="h3" style={{ marginTop: spacing.xl }}>{question.prompt}</AppText>
+          <AppText variant="h3" align="center">{question.prompt}</AppText>
         </Animated.View>
 
         {question.audioUrl ? (
@@ -284,6 +285,7 @@ export default function QuizScreen() {
             );
           })}
         </Animated.View>
+        </View>
       </View>
 
       {/* Panneau de feedback */}

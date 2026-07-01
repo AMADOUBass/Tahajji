@@ -85,6 +85,18 @@ export function useLessonItems(lessonId: number) {
   });
 }
 
+/** Tous les items (lettres/mots) — sert à enrichir le feedback du quiz, examens compris. */
+export function useAllLessonItems() {
+  return useQuery({
+    queryKey: ['allLessonItems'] as const,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('lesson_items').select('*').order('id');
+      if (error) throw error;
+      return data.map(toItem);
+    },
+  });
+}
+
 export function useQuizQuestions(lessonId: number) {
   return useQuery({
     queryKey: queryKeys.quiz(lessonId),
