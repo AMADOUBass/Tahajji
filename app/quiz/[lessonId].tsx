@@ -12,6 +12,7 @@ import { playCorrectSound, playWrongSound } from '@/lib/sounds';
 import { useAllLessonItems, useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { useQuizStore } from '@/store/quiz';
 
 const XP_PER_LESSON = 50;
 const PASS_THRESHOLD = 70; // % minimum pour valider un examen
@@ -53,6 +54,25 @@ export default function QuizScreen() {
   const seededRef = useRef(false);
   // Verrou anti double-tap sur « Continuer » (évite de sauter une question).
   const advancingRef = useRef(false);
+
+  // Reprise du quiz là où on s'est arrêté (leçons — pas les examens ni la révision).
+  const saveQuiz = useQuizStore((s) => s.save);
+  const clearQuiz = useQuizStore((s) => s.clear);
+  const savedByLesson = useQuizStore((s) => s.byLesson);
+  const resumable = !isExam && !isReview;
+  const resumedRef = useRef(false);
+  useEffect(() => {
+    if (resumedRef.current) return;
+    if (!lessons || !questions || questions.length === 0) return; // attendre le chargement
+    if (resumable) {
+      const snap = savedByLesson[lessonId];
+      if (snap && snap.qIndex > 0 && snap.qIndex < questions.length) {
+        setQIndex(snap.qIndex);
+        setCorrectCount(snap.correctCount);
+      }
+    }
+    resumedRef.current = true;
+  }, [lessons, questions, resumable, savedByLesson, lessonId]);
   // Tremblement de la grille d'options sur mauvaise réponse.
   const shake = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
@@ -153,8 +173,10 @@ export default function QuizScreen() {
     if (advancingRef.current) return;
     advancingRef.current = true;
     if (qIndex < questions!.length - 1) {
-      setQIndex((i) => i + 1);
+      const next = qIndex + 1;
+      setQIndex(next);
       setSelected(null);
+      if (resumable) saveQuiz(lessonId, { qIndex: next, correctCount }); // sauvegarde la reprise
     } else {
       const finalCorrect = correctCount;
       const stars = finalCorrect >= questions!.length ? 3 : finalCorrect >= questions!.length - 1 ? 2 : 1;
@@ -163,6 +185,7 @@ export default function QuizScreen() {
   }
 
   function finish(stars: number) {
+    clearQuiz(lessonId); // quiz terminé → on efface la reprise sauvegardée
     // Mode révision : on regagne un cœur, sans recompléter la leçon.
     if (isReview) {
       refillHearts.mutate(1, { onSuccess: () => router.replace('/') });
