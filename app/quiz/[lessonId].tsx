@@ -320,13 +320,31 @@ export default function QuizScreen() {
                 const info = infoByArabic.get(question.correctAnswer);
                 if (info) {
                   return (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 2 }}>
-                      <AppText variant="caption" tone="secondary" style={{ flexShrink: 1 }}>
+                    <View style={{ marginTop: 4, gap: spacing.sm }}>
+                      <AppText variant="caption" tone="secondary">
                         {question.correctAnswer} — {info.translationFr ?? info.transliteration}
                       </AppText>
                       {info.audioUrl ? (
-                        <Pressable onPress={() => playAudioUrl(info.audioUrl)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Réécouter le son">
+                        <Pressable
+                          onPress={() => playAudioUrl(info.audioUrl)}
+                          accessibilityRole="button"
+                          accessibilityLabel="Réécouter le son"
+                          style={({ pressed }) => ({
+                            alignSelf: 'flex-start',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: spacing.sm,
+                            backgroundColor: colors.surface,
+                            borderWidth: 1.5,
+                            borderColor: colors.primary,
+                            borderRadius: radius.md,
+                            paddingVertical: spacing.sm,
+                            paddingHorizontal: spacing.lg,
+                            opacity: pressed ? 0.7 : 1,
+                          })}
+                        >
                           <Ionicons name="volume-high" size={18} color={colors.primary} />
+                          <AppText variant="label" color={colors.primary}>Réécouter le son</AppText>
                         </Pressable>
                       ) : null}
                     </View>
