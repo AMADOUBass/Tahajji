@@ -52,7 +52,7 @@ function Feature({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label:
   const { colors } = useTheme();
   return (
     <View style={{ alignItems: 'center', gap: 6, width: 86 }}>
-      <View style={{ width: 46, height: 46, borderRadius: 14, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 46, height: 46, borderRadius: radius.md, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' }}>
         <Ionicons name={icon} size={20} color={colors.primary} />
       </View>
       <AppText variant="caption" tone="secondary" align="center">{label}</AppText>
