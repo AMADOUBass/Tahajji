@@ -66,8 +66,8 @@ export default function QuizScreen() {
     if (!lessons || !questions || questions.length === 0) return; // attendre le chargement
     if (resumable) {
       const snap = savedByLesson[lessonId];
-      if (snap && snap.qIndex > 0 && snap.qIndex < questions.length) {
-        setQIndex(snap.qIndex);
+      if (snap && snap.qIndex > 0) {
+        setQIndex(Math.min(snap.qIndex, questions.length - 1));
         setCorrectCount(snap.correctCount);
       }
     }
@@ -148,8 +148,10 @@ export default function QuizScreen() {
     if (answered) return;
     advancingRef.current = false;
     setSelected(option);
-    if (option === question.correctAnswer) {
-      setCorrectCount((c) => c + 1);
+    const correct = option === question.correctAnswer;
+    const newCorrect = correctCount + (correct ? 1 : 0);
+    if (correct) {
+      setCorrectCount(newCorrect);
       hapticSuccess();
       playCorrectSound();
     } else {
@@ -167,16 +169,16 @@ export default function QuizScreen() {
         consumeHeart.mutate();
       }
     }
+    // Une question RÉPONDUE (juste ou fausse) = faite → reprise à la suivante.
+    if (resumable) saveQuiz(lessonId, { qIndex: qIndex + 1, correctCount: newCorrect });
   }
 
   function onContinue() {
     if (advancingRef.current) return;
     advancingRef.current = true;
     if (qIndex < questions!.length - 1) {
-      const next = qIndex + 1;
-      setQIndex(next);
+      setQIndex((i) => i + 1);
       setSelected(null);
-      if (resumable) saveQuiz(lessonId, { qIndex: next, correctCount }); // sauvegarde la reprise
     } else {
       const finalCorrect = correctCount;
       const stars = finalCorrect >= questions!.length ? 3 : finalCorrect >= questions!.length - 1 ? 2 : 1;
