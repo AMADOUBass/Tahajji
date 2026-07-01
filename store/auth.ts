@@ -62,6 +62,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   signUp: async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) return { error: error.message };
+    // Un e-mail déjà inscrit : Supabase masque l'existence du compte (anti-
+    // énumération) en renvoyant un utilisateur SANS identités. On le détecte pour
+    // empêcher un doublon (un e-mail = un seul compte).
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      return { error: 'Un compte existe déjà avec cet e-mail. Connecte-toi plutôt.' };
+    }
     // Pas de session immédiate ⇒ un code de confirmation a été envoyé par e-mail.
     return { error: null, needsConfirmation: !data.session };
   },

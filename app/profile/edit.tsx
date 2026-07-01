@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
 import { AppText, Button, Screen } from '@/components/ui';
+import { hapticSuccess } from '@/lib/haptics';
 import { useProfile, useUpdateProfile } from '@/lib/queries';
 import { fonts, radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -27,7 +28,7 @@ export default function EditProfileScreen() {
     updateProfile.mutate(
       { displayName: displayName.trim(), bio: bio.trim() || null },
       {
-        onSuccess: () => router.back(),
+        onSuccess: () => { hapticSuccess(); router.back(); },
         onError: (e) => setError(e instanceof Error ? e.message : 'Erreur'),
       },
     );
@@ -50,7 +51,7 @@ export default function EditProfileScreen() {
     <Screen scroll keyboardAvoiding contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
       {/* En-tête */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Retour">
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </Pressable>
         <AppText variant="h3">Modifier le profil</AppText>
@@ -95,7 +96,10 @@ export default function EditProfileScreen() {
       </View>
 
       {error ? (
-        <AppText variant="caption" color={colors.coral} style={{ marginTop: spacing.md }}>{error}</AppText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: spacing.md }}>
+          <Ionicons name="alert-circle" size={15} color={colors.coral} />
+          <AppText variant="caption" color={colors.coral} style={{ flexShrink: 1 }}>{error}</AppText>
+        </View>
       ) : null}
 
       <Button label="Enregistrer" onPress={save} loading={updateProfile.isPending} style={{ marginTop: spacing.xl }} />
