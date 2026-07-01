@@ -9,7 +9,7 @@ import { playAudioUrl } from '@/lib/audio';
 import { hapticError, hapticSuccess } from '@/lib/haptics';
 import { MAX_HEARTS, effectiveHearts } from '@/lib/hearts';
 import { playCorrectSound, playWrongSound } from '@/lib/sounds';
-import { useCompleteLesson, useConsumeHeart, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
+import { useCompleteLesson, useConsumeHeart, useLessonItems, useLessons, useProfile, useQuizQuestions, useRefillHearts } from '@/lib/queries';
 import { radius, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -26,6 +26,12 @@ export default function QuizScreen() {
   const { data: questions, isLoading } = useQuizQuestions(lessonId);
   const { data: profile } = useProfile();
   const { data: lessons } = useLessons();
+  const { data: lessonItems } = useLessonItems(lessonId);
+  // Infos par lettre/mot (translittération, description, audio) pour enrichir le feedback.
+  const infoByArabic = useMemo(
+    () => new Map((lessonItems ?? []).map((it) => [it.arabicText, it])),
+    [lessonItems],
+  );
   const completeLesson = useCompleteLesson();
   const consumeHeart = useConsumeHeart();
   const refillHearts = useRefillHearts();
@@ -310,11 +316,26 @@ export default function QuizScreen() {
               <AppText variant="title" color={isCorrect ? colors.success : colors.coral}>
                 {isCorrect ? "Bravo, c'est ça !" : 'Presque ! Continue.'}
               </AppText>
-              {!isCorrect ? (
-                <AppText variant="caption" tone="secondary">
-                  La bonne réponse : {question.correctAnswer}
-                </AppText>
-              ) : null}
+              {(() => {
+                const info = infoByArabic.get(question.correctAnswer);
+                if (info) {
+                  return (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 2 }}>
+                      <AppText variant="caption" tone="secondary" style={{ flexShrink: 1 }}>
+                        {question.correctAnswer} — {info.translationFr ?? info.transliteration}
+                      </AppText>
+                      {info.audioUrl ? (
+                        <Pressable onPress={() => playAudioUrl(info.audioUrl)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Réécouter le son">
+                          <Ionicons name="volume-high" size={18} color={colors.primary} />
+                        </Pressable>
+                      ) : null}
+                    </View>
+                  );
+                }
+                return !isCorrect ? (
+                  <AppText variant="caption" tone="secondary">La bonne réponse : {question.correctAnswer}</AppText>
+                ) : null;
+              })()}
             </View>
           </View>
           <Button
