@@ -31,6 +31,8 @@ interface AppTextProps {
   align?: TextStyle['textAlign'];
   numberOfLines?: number;
   style?: StyleProp<TextStyle>;
+  /** Rend le texte tappable (ex. lien inline). */
+  onPress?: () => void;
 }
 
 const VARIANTS: Record<TextVariant, TextStyle> = {
@@ -54,6 +56,7 @@ export function AppText({
   align,
   numberOfLines,
   style,
+  onPress,
 }: AppTextProps) {
   const { colors } = useTheme();
 
@@ -69,6 +72,7 @@ export function AppText({
   return (
     <Text
       numberOfLines={numberOfLines}
+      onPress={onPress}
       style={[VARIANTS[variant], { color: color ?? toneColor[tone] }, align ? { textAlign: align } : null, style]}
     >
       {children}

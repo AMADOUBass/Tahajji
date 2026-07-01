@@ -5,8 +5,8 @@
  */
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Alert, Pressable, TextInput, View } from 'react-native';
 
 import { AppText, Button, Screen } from '@/components/ui';
 import { fonts, radius, spacing } from '@/lib/theme';
@@ -26,6 +26,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [focused, setFocused] = useState<'email' | 'password' | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const passwordRef = useRef<TextInput>(null);
   const signUp = useAuthStore((s) => s.signUp);
   const signIn = useAuthStore((s) => s.signIn);
 
@@ -73,7 +74,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   };
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
+    <Screen scroll keyboardAvoiding contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
       <Pressable
         onPress={() => router.back()}
         style={{
@@ -114,6 +115,9 @@ export function AuthForm({ mode }: AuthFormProps) {
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              blurOnSubmit={false}
               style={{ flex: 1, fontFamily: fonts.medium, fontSize: 15, color: colors.text }}
             />
           </View>
@@ -123,6 +127,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           <AppText variant="label" tone="secondary">Mot de passe</AppText>
           <View style={fieldStyle('password')}>
             <TextInput
+              ref={passwordRef}
               value={password}
               onChangeText={setPassword}
               onFocus={() => setFocused('password')}
@@ -131,6 +136,8 @@ export function AuthForm({ mode }: AuthFormProps) {
               placeholderTextColor={colors.textSecondary}
               secureTextEntry={!showPassword}
               autoCapitalize="none"
+              returnKeyType="go"
+              onSubmitEditing={submit}
               style={{ flex: 1, fontFamily: fonts.medium, fontSize: 15, color: colors.text }}
             />
             <Pressable onPress={() => setShowPassword((s) => !s)} hitSlop={10}>
@@ -142,9 +149,10 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <Button label="Continuer" onPress={submit} loading={loading} style={{ marginTop: spacing.xl }} />
       {message ? (
-        <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.md }}>
-          {message}
-        </AppText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: spacing.md }}>
+          <Ionicons name="alert-circle" size={15} color={colors.coral} />
+          <AppText variant="caption" color={colors.coral} align="center" style={{ flexShrink: 1 }}>{message}</AppText>
+        </View>
       ) : null}
 
       {!isSignUp ? (
@@ -165,7 +173,10 @@ export function AuthForm({ mode }: AuthFormProps) {
       </View>
 
       <AppText variant="caption" tone="secondary" align="center" style={{ marginTop: spacing.xl }}>
-        En continuant, tu acceptes nos conditions et notre politique de confidentialité.
+        En continuant, tu acceptes nos{' '}
+        <AppText variant="caption" color={colors.primary} onPress={() => router.push('/legal/terms')}>conditions</AppText>
+        {' '}et notre{' '}
+        <AppText variant="caption" color={colors.primary} onPress={() => router.push('/legal/privacy')}>politique de confidentialité</AppText>.
       </AppText>
 
       <Pressable onPress={() => router.replace(isSignUp ? '/(auth)/sign-in' : '/(auth)/sign-up')} style={{ marginTop: spacing.lg }}>
@@ -186,9 +197,13 @@ function SocialButton({ provider, label }: { provider: 'google' | 'apple'; label
   const fg = isApple ? '#FFFFFF' : '#1F1F1F';
   const iconColor = isApple ? '#FFFFFF' : '#4285F4';
   const borderColor = isApple ? '#000000' : '#DADCE0';
+  const name = isApple ? 'Apple' : 'Google';
 
   return (
     <Pressable
+      onPress={() => Alert.alert(`Connexion ${name}`, `La connexion avec ${name} arrive bientôt. Utilise ton e-mail pour l’instant.`)}
+      accessibilityRole="button"
+      accessibilityLabel={label}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

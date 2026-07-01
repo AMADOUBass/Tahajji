@@ -47,7 +47,7 @@ export default function EditProfileScreen() {
   const initial = (displayName || 'A').charAt(0).toUpperCase();
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
+    <Screen scroll keyboardAvoiding contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
       {/* En-tête */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm }}>
         <Pressable onPress={() => router.back()} hitSlop={10}>

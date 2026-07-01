@@ -48,7 +48,7 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
+    <Screen scroll keyboardAvoiding contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
       <View style={{ marginTop: spacing.xxl }}>
         <AppText variant="h2">Nouveau mot de passe</AppText>
         <AppText variant="body" tone="secondary" style={{ marginTop: spacing.sm }}>

@@ -53,7 +53,7 @@ export default function VerifyOtpScreen() {
   };
 
   return (
-    <Screen scroll contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
+    <Screen scroll keyboardAvoiding contentStyle={{ paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl }}>
       <Pressable
         onPress={() => router.back()}
         style={{
