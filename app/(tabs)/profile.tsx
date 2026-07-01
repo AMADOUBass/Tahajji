@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Alert, Pressable, Switch, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Modal, Pressable, Switch, View } from 'react-native';
 
 import { AppText, Card, ProgressBar, Screen } from '@/components/ui';
 import { computeBadges, levelFromXp } from '@/lib/gamification';
@@ -23,6 +24,16 @@ export default function ProfileScreen() {
   const remindersEnabled = usePrefsStore((s) => s.remindersEnabled);
   const reminderHour = usePrefsStore((s) => s.reminderHour);
   const setRemindersEnabled = usePrefsStore((s) => s.setRemindersEnabled);
+  const setReminderHour = usePrefsStore((s) => s.setReminderHour);
+  const [hourPicker, setHourPicker] = useState(false);
+
+  const HOURS = [6, 7, 8, 12, 18, 19, 20, 21];
+  const hourLabel = (h: number) => `${String(h).padStart(2, '0')}:00`;
+  const changeHour = async (h: number) => {
+    setReminderHour(h);
+    setHourPicker(false);
+    if (remindersEnabled) await scheduleDailyReminder(h);
+  };
 
   const toggleReminders = async (value: boolean) => {
     if (value) {
@@ -151,6 +162,16 @@ export default function ProfileScreen() {
             thumbColor={colors.onPrimary}
           />
         </SettingRow>
+        {remindersEnabled ? (
+          <Pressable onPress={() => setHourPicker(true)}>
+            <SettingRow icon="time-outline" label="Heure du rappel">
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <AppText variant="bodyStrong" color={colors.primary}>{hourLabel(reminderHour)}</AppText>
+                <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+              </View>
+            </SettingRow>
+          </Pressable>
+        ) : null}
         {/* Toggle de DEV uniquement (jamais en production) : simule le premium. */}
         {__DEV__ ? (
           <SettingRow icon="diamond-outline" label="Premium (démo)">
@@ -188,6 +209,28 @@ export default function ProfileScreen() {
           </SettingRow>
         </Pressable>
       </Card>
+
+      {/* Fiche : choix de l'heure du rappel */}
+      <Modal visible={hourPicker} transparent animationType="fade" onRequestClose={() => setHourPicker(false)}>
+        <Pressable
+          onPress={() => setHourPicker(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center', padding: spacing.xl }}
+        >
+          <Pressable onPress={() => {}} style={{ width: '100%', maxWidth: 320, backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg }}>
+            <AppText variant="title" align="center" style={{ marginBottom: spacing.md }}>Heure du rappel</AppText>
+            {HOURS.map((h, i) => (
+              <Pressable
+                key={h}
+                onPress={() => changeHour(h)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.md, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: colors.line }}
+              >
+                <AppText variant="bodyStrong" color={h === reminderHour ? colors.primary : colors.text}>{hourLabel(h)}</AppText>
+                {h === reminderHour ? <Ionicons name="checkmark" size={20} color={colors.primary} /> : null}
+              </Pressable>
+            ))}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </Screen>
   );
 }

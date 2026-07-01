@@ -9,6 +9,7 @@ interface PrefsState {
   remindersEnabled: boolean;
   reminderHour: number;
   setRemindersEnabled: (v: boolean) => void;
+  setReminderHour: (h: number) => void;
 }
 
 export const usePrefsStore = create<PrefsState>()(
@@ -17,6 +18,7 @@ export const usePrefsStore = create<PrefsState>()(
       remindersEnabled: false,
       reminderHour: 19,
       setRemindersEnabled: (remindersEnabled) => set({ remindersEnabled }),
+      setReminderHour: (reminderHour) => set({ reminderHour }),
     }),
     {
       name: 'tahajji-prefs',
