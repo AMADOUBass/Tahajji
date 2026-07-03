@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Asset } from 'expo-asset';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, Share, View } from 'react-native';
@@ -28,6 +29,20 @@ export default function LevelCompleteScreen() {
     if (failed) hapticError();
     else hapticSuccess();
   }, [failed]);
+
+  // Partage avec le logo de l'app (image sur iOS ; texte sur Android).
+  const shareSuccess = async () => {
+    try {
+      const asset = Asset.fromModule(require('../../assets/images/icon.png'));
+      await asset.downloadAsync();
+      await Share.share({
+        message: 'J’apprends à lire le Coran, pas à pas, avec Tahajji.',
+        url: asset.localUri ?? undefined,
+      });
+    } catch {
+      // ignore
+    }
+  };
 
   const { data: lessons } = useLessons();
   const lesson = lessons?.find((l) => l.id === lessonId);
@@ -124,10 +139,7 @@ export default function LevelCompleteScreen() {
       </View>
 
       <Button label="Continuer" variant="gold" onPress={() => router.replace('/')} />
-      <Pressable
-        style={{ marginTop: spacing.md, paddingVertical: spacing.sm }}
-        onPress={() => Share.share({ message: 'J’apprends à lire le Coran, pas à pas, avec Tahajji.' }).catch(() => {})}
-      >
+      <Pressable style={{ marginTop: spacing.md, paddingVertical: spacing.sm }} onPress={shareSuccess}>
         <AppText variant="bodyStrong" align="center" color="rgba(255,253,247,0.8)">Partager ma réussite</AppText>
       </Pressable>
     </Screen>
