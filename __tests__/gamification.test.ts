@@ -27,23 +27,24 @@ describe('computeBadges', () => {
   it('aucun badge gagné pour un nouveau compte', () => {
     const badges = computeBadges({ xp: 0, streak: 0, completedCount: 0, level: 1 });
     expect(badges.every((b) => !b.earned)).toBe(true);
-    expect(badges).toHaveLength(6);
+    expect(badges.length).toBeGreaterThan(0);
   });
 
-  it('débloque la 1ʳᵉ leçon dès une leçon terminée', () => {
+  it('débloque le 1er palier de leçons dès une leçon terminée', () => {
     const badges = computeBadges({ xp: 50, streak: 1, completedCount: 1, level: 1 });
-    expect(badges.find((b) => b.id === 'first')?.earned).toBe(true);
-    expect(badges.find((b) => b.id === 'five')?.earned).toBe(false);
+    expect(badges.find((b) => b.id === 'lessons-1')?.earned).toBe(true);
+    expect(badges.find((b) => b.id === 'lessons-5')?.earned).toBe(false);
   });
 
   it('débloque les paliers selon les seuils', () => {
-    const badges = computeBadges({ xp: 200, streak: 3, completedCount: 10, level: 5 });
+    const badges = computeBadges({ xp: 1000, streak: 30, completedCount: 25, level: 10 });
     const earned = Object.fromEntries(badges.map((b) => [b.id, b.earned]));
-    expect(earned.first).toBe(true);
-    expect(earned.five).toBe(true);
-    expect(earned.streak3).toBe(true);
-    expect(earned.xp200).toBe(true);
-    expect(earned.ten).toBe(true);
-    expect(earned.level5).toBe(true);
+    expect(earned['lessons-25']).toBe(true);
+    expect(earned['lessons-50']).toBe(false);
+    expect(earned['streak-30']).toBe(true);
+    expect(earned['streak-100']).toBe(false);
+    expect(earned['xp-1000']).toBe(true);
+    expect(earned['level-10']).toBe(true);
+    expect(earned['level-20']).toBe(false);
   });
 });

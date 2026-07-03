@@ -19,6 +19,10 @@ export interface Badge {
   earned: boolean;
 }
 
+/**
+ * Badges générés dynamiquement à partir de PALIERS. Ajouter un palier = une ligne.
+ * Affichés en défilement horizontal (ne prend qu'une ligne à l'écran).
+ */
 export function computeBadges(opts: {
   xp: number;
   streak: number;
@@ -26,12 +30,19 @@ export function computeBadges(opts: {
   level: number;
 }): Badge[] {
   const { xp, streak, completedCount, level } = opts;
-  return [
-    { id: 'first', label: '1ʳᵉ leçon', icon: 'footsteps', earned: completedCount >= 1 },
-    { id: 'five', label: '5 leçons', icon: 'ribbon', earned: completedCount >= 5 },
-    { id: 'streak3', label: 'Série 3 j', icon: 'flame', earned: streak >= 3 },
-    { id: 'xp200', label: '200 XP', icon: 'star', earned: xp >= 200 },
-    { id: 'ten', label: '10 leçons', icon: 'school', earned: completedCount >= 10 },
-    { id: 'level5', label: 'Niveau 5', icon: 'trophy', earned: level >= 5 },
+  const badges: Badge[] = [];
+
+  const tiers = [
+    { key: 'lessons', icon: 'school' as const, value: completedCount, steps: [1, 5, 10, 25, 50], label: (n: number) => `${n} leçon${n > 1 ? 's' : ''}` },
+    { key: 'streak', icon: 'flame' as const, value: streak, steps: [3, 7, 30, 100], label: (n: number) => `Série ${n} j` },
+    { key: 'xp', icon: 'star' as const, value: xp, steps: [100, 500, 1000, 5000], label: (n: number) => `${n} XP` },
+    { key: 'level', icon: 'trophy' as const, value: level, steps: [5, 10, 20], label: (n: number) => `Niveau ${n}` },
   ];
+
+  for (const t of tiers) {
+    for (const step of t.steps) {
+      badges.push({ id: `${t.key}-${step}`, label: t.label(step), icon: t.icon, earned: t.value >= step });
+    }
+  }
+  return badges;
 }

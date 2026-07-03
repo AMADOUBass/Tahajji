@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Modal, Pressable, Switch, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Switch, View } from 'react-native';
 
 import { AppText, Card, ProgressBar, Screen } from '@/components/ui';
 import { computeBadges, levelFromXp } from '@/lib/gamification';
@@ -57,6 +57,8 @@ export default function ProfileScreen() {
   const { level, xpInLevel, xpForLevel, progress: levelProgress } = levelFromXp(xp);
   const badges = computeBadges({ xp, streak: profile?.streakCount ?? 0, completedCount: lessonsCompleted, level });
   const earnedCount = badges.filter((b) => b.earned).length;
+  // Gagnés en premier (plus valorisant).
+  const sortedBadges = [...badges].sort((a, b) => Number(b.earned) - Number(a.earned));
 
   return (
     <Screen scroll contentStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxxl }}>
@@ -111,9 +113,9 @@ export default function ProfileScreen() {
         <AppText variant="title">Badges</AppText>
         <AppText variant="caption" tone="secondary">{earnedCount}/{badges.length} débloqués</AppText>
       </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
-        {badges.map((b) => (
-          <View key={b.id} style={{ alignItems: 'center', width: 88, gap: 6 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md, paddingRight: spacing.lg }}>
+        {sortedBadges.map((b) => (
+          <View key={b.id} style={{ alignItems: 'center', width: 72, gap: 6 }}>
             <View
               style={{
                 width: 56,
@@ -126,10 +128,10 @@ export default function ProfileScreen() {
             >
               <Ionicons name={b.icon} size={26} color={b.earned ? '#fff' : colors.lockedInk} />
             </View>
-            <AppText variant="caption" tone={b.earned ? 'default' : 'secondary'} align="center">{b.label}</AppText>
+            <AppText variant="caption" tone={b.earned ? 'default' : 'secondary'} align="center" numberOfLines={1}>{b.label}</AppText>
           </View>
         ))}
-      </View>
+      </ScrollView>
 
       {/* Premium / paywall */}
       <Pressable onPress={() => router.push('/paywall')} style={{ marginTop: spacing.xl }}>
