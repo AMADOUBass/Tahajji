@@ -135,7 +135,18 @@ export default function QuizScreen() {
             {heartsActive ? <ExamFact icon="heart" color={colors.coral} text="Tes cœurs sont en jeu (−1 par erreur)" /> : null}
           </View>
         </View>
-        <Button label="Commencer l’examen" variant="gold" onPress={() => setStarted(true)} style={{ marginBottom: spacing.xl }} />
+        {heartsActive && effectiveHearts(profile).count <= 0 ? (
+          <View style={{ marginBottom: spacing.xl, gap: spacing.sm, alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+              <Ionicons name="heart-dislike" size={20} color={colors.coral} />
+              <AppText variant="bodyStrong" color={colors.coral}>Plus de cœurs pour l’examen</AppText>
+            </View>
+            <AppText variant="caption" tone="secondary" align="center">Révise une leçon pour regagner un cœur, puis reviens.</AppText>
+            <Button label="Retour" variant="secondary" onPress={() => router.back()} />
+          </View>
+        ) : (
+          <Button label="Commencer l’examen" variant="gold" onPress={() => setStarted(true)} style={{ marginBottom: spacing.xl }} />
+        )}
       </Screen>
     );
   }

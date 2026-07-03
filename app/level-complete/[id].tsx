@@ -50,7 +50,7 @@ export default function LevelCompleteScreen() {
             </View>
           </Animated.View>
 
-          <Animated.View entering={FadeInUp.delay(150)} style={{ alignItems: 'center', gap: spacing.lg }}>
+          <Animated.View entering={FadeInUp.delay(150)} style={{ alignItems: 'center', gap: spacing.lg, alignSelf: 'stretch' }}>
             <AppText variant="overline" color={colors.coral}>Examen non validé</AppText>
             <AppText variant="h2" color={onPrimary} align="center">Presque ! Réessaie</AppText>
             <AppText variant="body" color="rgba(255,253,247,0.85)" align="center">

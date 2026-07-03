@@ -188,7 +188,7 @@ export default function SurahScreen() {
               last={i === verses!.length - 1}
               isCurrent={currentIndex === i}
               playing={currentIndex === i && status.playing}
-              onPlay={() => { hapticLight(); playVerse(i); }}
+              onPlay={() => { hapticLight(); if (i === currentIndex) togglePlay(); else playVerse(i); }}
               onLayout={(y) => { versePos.current[i] = y; }}
             />
           ))
