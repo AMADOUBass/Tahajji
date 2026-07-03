@@ -47,6 +47,19 @@ for (let y = 0; y < H; y++) {
 }
 await sharp(badge, { raw: { width: W, height: H, channels: 4 } }).png().trim().toFile(`${OUT}/logo-badge.png`);
 
+// 2b) VERSION ACCUEIL : on GARDE les coins blancs (à peine visibles sur le crème),
+//     on couvre seulement le filigrane. C'est le rendu d'origine, symétrique.
+const welcome = Buffer.from(raw);
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    if (isWatermark(x, y) && !nearWhite(welcome[i], welcome[i + 1], welcome[i + 2])) {
+      welcome[i] = ESP.r; welcome[i + 1] = ESP.g; welcome[i + 2] = ESP.b; // couvre le filigrane, garde les coins blancs
+    }
+  }
+}
+await sharp(welcome, { raw: { width: W, height: H, channels: 4 } }).png().toFile(`${OUT}/logo-welcome.png`);
+
 // 3) ÉTOILE SEULE : recadrée sur l'or (bbox 184→839), fond espresso → transparent.
 const PAD = 8;
 const L = 184 - PAD, T = 184 - PAD, SIZE = (839 - 184) + 1 + 2 * PAD;
