@@ -12,9 +12,10 @@ import type { Story } from '@/types/models';
 
 const CATEGORIES: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap }> = {
   prophetes: { label: 'Prophètes', icon: 'people-outline' },
+  femmes: { label: 'Femmes de l’islam', icon: 'flower-outline' },
+  compagnons: { label: 'Compagnons', icon: 'people-circle-outline' },
   histoire: { label: 'Histoire de l’islam', icon: 'time-outline' },
   valeurs: { label: 'Valeurs', icon: 'heart-outline' },
-  compagnons: { label: 'Compagnons', icon: 'people-circle-outline' },
 };
 
 export default function StoriesScreen() {
