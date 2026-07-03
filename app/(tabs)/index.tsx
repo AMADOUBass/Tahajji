@@ -353,7 +353,7 @@ function LessonNode({
       <AppText
         variant="caption"
         align="center"
-        numberOfLines={1}
+        numberOfLines={2}
         color={locked && !inProgress ? colors.lockedInk : colors.text}
         style={{ marginTop: spacing.xs, width: 160, fontFamily: fonts.semibold, fontSize: 11.5 }}
       >

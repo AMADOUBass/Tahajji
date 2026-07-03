@@ -96,7 +96,7 @@ function StoryRow({ story, index }: { story: Story; index: number }) {
           <Ionicons name={(story.icon as keyof typeof Ionicons.glyphMap) ?? 'book-outline'} size={22} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
-          <AppText variant="title" numberOfLines={1}>{story.title}</AppText>
+          <AppText variant="title" numberOfLines={2}>{story.title}</AppText>
           {story.summary ? (
             <AppText variant="caption" tone="secondary" numberOfLines={2} style={{ marginTop: 2 }}>{story.summary}</AppText>
           ) : null}
