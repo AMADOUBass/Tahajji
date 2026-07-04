@@ -11,7 +11,7 @@ interface LogoProps {
 export function Logo({ size = 70 }: LogoProps) {
   return (
     <Image
-      source={require('../../assets/images/logo-welcome.png')}
+      source={require('../../assets/images/splash-icon.png')}
       style={{ width: size, height: size }}
       resizeMode="contain"
       accessibilityLabel="Logo Tahajji"
